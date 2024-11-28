@@ -13,11 +13,20 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->integer('role_id');
+            $table->integer('position_id');
+            $table->integer('department_id');
             $table->string('name');
+            $table->string('username');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            // $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('avatar')->default('profile.jpg')->nullable();
+            $table->string('sign')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
+            $table->timestamp('last_login')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
 

@@ -1,0 +1,89 @@
+* {
+    scroll-behavior: smooth;
+    font-family: "Figtree", sans-serif;
+}
+
+.rounded-partner {
+    border-radius: 20px;
+}
+
+/* FORM CONTROL FOCUS */
+/* .form-control:focus {
+    border-color: rgba(241, 93, 75, 0.75);
+    box-shadow: 0 0 0 0.2rem rgba(241, 93, 75, 0.5);
+} */
+
+/* Login Page */
+.background {
+    background-image: url(/assets/img/background/Pattern_Dark.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #000000;
+}
+.login_card {
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    border-color: rgba(0, 85, 255, 0.75);
+    box-shadow: 0 0 0 0.35rem rgba(0, 85, 255, 0.25);
+}
+
+/* Asset */
+.badge-orange {
+    /* border: 1px solid;
+    border-color: rgba(241, 93, 75, 1); */
+    background-color: #ff9130;
+    color: #fff;
+}
+
+/* Nav Rounded */
+.nav-tabs .rounded {
+    border-top-left-radius: 20px !important;
+}
+
+/* Sidebar */
+
+/* input {
+    background-color: #f15d4b !important;
+} */
+
+/* Sweetalert custom color */
+.colored-toast.swal2-icon-success {
+    background-color: #a5dc86 !important;
+}
+
+.colored-toast.swal2-icon-error {
+    background-color: #f27474 !important;
+}
+
+.colored-toast.swal2-icon-warning {
+    background-color: #f8bb86 !important;
+}
+
+.colored-toast.swal2-icon-info {
+    background-color: #3fc3ee !important;
+}
+
+.colored-toast.swal2-icon-question {
+    background-color: #87adbd !important;
+}
+
+.colored-toast .swal2-title {
+    color: white;
+}
+
+.colored-toast .swal2-close {
+    color: white;
+}
+
+.colored-toast .swal2-html-container {
+    color: white;
+}
+
+/* Cell color */
+.bg-success-2 {
+    background-color: #b6d7a8;
+}

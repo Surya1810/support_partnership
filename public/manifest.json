@@ -1,0 +1,17 @@
+{
+    "name": "Support Partnership",
+    "short_name": "SP",
+    "start_url": "/index.php",
+    "background_color": "#0055FF",
+    "description": "Website for support Partnership team",
+    "display": "fullscreen",
+    "theme_color": "#ffffff",
+    "icons": [
+        {
+            "src": "/assets/logo/main_icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
