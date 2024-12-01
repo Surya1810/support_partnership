@@ -2,9 +2,31 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
-    //
+    use HasFactory, SoftDeletes;
+
+    protected $casts = [
+        'deadline' => 'datetime',
+        'start' => 'datetime'
+    ];
+
+    protected $dates = ['deleted_at'];
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+    public function pic()
+    {
+        return $this->belongsTo(User::class, 'pic_id');
+    }
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
 }

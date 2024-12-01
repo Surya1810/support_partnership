@@ -24,6 +24,9 @@
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous">
     </script>
 
+    <!-- Sweetalert2 -->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -39,6 +42,68 @@
 
     <!-- Jquery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+    <!-- Sweetalert2 -->
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            iconColor: 'white',
+            customClass: {
+                popup: 'colored-toast'
+            },
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true
+        })
+
+        @if (session('pesan'))
+            @switch(session('level-alert'))
+                @case('alert-success')
+                Toast.fire({
+                    icon: 'success',
+                    title: '{{ Session::get('pesan') }}'
+                })
+                @break
+
+                @case('alert-danger')
+                Toast.fire({
+                    icon: 'error',
+                    title: '{{ Session::get('pesan') }}'
+                })
+                @break
+
+                @case('alert-warning')
+                Toast.fire({
+                    icon: 'warning',
+                    title: '{{ Session::get('pesan') }}'
+                })
+                @break
+
+                @case('alert-question')
+                Toast.fire({
+                    icon: 'question',
+                    title: '{{ Session::get('pesan') }}'
+                })
+                @break
+
+                @default
+                Toast.fire({
+                    icon: 'info',
+                    title: '{{ Session::get('pesan') }}'
+                })
+            @endswitch
+        @endif
+        @if (count($errors) > 0)
+            @foreach ($errors->all() as $error)
+                Toast.fire({
+                    icon: 'error',
+                    title: '{{ $error }}'
+                })
+            @endforeach
+        @endif
+    </script>
+
     @stack('scripts')
 </body>
 

@@ -12,7 +12,8 @@ class ClientController extends Controller
      */
     public function index()
     {
-        //
+        $clients = Client::where('is_active', true)->get();
+        return view('client.index', compact('clients'));
     }
 
     /**

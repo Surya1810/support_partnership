@@ -44,9 +44,32 @@
                                     @enderror
                                 </div>
 
-                                <button type="submit" class="btn btn-primary mt-3 px-3 float-end">
-                                    {{ __('LOG IN') }}
-                                </button>
+                                <div class="row mb-4">
+                                    <div class="col-6">
+                                        <div class="icheck-primary">
+                                            <input class="form-check-input" type="checkbox" name="remember" id="remember"
+                                                {{ old('remember') ? 'checked' : '' }}>
+                                            <label for="remember">
+                                                {{ __('Ingat Saya') }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    @if (Route::has('password.request'))
+                                        <div class="col-6">
+                                            <a href="{{ route('password.request') }}"
+                                                class="text-decoration-none float-end">
+                                                {{ __('Lupa Password?') }}
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-lg btn-primary px-3 rounded-5 w-100"
+                                        style="font-weight: 500;font-size: 15px">
+                                        {{ __('Login') }}
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>

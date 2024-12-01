@@ -12,7 +12,8 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        //
+        $suppliers = Supplier::where('is_active', true)->get();
+        return view('supplier.index', compact('suppliers'));
     }
 
     /**

@@ -15,16 +15,13 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- PWA  -->
-    <meta name="theme-color" content="#ffffff" />
-    <link rel="apple-touch-icon" href="{{ asset('favicons/android-chrome-512x512.png') }}">
-    <link rel="manifest" href="{{ asset('/manifest.json') }}">
-
-    <!-- Favicons -->
-    <link rel="icon" type="image/png" href="{{ asset('favicons/favicon-48x48.png') }}" sizes="48x48" />
+    <link rel="icon" type="image/png" href="{{ asset('favicons/favicon-96x96.png') }}" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicons/favicon.svg') }}" />
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicons/apple-touch-icon.png') }}" />
+    <meta name="apple-mobile-web-app-title" content="Partnership Support" />
     <link rel="manifest" href="{{ asset('favicons/site.webmanifest') }}" />
+    <meta name="theme-color" content="#ffffff" />
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/FontAwesome/6.2.1/css/all.min.css') }}">
@@ -115,14 +112,6 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column nav-legacy nav-child-indent nav-collapse-hide-child"
                         data-widget="treeview" role="menu" data-accordion="false">
-                        {{-- <li class="nav-item">
-                            <a href="{{ route('dashboard') }}" class="nav-link">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Dashboard
-                                </p>
-                            </a>
-                        </li> --}}
                         <li class="nav-item">
                             <a href="{{ route('dashboard') }}" class="nav-link">
                                 <i class="nav-icon fa-solid fa-house"></i>
@@ -141,7 +130,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="{{ route('department.index') }}" class="nav-link">
                                 <i class="nav-icon fa-solid fa-users-viewfinder"></i>
                                 <p>
                                     Department
@@ -181,20 +170,28 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-header mt-3">DATA</li>
+                        <li class="nav-header mt-3">DATABASE</li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon fa-solid fa-handshake"></i>
+                            <a href="{{ route('client.index') }}" class="nav-link">
+                                <i class="nav-icon fa-regular fa-handshake"></i>
                                 <p>
                                     Client
                                 </p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="{{ route('supplier.index') }}" class="nav-link">
                                 <i class="nav-icon fa-solid fa-warehouse"></i>
                                 <p>
                                     Supplier
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('partner.index') }}" class="nav-link">
+                                <i class="nav-icon fa-solid fa-helmet-safety"></i>
+                                <p>
+                                    Partner
                                 </p>
                             </a>
                         </li>

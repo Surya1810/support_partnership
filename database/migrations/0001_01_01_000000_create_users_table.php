@@ -22,6 +22,7 @@ return new class extends Migration
             // $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('avatar')->default('profile.jpg')->nullable();
+            $table->string('barcode')->nullable();
             $table->string('sign')->nullable();
             $table->boolean('is_active')->default(true);
             $table->rememberToken();

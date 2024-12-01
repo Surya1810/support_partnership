@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -42,4 +45,15 @@ Route::middleware('auth')->group(function () {
     Route::resource('task', TaskController::class)->except([
         'store'
     ]);
+    Route::post('/task/{id}', [TaskController::class, 'store'])->name('task.store');
+    Route::get('/task/status/{id}', [TaskController::class, 'status'])->name('task.status');
+
+    // Client
+    Route::resource('client', ClientController::class);
+
+    // Supplier
+    Route::resource('supplier', SupplierController::class);
+
+    // Partner
+    Route::resource('partner', PartnerController::class);
 });
