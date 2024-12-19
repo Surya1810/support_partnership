@@ -13,7 +13,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::where('is_active', true)->get();
         return view('employee.index', compact('users'));
     }
 

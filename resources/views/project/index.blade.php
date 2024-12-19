@@ -53,7 +53,7 @@
                             <table id="projectTable" class="table table-bordered text-nowrap">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th style="width: 50%">
+                                        <th style="width: 45%">
                                             Project Name
                                         </th>
                                         <th style="width: 18%">
@@ -64,6 +64,9 @@
                                         </th>
                                         <th style="width: 5%">
                                             Due Date
+                                        </th>
+                                        <th style="width: 5%">
+                                            Days
                                         </th>
                                         <th style="width: 5%">
                                             Status
@@ -120,6 +123,17 @@
                                                 </td>
                                             @else
                                                 <td>{{ $project->deadline->toFormattedDateString('d/m/y') }}</td>
+                                            @endif
+                                            @if ($project->deadline->isPast())
+                                                <td bgcolor="ea9999">
+                                                    {{ $project->deadline->diffInDays($today, true) }} days
+                                                </td>
+                                            @elseif ($project->deadline->diffInDays($today) <= '7')
+                                                <td bgcolor="ffe599" class="text-black">
+                                                    {{ $project->deadline->diffInDays($today, true) }} days
+                                                </td>
+                                            @else
+                                                <td>{{ $project->deadline->diffInDays($today, true) }} days</td>
                                             @endif
                                             <td class="text-center">
                                                 @if ($project->status == 'Finished')

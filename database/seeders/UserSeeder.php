@@ -32,18 +32,27 @@ class UserSeeder extends Seeder
             'password' => bcrypt('123'),
         ]);
         $user = User::create([
+            'role_id' => '3',
+            'position_id' => '1',
+            'department_id' => '5',
+            'name' => 'Rudy Haryanto',
+            'username' => 'Rudy',
+            'email' => 'rudy@partnership.co.id',
+            'password' => bcrypt('123'),
+        ]);
+        $user = User::create([
             'role_id' => '4',
             'position_id' => '1',
-            'department_id' => '1',
+            'department_id' => '3',
             'name' => 'Encep Zainul Syah',
             'username' => 'Enza',
             'email' => 'enza@partnership.co.id',
             'password' => bcrypt('123'),
         ]);
         $user = User::create([
-            'role_id' => '1',
+            'role_id' => '4',
             'position_id' => '1',
-            'department_id' => '1',
+            'department_id' => '5',
             'name' => 'Surya Dinarta Halim',
             'username' => 'Surya',
             'email' => 'surya@partnership.co.id',

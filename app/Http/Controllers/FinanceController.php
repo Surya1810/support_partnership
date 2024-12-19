@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\File;
+use App\Models\Finance;
 use Illuminate\Http\Request;
 
-class FileController extends Controller
+class FinanceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('file.document');
+        //
     }
 
     /**
@@ -34,7 +34,7 @@ class FileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(File $file)
+    public function show(Finance $finance)
     {
         //
     }
@@ -42,7 +42,7 @@ class FileController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(File $file)
+    public function edit(Finance $finance)
     {
         //
     }
@@ -50,7 +50,7 @@ class FileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, File $file)
+    public function update(Request $request, Finance $finance)
     {
         //
     }
@@ -58,7 +58,7 @@ class FileController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(File $file)
+    public function destroy(Finance $finance)
     {
         //
     }

@@ -77,21 +77,16 @@
                                             <td>+{{ $client->number }}</td>
                                             <td>{{ $client->position }}</td>
                                             <td>
-                                                @if ($client->projects->every(fn($project) => $project->status != 'Finished'))
-                                                    <span class="badge badge-warning">On Progress</span>
-                                                @elseif ($client->projects->count() == 0)
+                                                @if ($client->projects->count() == 0)
                                                     <span class="badge badge-danger">New</span>
-                                                @elseif ($client->projects->every(fn($project) => $project->status == 'Finished'))
-                                                    <span class="badge badge-info">Maintanance</span>
+                                                @else
+                                                    @if ($client->projects->every(fn($project) => $project->status != 'Finished'))
+                                                        <span class="badge badge-warning">On Progress</span>
+                                                    @elseif ($client->projects->every(fn($project) => $project->status == 'Finished'))
+                                                        <span class="badge badge-info">Maintanance</span>
+                                                    @endif
                                                 @endif
                                             </td>
-                                            {{-- <td>
-                                                @if ($client->is_active == 1)
-                                                    Active
-                                                @else
-                                                    Disabled
-                                                @endif
-                                            </td> --}}
                                             <td>
                                                 <a href="https://wa.me/{{ $client->number }}" target="_blank"
                                                     class="btn btn-sm btn-success rounded-partner"> <i

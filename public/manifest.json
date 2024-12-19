@@ -1,0 +1,23 @@
+{
+        "name": "Partnership Support",
+    "short_name": "Partners",
+    "start_url": "/index.php",
+    "theme_color": "#ffffff",
+    "background_color": "#0055FF",
+    "display": "fullscreen",
+    "description": "Website for support Partnership team",
+    "icons": [
+        {
+            "src": "/favicons/web-app-manifest-192x192.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/favicons/web-app-manifest-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

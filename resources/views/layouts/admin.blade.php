@@ -4,6 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Partnership Support">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -20,7 +24,8 @@
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicons/apple-touch-icon.png') }}" />
     <meta name="apple-mobile-web-app-title" content="Partnership Support" />
-    <link rel="manifest" href="{{ asset('favicons/site.webmanifest') }}" />
+    {{-- <link rel="manifest" href="{{ asset('favicons/site.webmanifest') }}" /> --}}
+    <link rel="manifest" href="{{ asset('manifest.json') }}" />
     <meta name="theme-color" content="#ffffff" />
 
     <!-- Font Awesome Icons -->
@@ -54,6 +59,7 @@
 
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
+
                 <!-- Notifications Dropdown Menu -->
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="#">
@@ -81,6 +87,7 @@
                         <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
                     </div> --}}
                 </li>
+                <button id="installPWA" class="btn btn-sm btn-primary rounded-partner">Install App</button>
             </ul>
         </nav>
 
@@ -163,7 +170,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="{{ route('file.document') }}" class="nav-link">
                                 <i class="nav-icon fa-regular fa-folder-open"></i>
                                 <p>
                                     File
@@ -249,6 +256,7 @@
     <!-- AdminLTE App -->
     <script src="{{ asset('assets/adminLTE/dist/js/adminlte.min.js') }}"></script>
 
+    <!-- Service Worker -->
     <script src="{{ asset('/sw.js') }}"></script>
     <script>
         if ("serviceWorker" in navigator) {
@@ -267,6 +275,39 @@
         }
     </script>
 
+    <!-- Install Button PWA -->
+    <script>
+        let deferredPrompt;
+        const installButton = document.getElementById('installPWA');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.style.display = 'block';
+        });
+
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const {
+                    outcome
+                } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('PWA installed');
+                } else {
+                    console.log('PWA installation declined');
+                }
+                deferredPrompt = null;
+            }
+            installButton.style.display = 'none';
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installed successfully');
+        });
+    </script>
+
+    <!-- Active Class -->
     <script>
         /*** add active class and stay opened when selected ***/
         var url = window.location;

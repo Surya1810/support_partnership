@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SupplierController;
@@ -27,6 +30,11 @@ Route::middleware('auth')->group(function () {
     // Department
     Route::resource('department', DepartmentController::class);
 
+    // Finance
+    Route::resource('finance', FinanceController::class);
+    // Pengajuan
+    Route::resource('finance/pengajuan', PengajuanController::class);
+
     // Profile Section
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update/{id}', [ProfileController::class, 'update'])->name('profile.update');
@@ -47,6 +55,13 @@ Route::middleware('auth')->group(function () {
     ]);
     Route::post('/task/{id}', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/status/{id}', [TaskController::class, 'status'])->name('task.status');
+
+    // File
+    Route::resource('file', FileController::class);
+    Route::get('/document', [FileController::class, 'index'])->name('file.document');
+    Route::get('/compro', [FileController::class, 'compro'])->name('file.compro');
+    Route::get('/template', [FileController::class, 'template'])->name('file.template');
+
 
     // Client
     Route::resource('client', ClientController::class);
