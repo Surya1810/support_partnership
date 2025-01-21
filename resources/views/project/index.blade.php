@@ -43,7 +43,8 @@
                                 @if (auth()->user()->role_id != 5)
                                     <div class="col-6">
                                         <a href="{{ route('project.create') }}"
-                                            class="btn btn-sm btn-primary rounded-partner float-right">Create
+                                            class="btn btn-sm btn-primary rounded-partner float-right"><i
+                                                class="fas fa-plus"></i> Create
                                             Project</a>
                                     </div>
                                 @endif
@@ -126,14 +127,14 @@
                                             @endif
                                             @if ($project->deadline->isPast())
                                                 <td bgcolor="ea9999">
-                                                    {{ $project->deadline->diffInDays($today, true) }} days
+                                                    {{ $project->deadline->diffInDays($today, true) }} days`
                                                 </td>
                                             @elseif ($project->deadline->diffInDays($today) <= '7')
                                                 <td bgcolor="ffe599" class="text-black">
-                                                    {{ $project->deadline->diffInDays($today, true) }} days
+                                                    {{ $project->deadline->diffInDays($today, true) }} days`
                                                 </td>
                                             @else
-                                                <td>{{ $project->deadline->diffInDays($today, true) }} days</td>
+                                                <td>{{ $project->deadline->diffInDays($today, true) }} days`</td>
                                             @endif
                                             <td class="text-center">
                                                 @if ($project->status == 'Finished')

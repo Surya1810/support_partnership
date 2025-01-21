@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title')
-    Employee
+    Report
 @endsection
 
 @push('css')
@@ -18,10 +18,11 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Employee</h1>
+                    <h1>Report</h1>
                     <ol class="breadcrumb text-black-50">
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
-                        <li class="breadcrumb-item active"><strong>Employee</strong></li>
+                        <li class="breadcrumb-item">Finance</li>
+                        <li class="breadcrumb-item active"><strong>Report</strong></li>
                     </ol>
                 </div>
             </div>
@@ -32,56 +33,33 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-12">
+                <div class="col-12 col-md-4">
                     <div class="card card-outline rounded-partner card-primary">
-                        <div class="card-header">
-                            <div class="row align-items-center">
-                                <div class="col-6">
-                                    <h3 class="card-title">Employee List</h3>
-                                </div>
-                            </div>
+                        <div class="card-body">
+                            <p><strong>Cash Balance</strong></p>
+                            <h3>Rp<i class="fa-solid fa-infinity"></i></h3>
+                            <small>current</small>
+                            <hr>
                         </div>
-                        <div class="card-body table-responsive">
-                            <table id="employeeTable" class="table table-bordered text-nowrap text-center">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th style="width: 5%">
-                                            ID
-                                        </th>
-                                        <th>
-                                            Name
-                                        </th>
-                                        <th>
-                                            Position
-                                        </th>
-                                        <th>
-                                            Email
-                                        </th>
-                                        <th>
-                                            Department
-                                        </th>
-                                        <th>
-                                            Action
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($users as $key => $user)
-                                        <tr>
-                                            <td>{{ ++$key }}</td>
-                                            <td>{{ $user->name }}</td>
-                                            <td>{{ $user->role->name }}</td>
-                                            <td>{{ $user->email }}</td>
-                                            <td>
-                                                {{ $user->department->name }}
-                                            </td>
-                                            <td>
-
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card card-outline rounded-partner card-primary">
+                        <div class="card-body">
+                            <p><strong>Expenses</strong></p>
+                            <h3>Rp<i class="fa-solid fa-infinity"></i></h3>
+                            <small>this year</small>
+                            <hr>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card card-outline rounded-partner card-primary">
+                        <div class="card-body">
+                            <p><strong>Net Profit</strong></p>
+                            <h3>Rp<i class="fa-solid fa-infinity"></i></h3>
+                            <small>this year</small>
+                            <hr>
                         </div>
                     </div>
                 </div>
@@ -105,9 +83,21 @@
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 
-    <script type="text/javascript">
+    <script src="{{ asset('assets/adminLTE/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
+
+    <script>
+        $('.price').inputmask({
+            alias: 'numeric',
+            prefix: 'Rp',
+            digits: 0,
+            groupSeparator: '.',
+            autoGroup: true,
+            removeMaskOnSubmit: true,
+            rightAlign: false
+        });
+
         $(function() {
-            $('#employeeTable').DataTable({
+            $('#ledgerTable').DataTable({
                 "paging": true,
                 'processing': true,
                 "lengthChange": true,

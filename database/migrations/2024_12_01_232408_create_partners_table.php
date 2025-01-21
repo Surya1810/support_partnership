@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('contact');
             $table->string('number');
             $table->string('keyword');
-            $table->text('keterangan')->nullable();
+            $table->text('desc')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

@@ -29,7 +29,32 @@ class PartnerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'bail|required|max:255',
+            'contact' => 'bail|required|max:255',
+            'number' => 'bail|required|numeric|digits_between:10,15',
+            'keyword' => 'bail|required|max:255',
+            'desc' => 'bail|required|max:255',
+        ]);
+
+        $old = session()->getOldInput();
+
+        // Normalisasi nomor telepon
+        $phoneNumber = $request->number;
+        $normalizedNumber = ltrim($phoneNumber, '0'); // Hilangkan angka 0 di awal
+        if (!str_starts_with($normalizedNumber, '62')) {
+            $normalizedNumber = '62' . $normalizedNumber;
+        }
+
+        $partner = new Partner();
+        $partner->name = $request->name;
+        $partner->contact = $request->contact;
+        $partner->number = $normalizedNumber;
+        $partner->keyword = implode(",", $request->keyword);
+        $partner->desc = $request->desc;
+        $partner->save();
+
+        return redirect()->route('partner.index')->with(['pesan' => 'Partner created successfully', 'level-alert' => 'alert-success']);
     }
 
     /**
@@ -51,16 +76,43 @@ class PartnerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Partner $partner)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'bail|required|max:255',
+            'contact' => 'bail|required|max:255',
+            'number' => 'bail|required|numeric|digits_between:10,15',
+            // 'keyword' => 'bail|required|max:255',
+            'desc' => 'bail|required|max:255',
+        ]);
+
+        $partner = Partner::find($id);
+
+        // Normalisasi nomor telepon
+        $phoneNumber = $request->number;
+        $normalizedNumber = ltrim($phoneNumber, '0'); // Hilangkan angka 0 di awal
+        if (!str_starts_with($normalizedNumber, '62')) {
+            $normalizedNumber = '62' . $normalizedNumber;
+        }
+
+        $partner->name = $request->name;
+        $partner->contact = $request->contact;
+        $partner->number = $normalizedNumber;
+        // $partner->keyword = implode(",", $request->keyword);
+        $partner->desc = $request->desc;
+        $partner->update();
+
+        return redirect()->route('partner.index')->with(['pesan' => 'Partner updated successfully', 'level-alert' => 'alert-success']);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Partner $partner)
+    public function destroy($id)
     {
-        //
+        $partner = Partner::find($id);
+        $partner->delete();
+
+        return redirect()->route('partner.index')->with(['pesan' => 'Partner & projects deleted successfully', 'level-alert' => 'alert-danger']);
     }
 }

@@ -71,6 +71,9 @@
                                         <div class="col-lg-3">
                                             <div class="card rounded-partner">
                                                 <div class="card-body">
+                                                    <h5>Department</h5>
+                                                    {{ $project->department->name }}
+                                                    <hr>
                                                     <h5>PIC</h5>
                                                     {{ $project->pic->username }}
                                                     <hr>

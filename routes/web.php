@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\FileController;
+use App\Http\Controllers\ExpenseRequestController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\PengajuanController;
@@ -11,6 +11,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserExtensionController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 Route::get('/dashboard', function () {
     return view('home.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -27,11 +29,18 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // User | Employee
     Route::resource('employee', UserController::class);
+    Route::resource('user-data', UserExtensionController::class);
     // Department
     Route::resource('department', DepartmentController::class);
 
     // Finance
     Route::resource('finance', FinanceController::class);
+
+    Route::resource('application', ExpenseRequestController::class);
+    Route::put('/application/approve/{id}', [ExpenseRequestController::class, 'approve'])->name('application.approve');
+    Route::put('/application/reject/{id}', [ExpenseRequestController::class, 'reject'])->name('application.reject');
+    Route::put('/application/process/{id}', [ExpenseRequestController::class, 'process'])->name('application.process');
+
     // Pengajuan
     Route::resource('finance/pengajuan', PengajuanController::class);
 
@@ -55,13 +64,6 @@ Route::middleware('auth')->group(function () {
     ]);
     Route::post('/task/{id}', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/status/{id}', [TaskController::class, 'status'])->name('task.status');
-
-    // File
-    Route::resource('file', FileController::class);
-    Route::get('/document', [FileController::class, 'index'])->name('file.document');
-    Route::get('/compro', [FileController::class, 'compro'])->name('file.compro');
-    Route::get('/template', [FileController::class, 'template'])->name('file.template');
-
 
     // Client
     Route::resource('client', ClientController::class);

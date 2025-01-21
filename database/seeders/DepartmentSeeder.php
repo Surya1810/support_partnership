@@ -34,5 +34,8 @@ class DepartmentSeeder extends Seeder
         $Department = Department::create([
             'name' => 'Partnership Event Organizer & Mice'
         ]);
+        $Department = Department::create([
+            'name' => 'Finance'
+        ]);
     }
 }

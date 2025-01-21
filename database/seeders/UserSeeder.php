@@ -32,12 +32,39 @@ class UserSeeder extends Seeder
             'password' => bcrypt('123'),
         ]);
         $user = User::create([
+            'role_id' => '4',
+            'position_id' => '1',
+            'department_id' => '8',
+            'name' => 'Novia Fadhilah',
+            'username' => 'Novia',
+            'email' => 'novia@partnership.co.id',
+            'password' => bcrypt('123'),
+        ]);
+        $user = User::create([
+            'role_id' => '3',
+            'position_id' => '1',
+            'department_id' => '8',
+            'name' => 'Annisa Yulianti',
+            'username' => 'Annisa',
+            'email' => 'annisa@partnership.co.id',
+            'password' => bcrypt('123'),
+        ]);
+        $user = User::create([
             'role_id' => '3',
             'position_id' => '1',
             'department_id' => '5',
             'name' => 'Rudy Haryanto',
             'username' => 'Rudy',
             'email' => 'rudy@partnership.co.id',
+            'password' => bcrypt('123'),
+        ]);
+        $user = User::create([
+            'role_id' => '3',
+            'position_id' => '1',
+            'department_id' => '3',
+            'name' => 'Uci Ahmad',
+            'username' => 'Uci',
+            'email' => 'uci@partnership.co.id',
             'password' => bcrypt('123'),
         ]);
         $user = User::create([
@@ -56,6 +83,24 @@ class UserSeeder extends Seeder
             'name' => 'Surya Dinarta Halim',
             'username' => 'Surya',
             'email' => 'surya@partnership.co.id',
+            'password' => bcrypt('123'),
+        ]);
+        $user = User::create([
+            'role_id' => '4',
+            'position_id' => '1',
+            'department_id' => '3',
+            'name' => 'Duhan Arif',
+            'username' => 'Duhan',
+            'email' => 'duhan@partnership.co.id',
+            'password' => bcrypt('123'),
+        ]);
+        $user = User::create([
+            'role_id' => '5',
+            'position_id' => '1',
+            'department_id' => '3',
+            'name' => 'Dani Nugraha',
+            'username' => 'Dani',
+            'email' => 'dani@partnership.co.id',
             'password' => bcrypt('123'),
         ]);
     }

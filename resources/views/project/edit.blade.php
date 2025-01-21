@@ -90,7 +90,24 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="department_id">Department</label>
+                                        <select class="form-control department" style="width: 100%;" id="department_id"
+                                            name="department_id">
+                                            @foreach ($departments as $department)
+                                                <option {{ $project->department->id == $department->id ? 'selected' : '' }}
+                                                    value="{{ $department->id }}">{{ $department->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('department')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
                                     <div class="form-group">
                                         <label for="pic">PIC</label>
                                         <select class="form-control pic is-invalid" style="width: 100%;" id="pic"
@@ -107,7 +124,7 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-lg-4">
                                     <div class="form-group">
                                         <label for="assisten">Team Members</label>
                                         <select class="form-control team select2 @error('assisten') is-invalid @enderror"

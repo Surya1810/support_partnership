@@ -2,21 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Department;
-use App\Models\ExpenseRequest;
-use App\Models\Finance;
-use App\Models\User;
+use App\Models\Expense;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class FinanceController extends Controller
+class ExpenseController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('finance.index');
+        //
     }
 
     /**
@@ -38,7 +34,7 @@ class FinanceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Finance $finance)
+    public function show(Expense $expense)
     {
         //
     }
@@ -46,7 +42,7 @@ class FinanceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Finance $finance)
+    public function edit(Expense $expense)
     {
         //
     }
@@ -54,7 +50,7 @@ class FinanceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Finance $finance)
+    public function update(Request $request, Expense $expense)
     {
         //
     }
@@ -62,7 +58,7 @@ class FinanceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Finance $finance)
+    public function destroy(Expense $expense)
     {
         //
     }

@@ -46,6 +46,10 @@ class User extends Authenticatable
         ];
     }
 
+    public function extension()
+    {
+        return $this->hasOne(UserExtension::class);
+    }
     public function role()
     {
         return $this->belongsTo(Role::class);

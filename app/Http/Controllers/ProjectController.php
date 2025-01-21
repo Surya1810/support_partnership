@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\Department;
 use App\Models\Project;
 use App\Models\User;
 use Carbon\Carbon;
@@ -35,8 +36,9 @@ class ProjectController extends Controller
     public function create()
     {
         $users = User::where('id', '!=', '1')->get();
+        $departments = Department::all()->except(8);
         $clients = Client::all();
-        return view('project.create', compact('users', 'clients'));
+        return view('project.create', compact('users', 'clients', 'departments'));
     }
 
     /**
@@ -61,6 +63,7 @@ class ProjectController extends Controller
         $project = new Project();
         $project->name = $request->name;
         $project->client_id = $request->client;
+        $project->department_id = $request->department_id;
         $project->kode = (Str::random(5));
         $project->creative_brief = $request->creative_brief;
         $project->user_id = $request->pic;
@@ -90,8 +93,9 @@ class ProjectController extends Controller
         $project = Project::where('kode', $kode)->first();
         $users = User::where('id', '!=', '1')->get();
         $clients = Client::all();
+        $departments = Department::all()->except(8);
 
-        return view('project.edit', compact('project', 'users', 'clients'));
+        return view('project.edit', compact('project', 'users', 'clients', 'departments'));
     }
 
     /**
@@ -114,6 +118,7 @@ class ProjectController extends Controller
         $project = Project::find($id);
         $project->name = $request->name;
         $project->client_id = $request->client;
+        $project->department_id = $request->department_id;
         $project->creative_brief = $request->creative_brief;
         $project->user_id = $request->pic;
         $project->status = $request->status;

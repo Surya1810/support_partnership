@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('files', function (Blueprint $table) {
+        Schema::create('expense_items', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('expense_request_id')->constrained()->onDelete('cascade');
+            $table->string('item_name');
+            $table->integer('quantity')->default(1);
+            $table->decimal('unit_price', 15, 2);
+            $table->decimal('total_price', 15, 2);
             $table->timestamps();
         });
     }
@@ -22,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files');
+        Schema::dropIfExists('expense_items');
     }
 };

@@ -19,5 +19,11 @@ class ClientSeeder extends Seeder
             'number' => '6285310001999',
             'position' => 'Sekretaris Umum',
         ]);
+        $user = Client::create([
+            'name' => 'Dinas Pendidikan Kabupaten Pangandaran',
+            'contact' => 'Ibu Icha',
+            'number' => '628121446986',
+            'position' => 'Pengawas Mutu',
+        ]);
     }
 }

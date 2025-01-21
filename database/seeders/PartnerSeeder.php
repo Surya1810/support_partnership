@@ -18,7 +18,14 @@ class PartnerSeeder extends Seeder
             'contact' => 'Pak Hikmat Nugraha',
             'number' => '601112524065',
             'keyword' => 'geothermal,PSDMBP',
-            'keterangan' => 'Sales Asia Tenggara',
+            'desc' => 'Sales Asia Tenggara',
+        ]);
+        $partner = Partner::create([
+            'name' => 'Partnership Jepara',
+            'contact' => 'Pak Djambrong',
+            'number' => '628122997364',
+            'keyword' => 'interior, workshop',
+            'desc' => 'Workshop Partnership Jepara',
         ]);
     }
 }

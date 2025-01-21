@@ -91,7 +91,28 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="department_id"
+                                            class="mb-0 form-label col-form-label-sm">Department</label>
+                                        <select class="form-control department" style="width: 100%;" id="department_id"
+                                            name="department_id" required>
+                                            <option></option>
+                                            @foreach ($departments as $department)
+                                                <option value="{{ $department->id }}"
+                                                    {{ old('department_id') == $department->id ? 'selected' : '' }}>
+                                                    {{ $department->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('department_id')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
                                     <div class="form-group">
                                         <label for="pic">PIC</label>
                                         <select class="form-control pic" style="width: 100%;" id="pic" name="pic">
@@ -109,7 +130,7 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <div class="form-group">
                                         <label for="assisten">Team Members</label>
                                         <select class="form-control team select2 @error('assisten') is-invalid @enderror"
@@ -223,6 +244,10 @@
     <script>
         $(function() {
             //Initialize Select2 Elements
+            $('.department').select2({
+                placeholder: "Select Department",
+                allowClear: true,
+            })
             $('.pic').select2({
                 placeholder: "Select PIC",
                 allowClear: true,

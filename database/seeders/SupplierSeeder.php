@@ -18,7 +18,7 @@ class SupplierSeeder extends Seeder
             'contact' => 'Pak Yudhi',
             'number' => '628118204632',
             'keyword' => 'geothermal,PSDMBP',
-            'keterangan' => 'Sales Asahi',
+            'desc' => 'Sales Asahi',
         ]);
     }
 }

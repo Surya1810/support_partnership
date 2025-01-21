@@ -87,3 +87,10 @@
 .bg-success-2 {
     background-color: #b6d7a8;
 }
+
+.sidebar-collapse
+    .main-sidebar:hover
+    .nav-sidebar.nav-child-indent
+    .nav-treeview {
+    padding-left: 1rem;
+}

@@ -117,8 +117,8 @@
                 </div>
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column nav-legacy nav-child-indent nav-collapse-hide-child"
-                        data-widget="treeview" role="menu" data-accordion="false">
+                    <ul class="nav nav-pills nav-sidebar flex-column nav-legacy nav-child-indent" data-widget="treeview"
+                        role="menu" data-accordion="false">
                         <li class="nav-item">
                             <a href="{{ route('dashboard') }}" class="nav-link">
                                 <i class="nav-icon fa-solid fa-house"></i>
@@ -137,20 +137,26 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('department.index') }}" class="nav-link">
-                                <i class="nav-icon fa-solid fa-users-viewfinder"></i>
-                                <p>
-                                    Department
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fa-solid fa-chart-pie"></i>
+
                                 <p>
                                     Finance
+                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('finance.index') }}" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Report</p>
+                                    </a>
+                                    <a href="{{ route('application.index') }}" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Application</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-header mt-3">MANAGEMENT</li>
                         <li class="nav-item">
@@ -163,6 +169,14 @@
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link">
+                                <i class="nav-icon fa-solid fa-pencil"></i>
+                                <p>
+                                    Daily Task
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
                                 <i class="nav-icon fa-solid fa-file-signature"></i>
                                 <p>
                                     Notulen
@@ -170,10 +184,10 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('file.document') }}" class="nav-link">
-                                <i class="nav-icon fa-regular fa-folder-open"></i>
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fa-solid fa-computer"></i>
                                 <p>
-                                    File
+                                    Asset
                                 </p>
                             </a>
                         </li>
@@ -202,7 +216,6 @@
                                 </p>
                             </a>
                         </li>
-                        <hr>
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
