@@ -30,8 +30,8 @@ class UserExtensionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nik' => 'bail|required|max:255',
-            'npwp' => 'bail|required|max:255',
+            'nik' => 'bail|required|numeric|max:255',
+            'npwp' => 'bail|required|numeric|max:255',
             'phone' => 'bail|required|numeric|digits_between:10,15',
             'address' => 'bail|required|max:255',
             'religion' => 'bail|required|max:255',
@@ -47,7 +47,7 @@ class UserExtensionController extends Controller
             'senior_high' => 'bail|required|max:255',
             'college' => 'bail|required|max:255',
             'bank' => 'bail|required|max:255',
-            'account' => 'bail|required|max:255',
+            'account' => 'bail|required|numeric|max:255',
         ]);
 
         $old = session()->getOldInput();
