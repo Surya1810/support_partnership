@@ -21,7 +21,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
+// Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 Route::get('/dashboard', function () {
     return view('home.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

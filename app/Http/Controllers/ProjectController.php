@@ -158,13 +158,13 @@ class ProjectController extends Controller
 
         if ($project->status != 'Finished') {
             // find team
-            $asisten = explode(',', $project->assisten);
+            $asisten = explode(',', $project->assisten_id);
             $team = User::whereIn('id', $asisten)->pluck('id');
             // find pic
-            $pic = User::where('id', $project->pic)->pluck('id');
+            $pic = User::where('id', $project->user_id)->pluck('id');
             $pic_1 = explode(',', $pic);
             // find admin
-            $admin = [1, 9];
+            $admin = [1];
 
             $access = $pic->merge($team)->merge($admin);
 

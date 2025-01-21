@@ -155,7 +155,7 @@
                                 </button>
                             @endif
 
-                            @if (auth()->user()->id == 1 || auth()->user()->id == 9 || auth()->user()->id == 3)
+                            @if (auth()->user()->id == 1 || auth()->user()->id == $project->user_id)
                                 <button type="button" class="btn btn-success rounded-partner float-right"
                                     data-toggle="modal" data-target="#finishModal">
                                     <i class="fas fa-check"></i>
