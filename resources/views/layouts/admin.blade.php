@@ -167,30 +167,30 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fa-solid fa-pencil"></i>
                                 <p>
                                     Daily Task
                                 </p>
                             </a>
-                        </li>
-                        <li class="nav-item">
+                        </li> --}}
+                        {{-- <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fa-solid fa-file-signature"></i>
                                 <p>
                                     Notulen
                                 </p>
                             </a>
-                        </li>
-                        <li class="nav-item">
+                        </li> --}}
+                        {{-- <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fa-solid fa-computer"></i>
                                 <p>
                                     Asset
                                 </p>
                             </a>
-                        </li>
+                        </li> --}}
                         <li class="nav-header mt-3">DATABASE</li>
                         <li class="nav-item">
                             <a href="{{ route('client.index') }}" class="nav-link">
