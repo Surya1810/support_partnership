@@ -117,7 +117,7 @@ class ExpenseRequestController extends Controller
         $expenseRequest->total_amount = $totalAmount;
         $expenseRequest->save();
 
-        return redirect()->route('finance.application')->with(['pesan' => 'Application created successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('finance.index')->with(['pesan' => 'Application created successfully', 'level-alert' => 'alert-success']);
     }
 
     /**
@@ -155,7 +155,7 @@ class ExpenseRequestController extends Controller
         // Hapus pengajuan
         $expenseRequest->delete();
 
-        return redirect()->route('finance.application')->with(['pesan' => 'Application deleted successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('finance.index')->with(['pesan' => 'Application deleted successfully', 'level-alert' => 'alert-success']);
     }
 
     /**
@@ -202,7 +202,7 @@ class ExpenseRequestController extends Controller
             $this->sendToFinance($expenseRequest);
             $expenseRequest->save();
 
-            return redirect()->route('finance.application')->with(['pesan' => 'Application approved successfully by admin', 'level-alert' => 'alert-success']);
+            return redirect()->route('finance.index')->with(['pesan' => 'Application approved successfully by admin', 'level-alert' => 'alert-success']);
         }
 
         // Cek apakah approval selesai
@@ -215,7 +215,7 @@ class ExpenseRequestController extends Controller
 
         $expenseRequest->save();
 
-        return redirect()->route('finance.application')->with(['pesan' => 'Application approved successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('finance.index')->with(['pesan' => 'Application approved successfully', 'level-alert' => 'alert-success']);
     }
 
     private function sendToFinance($expenseRequest)
@@ -239,6 +239,6 @@ class ExpenseRequestController extends Controller
         $expenseRequest->status = 'report';
         $expenseRequest->save();
 
-        return redirect()->route('finance.application')->with(['pesan' => 'Application processed successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('finance.index')->with(['pesan' => 'Application processed successfully', 'level-alert' => 'alert-success']);
     }
 }
