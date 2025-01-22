@@ -86,6 +86,8 @@
                                                     <span class="badge badge-info">{{ $my_expense->status }}</span>
                                                 @elseif ($my_expense->status == 'report')
                                                     <span class="badge badge-warning">{{ $my_expense->status }}</span>
+                                                @elseif ($my_expense->status == 'rejected')
+                                                    <span class="badge badge-danger">{{ $my_expense->status }}</span>
                                                 @elseif ($my_expense->status == 'finish')
                                                     <span class="badge badge-success">{{ $my_expense->status }}</span>
                                                 @endif
@@ -151,6 +153,8 @@
                                                         <span class="badge badge-info">{{ $manager->status }}</span>
                                                     @elseif ($manager->status == 'report')
                                                         <span class="badge badge-warning">{{ $manager->status }}</span>
+                                                    @elseif ($my_expense->status == 'rejected')
+                                                        <span class="badge badge-danger">{{ $my_expense->status }}</span>
                                                     @elseif ($manager->status == 'finish')
                                                         <span class="badge badge-success">{{ $manager->status }}</span>
                                                     @endif
@@ -229,6 +233,8 @@
                                                         <span class="badge badge-info">{{ $direktur->status }}</span>
                                                     @elseif ($direktur->status == 'report')
                                                         <span class="badge badge-warning">{{ $direktur->status }}</span>
+                                                    @elseif ($my_expense->status == 'rejected')
+                                                        <span class="badge badge-danger">{{ $my_expense->status }}</span>
                                                     @elseif ($direktur->status == 'finish')
                                                         <span class="badge badge-success">{{ $direktur->status }}</span>
                                                     @endif
@@ -313,6 +319,8 @@
                                                     @elseif ($all_expense->status == 'report')
                                                         <span
                                                             class="badge badge-warning">{{ $all_expense->status }}</span>
+                                                    @elseif ($my_expense->status == 'rejected')
+                                                        <span class="badge badge-danger">{{ $my_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'finish')
                                                         <span
                                                             class="badge badge-success">{{ $all_expense->status }}</span>
@@ -341,7 +349,7 @@
                                                         </form>
                                                     </td>
                                                 @endif
-                                                @if (auth()->user()->department_id == 8 || $all_expense->status == 'processing')
+                                                @if (auth()->user()->department_id == 8 && $all_expense->status == 'processing')
                                                     <td>
                                                         <button class="btn btn-sm btn-success rounded-partner"
                                                             onclick="processExpense({{ $all_expense->id }})"><i
@@ -589,6 +597,7 @@
         </div>
     </div>
 
+    <!-- Modal Manager Approval-->
     @foreach ($managerRequests as $manager)
         <!-- Modal Show Approval-->
         <div class="modal fade" id="editStepModal{{ $manager->id }}" tabindex="-1"
@@ -686,6 +695,115 @@
                                 onclick="approveExpense({{ $manager->id }})">Approve</button>
                             <form id="delete-form-{{ $manager->id }}"
                                 action="{{ route('application.approve', $manager->id) }}" method="POST"
+                                style="display: none;">
+                                @csrf
+                                @method('PUT')
+                            </form>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    <!-- Modal Director Approval-->
+    @foreach ($directorRequests as $direktur)
+        <!-- Modal Show Approval-->
+        <div class="modal fade" id="editStepModal{{ $direktur->id }}" tabindex="-1"
+            aria-labelledby="editStepModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editStepModalLabel">Approval Application</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('application.approve', $direktur->id) }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="card rounded-partner">
+                                        <div class="card-body">
+                                            <h5>Name</h5>
+                                            {{ $direktur->user->name }}
+                                            <hr>
+                                            <h5>Department</h5>
+                                            {{ $direktur->department->name }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card rounded-partner">
+                                        <div class="card-body">
+                                            <h5>Category</h5>
+                                            {{ $direktur->category }}
+                                            <hr>
+                                            <h5>Use Date</h5>
+                                            {{ $direktur->use_date->toFormattedDateString('d/m/y') }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="col-lg-6">
+                                    <div class="card rounded-partner">
+                                        <div class="card-body">
+                                            <h5>Bank Name</h5>
+                                            {{ $direktur->bank_name }}
+                                            <hr>
+                                            <h5>Account Number</h5>
+                                            {{ $direktur->account_number }}
+                                            <hr>
+                                            <h5>Account Holder Name</h5>
+                                            {{ $direktur->account_holder_name }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card rounded-partner">
+                                        <div class="card-body">
+                                            <table class="table table-bordered" id="items-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item Name</th>
+                                                        <th>Qty</th>
+                                                        <th>Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($direktur->items as $item)
+                                                        <tr>
+                                                            <td>{{ $item->item_name }}</td>
+                                                            <td>{{ $item->quantity }}</td>
+                                                            <td>{{ formatRupiah($item->unit_price) }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                            <strong>Total Amount =
+                                            </strong>{{ formatRupiah($direktur->total_amount) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-sm btn-danger rounded-partner"
+                                onclick="rejectExpense({{ $direktur->id }})">Reject</button>
+                            <form id="delete-form-{{ $direktur->id }}"
+                                action="{{ route('application.reject', $direktur->id) }}" method="POST"
+                                style="display: none;">
+                                @csrf
+                                @method('PUT')
+                            </form>
+
+                            <button class="btn btn-sm btn-success rounded-partner"
+                                onclick="approveExpense({{ $direktur->id }})">Approve</button>
+                            <form id="delete-form-{{ $direktur->id }}"
+                                action="{{ route('application.approve', $direktur->id) }}" method="POST"
                                 style="display: none;">
                                 @csrf
                                 @method('PUT')

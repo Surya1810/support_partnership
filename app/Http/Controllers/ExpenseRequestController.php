@@ -33,6 +33,7 @@ class ExpenseRequestController extends Controller
                 $query->where('total_amount', '<=', 150000)
                     ->orWhere('approved_by_manager', false);
             })
+            ->where('user_id', '!=', Auth::user()->id)
             ->get();
 
         //query direktur  
@@ -94,6 +95,9 @@ class ExpenseRequestController extends Controller
             $expenseRequest->bank_name = $request->bank;
             $expenseRequest->account_number = $request->rekening;
             $expenseRequest->account_holder_name = '-';
+        }
+        if (Auth::user()->role_id === 3) {
+            $expenseRequest->approved_by_manager = true;
         }
         $expenseRequest->total_amount = 0;
         $expenseRequest->save();
@@ -228,7 +232,17 @@ class ExpenseRequestController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function reject($id) {}
+    public function reject($id)
+    {
+        $expenseRequest = ExpenseRequest::findOrFail($id);
+
+        $expenseRequest->approved_by_manager = false;
+        $expenseRequest->approved_by_director = false;
+        $expenseRequest->status = 'reject';
+        $expenseRequest->update();
+
+        return redirect()->route('application.index')->with(['pesan' => 'Application rejected successfully', 'level-alert' => 'alert-danger']);
+    }
 
     /**
      * Remove the specified resource from storage.
