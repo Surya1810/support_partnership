@@ -324,7 +324,7 @@
                                                             onclick="bypassExpense({{ $all_expense->id }})"><i
                                                                 class="fa-solid fa-check"></i></button>
                                                         <form id="bypass-form-{{ $all_expense->id }}"
-                                                            action="{{ route('expense.approve', $all_expense->id) }}"
+                                                            action="{{ route('application.store', $all_expense->id) }}"
                                                             method="POST" style="display: none;">
                                                             @csrf
                                                             @method('PUT')
@@ -334,7 +334,7 @@
                                                             onclick="deleteExpense({{ $all_expense->id }})"><i
                                                                 class="fa-solid fa-trash"></i></button>
                                                         <form id="delete-form-{{ $all_expense->id }}"
-                                                            action="{{ route('expense.destroy', $all_expense->id) }}"
+                                                            action="{{ route('application.destroy', $all_expense->id) }}"
                                                             method="POST" style="display: none;">
                                                             @csrf
                                                             @method('DELETE')
@@ -347,7 +347,7 @@
                                                             onclick="processExpense({{ $all_expense->id }})"><i
                                                                 class="fa-solid fa-check"></i></button>
                                                         <form id="process-form-{{ $all_expense->id }}"
-                                                            action="{{ route('expense.process', $all_expense->id) }}"
+                                                            action="{{ route('application.process', $all_expense->id) }}"
                                                             method="POST" style="display: none;">
                                                             @csrf
                                                             @method('PUT')
@@ -377,7 +377,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="{{ route('expense.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('application.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
@@ -599,7 +599,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('expense.approve', $manager->id) }}" method="POST"
+                    <form action="{{ route('application.approve', $manager->id) }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
@@ -674,7 +674,7 @@
                             <button class="btn btn-sm btn-danger rounded-partner"
                                 onclick="rejectExpense({{ $manager->id }})">Reject</button>
                             <form id="delete-form-{{ $manager->id }}"
-                                action="{{ route('expense.reject', $manager->id) }}" method="POST"
+                                action="{{ route('application.reject', $manager->id) }}" method="POST"
                                 style="display: none;">
                                 @csrf
                                 @method('PUT')
@@ -683,7 +683,7 @@
                             <button class="btn btn-sm btn-success rounded-partner"
                                 onclick="approveExpense({{ $manager->id }})">Approve</button>
                             <form id="delete-form-{{ $manager->id }}"
-                                action="{{ route('expense.approve', $manager->id) }}" method="POST"
+                                action="{{ route('application.approve', $manager->id) }}" method="POST"
                                 style="display: none;">
                                 @csrf
                                 @method('PUT')

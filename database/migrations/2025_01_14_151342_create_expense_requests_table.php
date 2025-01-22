@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('bank_name');
             $table->string('account_number');
             $table->string('account_holder_name');
-            $table->enum('status', ['pending', 'approved', 'processing', 'report', 'finish'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'processing', 'report', 'finish', 'rejected'])->default('pending');
             $table->boolean('approved_by_manager')->default(false);
             $table->boolean('approved_by_director')->default(false);
             $table->boolean('processed_by_finance')->default(false);
