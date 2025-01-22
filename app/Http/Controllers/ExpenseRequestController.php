@@ -87,7 +87,7 @@ class ExpenseRequestController extends Controller
             $expenseRequest->account_number = $user->extension->account;
             $expenseRequest->account_holder_name = $user->name;
         } elseif ($request->pencairan == 'lain') {
-            $expenseRequest->bank_name = $request->bank;
+            $expenseRequest->bank_name = $request->bank1;
             $expenseRequest->account_number = $request->rekening;
             $expenseRequest->account_holder_name = $request->atas_nama;
         } elseif ($request->pencairan == 'va') {

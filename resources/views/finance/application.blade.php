@@ -516,8 +516,9 @@
                         <div class="row">
                             <div class="col-md-12 d-none" id="rekening_lain">
                                 <div class="form-group">
-                                    <input type="text" name="bank" class="form-control" id="lain1"
-                                        placeholder="Enter bank name" autocomplete="off" value="{{ old('bank') }}">
+                                    <input type="text" name="bank1" class="form-control" id="lain1"
+                                        placeholder="Enter bank name" autocomplete="off" value="{{ old('bank1') }}"
+                                        oninput="this.value = this.value.toUpperCase()">
                                 </div>
                                 <div class="form-group">
                                     <input type="text" name="rekening" class="form-control" id="lain2"
@@ -533,7 +534,8 @@
                             <div class="col-md-12 d-none" id="virtual_account">
                                 <div class="form-group">
                                     <input type="text" name="bank" class="form-control" id="va1"
-                                        placeholder="Enter bank name" autocomplete="off" value="{{ old('bank') }}">
+                                        placeholder="Enter bank name" autocomplete="off" value="{{ old('bank') }}"
+                                        oninput="this.value = this.value.toUpperCase()">
                                 </div>
                                 <div class="form-group">
                                     <input type="text" name="rekening" class="form-control" id="va2"
