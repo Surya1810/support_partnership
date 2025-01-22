@@ -521,9 +521,9 @@
                                         oninput="this.value = this.value.toUpperCase()">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" name="rekening" class="form-control" id="lain2"
+                                    <input type="text" name="rekening1" class="form-control" id="lain2"
                                         placeholder="Enter account number" autocomplete="off"
-                                        value="{{ old('rekening') }}">
+                                        value="{{ old('rekening1') }}">
                                 </div>
                                 <div class="form-group">
                                     <input type="text" name="atas_nama" class="form-control" id="lain3"
