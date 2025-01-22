@@ -125,7 +125,7 @@ class ProjectController extends Controller
         $project->urgency = $request->urgency;
         $project->deadline = $request->deadline;
         $project->start = $request->start;
-        $project->assisten = implode(',', $request->assisten);
+        $project->assisten_id = implode(',', $request->assisten);
         $project->update();
 
         return redirect()->route('project.index')->with(['pesan' => 'Project updated successfully', 'level-alert' => 'alert-warning']);
