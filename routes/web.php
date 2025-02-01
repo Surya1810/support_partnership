@@ -25,7 +25,10 @@ Route::middleware('auth')->group(function () {
     // Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 
     // Dashboard
-    Route::get('/', [HomeController::class, 'index'])->name('dashboard');
+    Route::get('/', function () {
+        return redirect('dashboard');
+    });
+    Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
     // Profile Section
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
