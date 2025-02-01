@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Pengajuan extends Model
+class Document extends Model
 {
     //
 }

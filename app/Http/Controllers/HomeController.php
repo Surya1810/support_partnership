@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Document;
+use App\Models\ExpenseRequest;
+use App\Models\Project;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +26,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $projects = Project::all()->count();
+        $applications = ExpenseRequest::all()->count();
+        // $documents  =   Document::all()->count();
+        $documents  =   '-';
+
+        return view('home.dashboard', compact('projects', 'applications', 'documents'));
     }
 }

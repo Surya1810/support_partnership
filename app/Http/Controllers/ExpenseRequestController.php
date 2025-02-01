@@ -235,9 +235,6 @@ class ExpenseRequestController extends Controller
     public function reject($id)
     {
         $expenseRequest = ExpenseRequest::findOrFail($id);
-
-        $expenseRequest->approved_by_manager = false;
-        $expenseRequest->approved_by_director = false;
         $expenseRequest->status = 'reject';
         $expenseRequest->update();
 

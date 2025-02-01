@@ -158,6 +158,16 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('document.index') }}" class="nav-link">
+                                <i class="nav-icon fa-regular fa-folder-open"></i>
+                                <i class=""></i>
+                                <p>
+                                    Document
+                                </p>
+                            </a>
+                        </li>
+
                         <li class="nav-header mt-3">MANAGEMENT</li>
                         <li class="nav-item">
                             <a href="{{ route('project.index') }}" class="nav-link">

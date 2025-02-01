@@ -349,8 +349,8 @@
                                                         </form>
                                                     </td>
                                                 @endif
-                                                @if (auth()->user()->department_id == 8 && $all_expense->status == 'processing')
-                                                    <td>
+                                                <td>
+                                                    @if (auth()->user()->department_id == 8 && $all_expense->status == 'processing')
                                                         <button class="btn btn-sm btn-success rounded-partner"
                                                             onclick="processExpense({{ $all_expense->id }})"><i
                                                                 class="fa-solid fa-check"></i></button>
@@ -360,8 +360,8 @@
                                                             @csrf
                                                             @method('PUT')
                                                         </form>
-                                                    </td>
-                                                @endif
+                                                    @endif
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -684,7 +684,7 @@
                         <div class="modal-footer">
                             <button class="btn btn-sm btn-danger rounded-partner"
                                 onclick="rejectExpense({{ $manager->id }})">Reject</button>
-                            <form id="delete-form-{{ $manager->id }}"
+                            <form id="reject-form-{{ $manager->id }}"
                                 action="{{ route('application.reject', $manager->id) }}" method="POST"
                                 style="display: none;">
                                 @csrf
@@ -693,7 +693,7 @@
 
                             <button class="btn btn-sm btn-success rounded-partner"
                                 onclick="approveExpense({{ $manager->id }})">Approve</button>
-                            <form id="delete-form-{{ $manager->id }}"
+                            <form id="approve-form-{{ $manager->id }}"
                                 action="{{ route('application.approve', $manager->id) }}" method="POST"
                                 style="display: none;">
                                 @csrf
@@ -793,7 +793,7 @@
                         <div class="modal-footer">
                             <button class="btn btn-sm btn-danger rounded-partner"
                                 onclick="rejectExpense({{ $direktur->id }})">Reject</button>
-                            <form id="delete-form-{{ $direktur->id }}"
+                            <form id="reject-form-{{ $direktur->id }}"
                                 action="{{ route('application.reject', $direktur->id) }}" method="POST"
                                 style="display: none;">
                                 @csrf
@@ -802,7 +802,7 @@
 
                             <button class="btn btn-sm btn-success rounded-partner"
                                 onclick="approveExpense({{ $direktur->id }})">Approve</button>
-                            <form id="delete-form-{{ $direktur->id }}"
+                            <form id="approve-form-{{ $direktur->id }}"
                                 action="{{ route('application.approve', $direktur->id) }}" method="POST"
                                 style="display: none;">
                                 @csrf

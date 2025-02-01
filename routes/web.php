@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseRequestController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\ProfileController;
@@ -15,40 +18,37 @@ use App\Http\Controllers\UserExtensionController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect('dashboard');
-});
-
 Auth::routes();
 
-// Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
-Route::get('/dashboard', function () {
-    return view('home.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware('auth')->group(function () {
-    // User | Employee
-    Route::resource('employee', UserController::class);
-    Route::resource('user-data', UserExtensionController::class);
-    // Department
-    Route::resource('department', DepartmentController::class);
+    // Check
+    // Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 
-    // Finance
-    Route::resource('finance', FinanceController::class);
-
-    Route::resource('application', ExpenseRequestController::class);
-    Route::put('/application/approve/{id}', [ExpenseRequestController::class, 'approve'])->name('application.approve');
-    Route::put('/application/reject/{id}', [ExpenseRequestController::class, 'reject'])->name('application.reject');
-    Route::put('/application/process/{id}', [ExpenseRequestController::class, 'process'])->name('application.process');
-
-    // Pengajuan
-    Route::resource('finance/pengajuan', PengajuanController::class);
+    // Dashboard
+    Route::get('/', [HomeController::class, 'index'])->name('dashboard');
 
     // Profile Section
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update/{id}', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password/{id}', [ProfileController::class, 'password'])->name('profile.password');
     Route::delete('/profile/delete/{id}', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // User | Employee
+    Route::resource('employee', UserController::class);
+    Route::resource('user-data', UserExtensionController::class);
+
+    // Finance
+    Route::resource('finance', FinanceController::class);
+    // Application
+    Route::resource('application', ExpenseRequestController::class);
+    Route::put('/application/approve/{id}', [ExpenseRequestController::class, 'approve'])->name('application.approve');
+    Route::put('/application/reject/{id}', [ExpenseRequestController::class, 'reject'])->name('application.reject');
+    Route::put('/application/process/{id}', [ExpenseRequestController::class, 'process'])->name('application.process');
+    // Expense
+    Route::resource('expense', ExpenseController::class);
+
+    // Document
+    Route::resource('document', DocumentController::class);
 
     // Project Management
     Route::resource('project', ProjectController::class);

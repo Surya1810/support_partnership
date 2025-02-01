@@ -23,32 +23,49 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-3 col-6">
-                    <div class="small-box bg-primary">
-                        <div class="inner">
-                            <h3>150</h3>
+                    <a href="{{ route('project.index') }}">
+                        <div class="small-box bg-primary">
+                            <div class="inner">
+                                <h3>{{ $projects }}</h3>
 
-                            <p>Project</p>
+                                <p>Project</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-solid fa-paste"></i>
+                            </div>
+                            <span class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></span>
                         </div>
-                        <div class="icon">
-                            <i class="ion ion-bag"></i>
-                        </div>
-                        <a href="{{ route('project.index') }}" class="small-box-footer">More info <i
-                                class="fas fa-arrow-circle-right"></i></a>
-                    </div>
+                    </a>
                 </div>
                 <div class="col-lg-3 col-6">
-                    <div class="small-box bg-primary">
-                        <div class="inner">
-                            <h3>0</h3>
+                    <a href="{{ route('application.index') }}">
+                        <div class="small-box bg-primary">
+                            <div class="inner">
+                                <h3>{{ $applications }}</h3>
 
-                            <p>Application</p>
+                                <p>Application</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-solid fa-file-invoice"></i>
+                            </div>
+                            <span class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></span>
                         </div>
-                        <div class="icon">
-                            <i class="ion ion-bag"></i>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <a href="{{ route('document.index') }}">
+                        <div class="small-box bg-primary">
+                            <div class="inner">
+                                <h3>{{ $documents }}</h3>
+
+                                <p>Document</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-regular fa-folder-open"></i>
+                            </div>
+                            <span class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></span>
                         </div>
-                        <a href="{{ route('application.index') }}" class="small-box-footer">More info <i
-                                class="fas fa-arrow-circle-right"></i></a>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -136,7 +153,8 @@
                                     <option value="Hindu" {{ old('religion') == 'Hindu' ? 'selected' : '' }}>
                                         Hindu
                                     </option>
-                                    <option value="Confucianism" {{ old('religion') == 'Confucianism' ? 'selected' : '' }}>
+                                    <option value="Confucianism"
+                                        {{ old('religion') == 'Confucianism' ? 'selected' : '' }}>
                                         Confucianism
                                     </option>
                                 </select>
