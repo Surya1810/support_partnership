@@ -76,7 +76,10 @@
                                                 {{ $user->department->name }}
                                             </td>
                                             <td>
-
+                                                <button type="button" class="btn btn-sm btn-info rounded-partner"
+                                                    data-toggle="modal" data-target="#infoEmployee{{ $user->id }}">
+                                                    <i class="fas fa-regular fa-eye"></i>
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -88,6 +91,120 @@
             </div>
         </div>
     </section>
+
+    <!-- Modal Employee Info-->
+    @foreach ($users as $user)
+        <div class="modal fade" id="infoEmployee{{ $user->id }}" tabindex="-1" aria-labelledby="infoEmployeeLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="infoEmployeeLabel">Employee Info</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body">
+                        <p class="m-0"><strong>Personal Information</strong></p>
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">Name</label>
+                                <p>{{ $user->name }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">Nickname</label>
+                                <p>{{ $user->username }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">NIK</label>
+                                <p>{{ $user->nik }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">NPWP</label>
+                                <p>{{ $user->npwp }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">Phone</label>
+                                <p>{{ $user->phone }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">Address</label>
+                                <p>{{ $user->address }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">Religion</label>
+                                <p>{{ $user->religion }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">Birth</label>
+                                <p>{{ $user->pob }}, {{ $user->dob->format('d/m/Y') }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">Congenital Disease</label>
+                                <p>{{ $user->disease }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">Marriage Status</label>
+                                <p>{{ $user->marriage }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">Gender</label>
+                                <p>{{ $user->gender }}</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="mb-0 form-label col-form-label-sm">Language Skills</label>
+                                <p>{{ $user->language }}</p>
+                            </div>
+                        </div>
+                        <hr>
+
+                        <p class="m-0"><strong>Company Information</strong></p>
+                        <div class="col-12 col-md-6">
+                            <label class="mb-0 form-label col-form-label-sm">Email</label>
+                            <p>{{ $user->email }}</p>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="mb-0 form-label col-form-label-sm">Position</label>
+                            <p>{{ $user->email }}</p>
+                        </div>
+                        <hr>
+
+                        <p class="m-0"><strong>Educational Information</strong></p>
+                        <div class="col-12 col-md-6">
+                            <label class="mb-0 form-label col-form-label-sm">Elementary School</label>
+                            <p>{{ $user->elementary }}</p>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="mb-0 form-label col-form-label-sm">Junior High School</label>
+                            <p>{{ $user->junior }}</p>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="mb-0 form-label col-form-label-sm">Senior High School</label>
+                            <p>{{ $user->senior }}</p>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="mb-0 form-label col-form-label-sm">College</label>
+                            <p>{{ $user->college }}</p>
+                        </div>
+                        <hr>
+
+                        <p class="m-0"><strong>Account Information</strong></p>
+                        <div class="col-12 col-md-6">
+                            <label class="mb-0 form-label col-form-label-sm">Bank</label>
+                            <p>{{ $user->bank }}</p>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="mb-0 form-label col-form-label-sm">Account Number</label>
+                            <p>{{ $user->number }}</p>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 @endsection
 
 @push('scripts')
