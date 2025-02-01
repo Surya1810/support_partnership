@@ -37,22 +37,22 @@
                                             @csrf
                                             @method('PUT')
                                             <p class="m-0"><strong>Profile Information</strong></p>
-                                            <small>Update your accounts profile information and email address.</small><br>
+                                            <small>Update your accounts profile information.</small><br>
                                             <label class="mt-4 mb-0 form-label col-form-label-sm"
                                                 for="name">Name</label>
                                             <div class="input-group mb-3">
                                                 <input type="text" class="form-control" id="name" name="name"
-                                                    aria-describedby="name" value="{{ $user->name }}">
+                                                    aria-describedby="name" value="{{ $user->name }}" disabled>
+                                            </div>
+                                            <label class="mb-0 form-label col-form-label-sm" for="email">Email</label>
+                                            <div class="input-group mb-3">
+                                                <input type="email" class="form-control" id="email" name="email"
+                                                    aria-describedby="email" value=" {{ $user->email }}" disabled>
                                             </div>
                                             <label class="mb-0 form-label col-form-label-sm" for="username">Username</label>
                                             <div class="input-group mb-3">
                                                 <input type="text" class="form-control" id="username" name="username"
                                                     aria-describedby="username" value="{{ $user->username }}">
-                                            </div>
-                                            <label class="mb-0 form-label col-form-label-sm" for="email">Email</label>
-                                            <div class="input-group mb-3">
-                                                <input type="email" class="form-control" id="email" name="email"
-                                                    aria-describedby="email" value=" {{ $user->email }}">
                                             </div>
                                             <button type="submit" class="btn btn-sm btn-dark text-xs">SAVE</button>
                                         </form>
