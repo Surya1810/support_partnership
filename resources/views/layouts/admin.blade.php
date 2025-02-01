@@ -117,7 +117,7 @@
                 </div>
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview"
+                    <ul class="nav nav-pills nav-sidebar flex-column nav-legacy nav-child-indent" data-widget="treeview"
                         role="menu" data-accordion="false">
                         <li class="nav-item">
                             <a href="{{ route('dashboard') }}" class="nav-link">
