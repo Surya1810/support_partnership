@@ -25,6 +25,10 @@
                         <li class="breadcrumb-item active"><strong>Application</strong></li>
                     </ol>
                 </div>
+                <div class="col-6 text-right my-auto">
+                    <a type="button" class="btn btn-primary rounded-partner py-2" data-toggle="modal"
+                        data-target="#addApplication"><i class="fas fa-plus"></i> Create Application</a>
+                </div>
             </div>
         </div>
     </section>
@@ -32,12 +36,6 @@
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
-            <div class="row mb-3">
-                <a type="button" class="btn btn-primary rounded-partner mx-2" data-toggle="modal"
-                    data-target="#addApplication">Create Application <i class="fas fa-plus"></i></a>
-                <a type="button" class="btn btn-primary rounded-partner mx-2" data-toggle="modal"
-                    data-target="#addReport">Report Application <i class="fas fa-plus"></i></a>
-            </div>
             <div class="row">
                 <!-- Tabel pengajuan saya-->
                 <div class="col-12 col-md-6">

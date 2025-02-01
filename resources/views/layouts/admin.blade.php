@@ -12,7 +12,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title')</title>
+    <title>@yield('title') | Partnership</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -185,22 +185,48 @@
                                 </p>
                             </a>
                         </li> --}}
-                        {{-- <li class="nav-item">
+                        <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon fa-solid fa-file-signature"></i>
+                                <i class="nav-icon fa-regular fa-calendar"></i>
                                 <p>
-                                    Notulen
+                                    Schedule
                                 </p>
                             </a>
-                        </li> --}}
-                        {{-- <li class="nav-item">
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fa-solid fa-box"></i>
+                                <p>
+                                    Product
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fa-solid fa-computer"></i>
+
                                 <p>
                                     Asset
+                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
-                        </li> --}}
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Asset List</p>
+                                    </a>
+                                    <a href="#" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Stock Opname</p>
+                                    </a>
+                                    <a href="#" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>RFID Number</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         <li class="nav-header mt-3">DATABASE</li>
                         <li class="nav-item">
                             <a href="{{ route('client.index') }}" class="nav-link">
