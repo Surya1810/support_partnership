@@ -16,7 +16,7 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800,900&display=swap" rel="stylesheet" />
 
     <!-- PWA  -->
     <link rel="icon" type="image/png" href="{{ asset('favicons/favicon-96x96.png') }}" sizes="96x96" />
@@ -155,6 +155,10 @@
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Application</p>
                                     </a>
+                                    <a href="{{ route('coming_soon') }}" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Expense</p>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
@@ -171,22 +175,22 @@
                         <li class="nav-header mt-3">MANAGEMENT</li>
                         <li class="nav-item">
                             <a href="{{ route('project.index') }}" class="nav-link">
-                                <i class="nav-icon fa-solid fa-paste"></i>
+                                <i class="nav-icon fa-solid fa-helmet-safety"></i>
                                 <p>
                                     Project
                                 </p>
                             </a>
                         </li>
-                        {{-- <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon fa-solid fa-pencil"></i>
+                        <li class="nav-item">
+                            <a href="{{ route('coming_soon') }}" class="nav-link">
+                                <i class="nav-icon fa-solid fa-list-check"></i>
                                 <p>
                                     Daily Task
                                 </p>
                             </a>
-                        </li> --}}
+                        </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="{{ route('coming_soon') }}" class="nav-link">
                                 <i class="nav-icon fa-regular fa-calendar"></i>
                                 <p>
                                     Schedule
@@ -195,15 +199,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon fa-solid fa-box"></i>
-                                <p>
-                                    Product
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon fa-solid fa-computer"></i>
+                                <i class="nav-icon fa-solid fa-clipboard-list"></i>
 
                                 <p>
                                     Asset
@@ -212,15 +208,15 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link active">
+                                    <a href="{{ route('coming_soon') }}" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Asset List</p>
                                     </a>
-                                    <a href="#" class="nav-link active">
+                                    <a href="{{ route('coming_soon') }}" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Stock Opname</p>
                                     </a>
-                                    <a href="#" class="nav-link active">
+                                    <a href="{{ route('coming_soon') }}" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>RFID Number</p>
                                     </a>
@@ -246,9 +242,17 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('partner.index') }}" class="nav-link">
-                                <i class="nav-icon fa-solid fa-helmet-safety"></i>
+                                <i class="nav-icon fa-regular fa-address-book"></i>
                                 <p>
                                     Partner
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('coming_soon') }}" class="nav-link">
+                                <i class="nav-icon fa-solid fa-box"></i>
+                                <p>
+                                    Product
                                 </p>
                             </a>
                         </li>

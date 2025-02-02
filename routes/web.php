@@ -22,6 +22,11 @@ Route::middleware('auth')->group(function () {
     // Check
     // Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 
+    // Coming Soon
+    Route::get('/coming-soon', function () {
+        return view('coming_soon');
+    })->name('coming_soon');
+
     // Dashboard
     Route::get('/', function () {
         return redirect('dashboard');
