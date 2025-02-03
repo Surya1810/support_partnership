@@ -47,7 +47,7 @@
                     <div class="card card-outline rounded-partner card-primary">
                         <div class="card-body">
                             <p><strong>Expenses</strong></p>
-                            <h3>Rp<i class="fa-solid fa-infinity"></i></h3>
+                            <h3>{{ formatRupiah($expense_total) }}</h3>
                             <small>this year</small>
                             <hr>
                         </div>

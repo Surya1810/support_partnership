@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\ExpenseItem;
 use App\Models\ExpenseRequest;
 use App\Models\Finance;
 use App\Models\User;
@@ -16,7 +17,11 @@ class FinanceController extends Controller
      */
     public function index()
     {
-        return view('finance.index');
+        $expense_count = ExpenseRequest::sum('total_amount');
+        $kembalian = ExpenseItem::sum('actual_amount');
+
+        $expense_total = $expense_count - $kembalian;
+        return view('finance.index', compact('expense_total'));
     }
 
     /**
