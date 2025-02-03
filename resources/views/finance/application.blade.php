@@ -417,6 +417,11 @@
                                                 </td>
                                                 @if (auth()->user()->role_id == 1 || auth()->user()->department_id == 8)
                                                     <td>
+                                                        <button type="button" class="btn btn-sm btn-info rounded-partner"
+                                                            data-toggle="modal"
+                                                            data-target="#editStepModal{{ $all_expense->id }}">
+                                                            <i class="fa-solid fa-eye"></i>
+                                                        </button>
                                                         @if (auth()->user()->role_id == 1)
                                                             @if ($all_expense->status == 'pending')
                                                                 <button class="btn btn-sm btn-success rounded-partner"
@@ -698,7 +703,7 @@
     <!-- Modal Manager Approval-->
     @foreach ($managerRequests as $manager)
         <!-- Modal Show Approval-->
-        <div class="modal fade" id="editStepModal{{ $manager->id }}" tabindex="-1"
+        <div class="modal fade text-sm" id="editStepModal{{ $manager->id }}" tabindex="-1"
             aria-labelledby="editStepModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
@@ -768,8 +773,10 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
-                                        <strong class="text-center mt-3">Total =
-                                            {{ formatRupiah($manager->total_amount) }}</strong>
+                                        <div class="w-100 text-center mt-3">
+                                            <strong class="text-center">Total =
+                                                {{ formatRupiah($manager->total_amount) }}</strong>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -802,7 +809,7 @@
     <!-- Modal Director Approval-->
     @foreach ($directorRequests as $direktur)
         <!-- Modal Show Approval-->
-        <div class="modal fade" id="editStepModal{{ $direktur->id }}" tabindex="-1"
+        <div class="modal fade text-sm" id="editStepModal{{ $direktur->id }}" tabindex="-1"
             aria-labelledby="editStepModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
@@ -872,8 +879,10 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
-                                        <strong class="text-center mt-3">Total =
-                                            {{ formatRupiah($direktur->total_amount) }}</strong>
+                                        <div class="w-100 text-center mt-3">
+                                            <strong class="text-center">Total =
+                                                {{ formatRupiah($direktur->total_amount) }}</strong>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -897,6 +906,93 @@
                             @csrf
                             @method('PUT')
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    <!-- Modal Finance-->
+    @foreach ($all_expenses as $all_expense)
+        <!-- Modal Show Approval-->
+        <div class="modal fade text-sm" id="editStepModal{{ $all_expense->id }}" tabindex="-1"
+            aria-labelledby="editStepModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editStepModalLabel">Approval Application</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5>Name</h5>
+                                        {{ $all_expense->user->name }}
+                                        <hr>
+                                        <h5>Department</h5>
+                                        {{ $all_expense->department->name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5>Category</h5>
+                                        {{ $all_expense->category }}
+                                        <hr>
+                                        <h5>Use Date</h5>
+                                        {{ $all_expense->use_date->toFormattedDateString('d/m/y') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5>Bank Name</h5>
+                                        {{ $all_expense->bank_name }}
+                                        <hr>
+                                        <h5>Account Number</h5>
+                                        {{ $all_expense->account_number }}
+                                        <hr>
+                                        <h5>Account Holder Name</h5>
+                                        {{ $all_expense->account_holder_name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <table class="table table-bordered" id="items-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Item Name</th>
+                                                    <th>Qty</th>
+                                                    <th>Price</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($all_expense->items as $item)
+                                                    <tr>
+                                                        <td>{{ $item->item_name }}</td>
+                                                        <td>{{ $item->quantity }}</td>
+                                                        <td>{{ formatRupiah($item->unit_price) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                        <div class="w-100 text-center mt-3">
+                                            <strong class="text-center">Total =
+                                                {{ formatRupiah($all_expense->total_amount) }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -973,16 +1069,123 @@
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/jszip/jszip.min.js') }}"></script>
-    {{-- <script src="{{ asset('assets/adminLTE/plugins/pdfmake/pdfmake.min.js') }}"></script> --}}
-    {{-- <script src="{{ asset('assets/adminLTE/plugins/pdfmake/vfs_fonts.js') }}"></script> --}}
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
-    <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 
     <script src="{{ asset('assets/adminLTE/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
 
 
     <script type="text/javascript">
+        $(function() {
+            //Initialize Select2 Elements
+            $('.department').select2({
+                placeholder: "Select Department",
+                allowClear: true,
+            })
+            $('.category').select2({
+                placeholder: "Select Category",
+                allowClear: true,
+            })
+        })
+
+        $('.price_report').inputmask({
+            alias: 'numeric',
+            prefix: 'Rp',
+            digits: 0,
+            groupSeparator: '.',
+            autoGroup: true,
+            removeMaskOnSubmit: true,
+            rightAlign: false
+        });
+
+        $(function() {
+            $('#myexpenseTable').DataTable({
+                "paging": true,
+                'processing': true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                // "scrollX": true,
+                // width: "700px",
+                // columnDefs: [{
+                //     className: 'dtr-control',
+                //     orderable: false,
+                //     targets: -8
+                // }]
+            });
+            $('#reportTable').DataTable({
+                "paging": true,
+                'processing': true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                // "scrollX": true,
+                // width: "700px",
+                // columnDefs: [{
+                //     className: 'dtr-control',
+                //     orderable: false,
+                //     targets: -8
+                // }]
+            });
+            $('#managerTable').DataTable({
+                "paging": true,
+                'processing': true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                // "scrollX": true,
+                // width: "700px",
+                // columnDefs: [{
+                //     className: 'dtr-control',
+                //     orderable: false,
+                //     targets: -8
+                // }]
+            });
+            $('#direkturTable').DataTable({
+                "paging": true,
+                'processing': true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                // "scrollX": true,
+                // width: "700px",
+                // columnDefs: [{
+                //     className: 'dtr-control',
+                //     orderable: false,
+                //     targets: -8
+                // }]
+            });
+            $('#allTable').DataTable({
+                "paging": true,
+                'processing': true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                // "scrollX": true,
+                // width: "700px",
+                // columnDefs: [{
+                //     className: 'dtr-control',
+                //     orderable: false,
+                //     targets: -8
+                // }]
+            });
+        });
+
         function rejectExpense(id) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -1097,20 +1300,6 @@
                 }
             })
         }
-    </script>
-
-    <script>
-        $(function() {
-            //Initialize Select2 Elements
-            $('.department').select2({
-                placeholder: "Select Department",
-                allowClear: true,
-            })
-            $('.category').select2({
-                placeholder: "Select Category",
-                allowClear: true,
-            })
-        })
 
         function rekening_saya() {
             $('#virtual_account,#rekening_lain').hide();
@@ -1142,16 +1331,6 @@
             $('#va1,#va2')
                 .prop('required', true);
         }
-
-        $('.price_report').inputmask({
-            alias: 'numeric',
-            prefix: 'Rp',
-            digits: 0,
-            groupSeparator: '.',
-            autoGroup: true,
-            removeMaskOnSubmit: true,
-            rightAlign: false
-        });
     </script>
 
     <script>
@@ -1194,94 +1373,6 @@
             // Hapus baris
             $(document).on('click', '.remove-item', function() {
                 $(this).closest('tr').remove();
-            });
-
-            $(function() {
-                $('#myexpenseTable').DataTable({
-                    "paging": true,
-                    'processing': true,
-                    "lengthChange": true,
-                    "searching": true,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
-                    "responsive": true,
-                    // "scrollX": true,
-                    // width: "700px",
-                    // columnDefs: [{
-                    //     className: 'dtr-control',
-                    //     orderable: false,
-                    //     targets: -8
-                    // }]
-                });
-                $('#reportTable').DataTable({
-                    "paging": true,
-                    'processing': true,
-                    "lengthChange": true,
-                    "searching": true,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
-                    "responsive": true,
-                    // "scrollX": true,
-                    // width: "700px",
-                    // columnDefs: [{
-                    //     className: 'dtr-control',
-                    //     orderable: false,
-                    //     targets: -8
-                    // }]
-                });
-                $('#managerTable').DataTable({
-                    "paging": true,
-                    'processing': true,
-                    "lengthChange": true,
-                    "searching": true,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
-                    "responsive": true,
-                    // "scrollX": true,
-                    // width: "700px",
-                    // columnDefs: [{
-                    //     className: 'dtr-control',
-                    //     orderable: false,
-                    //     targets: -8
-                    // }]
-                });
-                $('#direkturTable').DataTable({
-                    "paging": true,
-                    'processing': true,
-                    "lengthChange": true,
-                    "searching": true,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
-                    "responsive": true,
-                    // "scrollX": true,
-                    // width: "700px",
-                    // columnDefs: [{
-                    //     className: 'dtr-control',
-                    //     orderable: false,
-                    //     targets: -8
-                    // }]
-                });
-                $('#allTable').DataTable({
-                    "paging": true,
-                    'processing': true,
-                    "lengthChange": true,
-                    "searching": true,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
-                    "responsive": true,
-                    // "scrollX": true,
-                    // width: "700px",
-                    // columnDefs: [{
-                    //     className: 'dtr-control',
-                    //     orderable: false,
-                    //     targets: -8
-                    // }]
-                });
             });
         });
     </script>
