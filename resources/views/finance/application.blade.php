@@ -35,32 +35,38 @@
 
     <!-- Main content -->
     <section class="content">
-        <div class="container-fluid">
+        <div class="container-fluid text-sm">
             <div class="row">
-                <!-- Tabel pengajuan saya-->
+                <!-- Tabel on going application-->
                 <div class="col-12 col-md-6">
-                    <div class="card card-outline rounded-partner card-primary">
+                    <div class="card card-outline rounded-partner card-primary collapsed-card">
                         <div class="card-header">
-                            <div class="row align-items-center">
-                                <div class="col-6">
-                                    <h3 class="card-title">My Application</h3>
-                                </div>
+                            <div class="card-title">
+                                <h6>My Application</h6>
+                            </div>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="card-body table-responsive">
                             <table id="myexpenseTable" class="table table-bordered text-nowrap">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th style="width: 50%">
+                                        <th style="width: 70%">
                                             Title
                                         </th>
                                         <th style="width: 10%">
                                             Category
                                         </th>
-                                        <th style="width: 10%">
+                                        <th style="width: 5%">
                                             Usage Date
                                         </th>
-                                        <th style="width: 15%">
+                                        <th style="width: 10%">
                                             Total Amount
                                         </th>
                                         <th style="width: 5%">
@@ -71,9 +77,9 @@
                                 <tbody>
                                     @foreach ($my_expenses as $my_expense)
                                         <tr>
-                                            <td class="text-wrap">{{ $my_expense->title }}</td>
+                                            <td>{{ $my_expense->title }}</td>
                                             <td>{{ $my_expense->category }}</td>
-                                            <td>{{ $my_expense->use_date->toFormattedDateString('d/m/y') }}</td>
+                                            <td>{{ $my_expense->use_date->format('d/m/y') }}</td>
                                             <td>{{ formatRupiah($my_expense->total_amount) }}</td>
                                             <td>
                                                 @if ($my_expense->status == 'pending')
@@ -82,8 +88,6 @@
                                                     <span class="badge badge-secondary">{{ $my_expense->status }}</span>
                                                 @elseif ($my_expense->status == 'processing')
                                                     <span class="badge badge-info">{{ $my_expense->status }}</span>
-                                                @elseif ($my_expense->status == 'report')
-                                                    <span class="badge badge-warning">{{ $my_expense->status }}</span>
                                                 @elseif ($my_expense->status == 'rejected')
                                                     <span class="badge badge-danger">{{ $my_expense->status }}</span>
                                                 @elseif ($my_expense->status == 'finish')
@@ -98,9 +102,84 @@
                     </div>
                 </div>
 
+                <!-- Tabel report-->
+                <div class="col-12 col-md-6">
+                    <div class="card card-outline rounded-partner card-primary collapsed-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h6>Report Application</h6>
+                            </div>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table id="reportTable" class="table table-bordered text-nowrap">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 65%">
+                                            Title
+                                        </th>
+                                        <th style="width: 10%">
+                                            Category
+                                        </th>
+                                        <th style="width: 5%">
+                                            Usage Date
+                                        </th>
+                                        <th style="width: 10%">
+                                            Total Amount
+                                        </th>
+                                        <th style="width: 5%">
+                                            Status
+                                        </th>
+                                        <th style="width: 5%">
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($reports as $report)
+                                        <tr>
+                                            <td>{{ $report->title }}</td>
+                                            <td>{{ $report->category }}</td>
+                                            <td>{{ $report->use_date->toFormattedDateString('d/m/y') }}</td>
+                                            <td>{{ formatRupiah($report->total_amount) }}</td>
+                                            <td>
+                                                @if ($report->status == 'pending')
+                                                    <span class="badge badge-warning">{{ $report->status }}</span>
+                                                @elseif ($report->status == 'finish')
+                                                    <span class="badge badge-success">{{ $report->status }}</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($report->status == 'report')
+                                                    <button type="button" class="btn btn-sm btn-warning rounded-partner"
+                                                        data-toggle="modal" data-target="#reportModal{{ $report->id }}">
+                                                        <i class="fa-regular fa-flag"></i>
+                                                    </button>
+                                                @elseif ($report->status == 'finish')
+                                                    <a href="{{ route('application.pdf', $report->id) }}"
+                                                        class="btn btn-sm btn-info rounded-partner" target="_blank">
+                                                        <i class="fa-regular fa-file-pdf"></i>
+                                                    </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Tabel approval manajer-->
                 @if (auth()->user()->role_id == 3)
-                    <div class="col-12 col-md-6">
+                    <div class="col-12">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-header">
                                 <div class="row align-items-center">
@@ -113,7 +192,10 @@
                                 <table id="managerTable" class="table table-bordered text-nowrap">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 50%">
+                                            <th style="width: 10%">
+                                                User
+                                            </th>
+                                            <th style="width: 45%">
                                                 Title
                                             </th>
                                             <th style="width: 10%">
@@ -138,6 +220,9 @@
                                     <tbody>
                                         @foreach ($managerRequests as $manager)
                                             <tr>
+                                                <td>{{ $manager->user->name }} <br>
+                                                    <small><strong>{{ $manager->department->name }}</strong></small>
+                                                </td>
                                                 <td>{{ $manager->title }}</td>
                                                 <td>{{ $manager->category }}</td>
                                                 <td>{{ $manager->use_date->toFormattedDateString('d/m/y') }}</td>
@@ -180,7 +265,7 @@
 
                 <!-- Tabel approval direktur-->
                 @if (auth()->user()->role_id == 2)
-                    <div class="col-12 col-md-6">
+                    <div class="col-12">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-header">
                                 <div class="row align-items-center">
@@ -193,7 +278,10 @@
                                 <table id="direkturTable" class="table table-bordered text-nowrap">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 50%">
+                                            <th style="width: 10%">
+                                                User
+                                            </th>
+                                            <th style="width: 45%">
                                                 Title
                                             </th>
                                             <th style="width: 10%">
@@ -218,6 +306,9 @@
                                     <tbody>
                                         @foreach ($directorRequests as $direktur)
                                             <tr>
+                                                <td>{{ $direktur->user->name }} <br>
+                                                    <small><strong>{{ $direktur->department->name }}</strong></small>
+                                                </td>
                                                 <td class="text-wrap">{{ $direktur->title }}</td>
                                                 <td>{{ $direktur->category }}</td>
                                                 <td>{{ $direktur->use_date->toFormattedDateString('d/m/y') }}</td>
@@ -231,7 +322,7 @@
                                                         <span class="badge badge-info">{{ $direktur->status }}</span>
                                                     @elseif ($direktur->status == 'report')
                                                         <span class="badge badge-warning">{{ $direktur->status }}</span>
-                                                    @elseif ($my_expense->status == 'rejected')
+                                                    @elseif ($direktur->status == 'rejected')
                                                         <span class="badge badge-danger">{{ $my_expense->status }}</span>
                                                     @elseif ($direktur->status == 'finish')
                                                         <span class="badge badge-success">{{ $direktur->status }}</span>
@@ -317,49 +408,56 @@
                                                     @elseif ($all_expense->status == 'report')
                                                         <span
                                                             class="badge badge-warning">{{ $all_expense->status }}</span>
-                                                    @elseif ($my_expense->status == 'rejected')
-                                                        <span class="badge badge-danger">{{ $my_expense->status }}</span>
+                                                    @elseif ($all_expense->status == 'rejected')
+                                                        <span class="badge badge-danger">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'finish')
                                                         <span
                                                             class="badge badge-success">{{ $all_expense->status }}</span>
                                                     @endif
                                                 </td>
-                                                @if (auth()->user()->role_id == 1)
+                                                @if (auth()->user()->role_id == 1 || auth()->user()->department_id == 8)
                                                     <td>
-                                                        <button class="btn btn-sm btn-success rounded-partner"
-                                                            onclick="bypassExpense({{ $all_expense->id }})"><i
-                                                                class="fa-solid fa-check"></i></button>
-                                                        <form id="bypass-form-{{ $all_expense->id }}"
-                                                            action="{{ route('application.store', $all_expense->id) }}"
-                                                            method="POST" style="display: none;">
-                                                            @csrf
-                                                            @method('PUT')
-                                                        </form>
+                                                        @if (auth()->user()->role_id == 1)
+                                                            <button class="btn btn-sm btn-success rounded-partner"
+                                                                onclick="bypassExpense({{ $all_expense->id }})"><i
+                                                                    class="fa-solid fa-check"></i></button>
+                                                            <form id="bypass-form-{{ $all_expense->id }}"
+                                                                action="{{ route('application.store', $all_expense->id) }}"
+                                                                method="POST" style="display: none;">
+                                                                @csrf
+                                                                @method('PUT')
+                                                            </form>
 
-                                                        <button class="btn btn-sm btn-danger rounded-partner"
-                                                            onclick="deleteExpense({{ $all_expense->id }})"><i
-                                                                class="fa-solid fa-trash"></i></button>
-                                                        <form id="delete-form-{{ $all_expense->id }}"
-                                                            action="{{ route('application.destroy', $all_expense->id) }}"
-                                                            method="POST" style="display: none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
+                                                            <button class="btn btn-sm btn-danger rounded-partner"
+                                                                onclick="deleteExpense({{ $all_expense->id }})"><i
+                                                                    class="fa-solid fa-trash"></i></button>
+                                                            <form id="delete-form-{{ $all_expense->id }}"
+                                                                action="{{ route('application.destroy', $all_expense->id) }}"
+                                                                method="POST" style="display: none;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                            </form>
+                                                        @endif
+                                                        @if (auth()->user()->department_id == 8 && $all_expense->status == 'processing')
+                                                            <button class="btn btn-sm btn-success rounded-partner"
+                                                                onclick="processExpense({{ $all_expense->id }})"><i
+                                                                    class="fa-solid fa-check"></i></button>
+                                                            <form id="process-form-{{ $all_expense->id }}"
+                                                                action="{{ route('application.process', $all_expense->id) }}"
+                                                                method="POST" style="display: none;">
+                                                                @csrf
+                                                                @method('PUT')
+                                                            </form>
+                                                        @endif
+                                                        @if ($all_expense->status == 'finish')
+                                                            <a href="{{ route('application.pdf', $all_expense->id) }}"
+                                                                class="btn btn-sm btn-info rounded-partner"
+                                                                target="_blank">
+                                                                <i class="fa-regular fa-file-pdf"></i>
+                                                            </a>
+                                                        @endif
                                                     </td>
                                                 @endif
-                                                <td>
-                                                    @if (auth()->user()->department_id == 8 && $all_expense->status == 'processing')
-                                                        <button class="btn btn-sm btn-success rounded-partner"
-                                                            onclick="processExpense({{ $all_expense->id }})"><i
-                                                                class="fa-solid fa-check"></i></button>
-                                                        <form id="process-form-{{ $all_expense->id }}"
-                                                            action="{{ route('application.process', $all_expense->id) }}"
-                                                            method="POST" style="display: none;">
-                                                            @csrf
-                                                            @method('PUT')
-                                                        </form>
-                                                    @endif
-                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -573,11 +671,11 @@
                             <tbody>
                                 <tr>
                                     <td><input type="text" name="items[0][item_name]" class="form-control"
-                                            placeholder="Enter item"></td>
+                                            placeholder="Enter item" required></td>
                                     <td><input type="number" name="items[0][quantity]" class="form-control"
-                                            placeholder="Enter quantity" min="1" value="1"></td>
+                                            placeholder="Enter quantity" min="1" value="1" required></td>
                                     <td><input type="text" name="items[0][unit_price]" class="form-control price"
-                                            placeholder="Enter Price" min="0" step="0.01"></td>
+                                            placeholder="Enter Price" min="0" step="0.01" required></td>
                                     <td><button type="button"
                                             class="btn btn-danger btn-sm remove-item rounded-partner"><i
                                                 class="fas fa-trash"></i></button></td>
@@ -608,97 +706,92 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('application.approve', $manager->id) }}" method="POST"
-                        enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="card rounded-partner">
-                                        <div class="card-body">
-                                            <h5>Name</h5>
-                                            {{ $manager->user->name }}
-                                            <hr>
-                                            <h5>Department</h5>
-                                            {{ $manager->department->name }}
-                                        </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5>Name</h5>
+                                        {{ $manager->user->name }}
+                                        <hr>
+                                        <h5>Department</h5>
+                                        {{ $manager->department->name }}
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
-                                    <div class="card rounded-partner">
-                                        <div class="card-body">
-                                            <h5>Category</h5>
-                                            {{ $manager->category }}
-                                            <hr>
-                                            <h5>Use Date</h5>
-                                            {{ $manager->use_date->toFormattedDateString('d/m/y') }}
-                                        </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5>Category</h5>
+                                        {{ $manager->category }}
+                                        <hr>
+                                        <h5>Use Date</h5>
+                                        {{ $manager->use_date->toFormattedDateString('d/m/y') }}
                                     </div>
                                 </div>
-                                <hr>
-                                <div class="col-lg-6">
-                                    <div class="card rounded-partner">
-                                        <div class="card-body">
-                                            <h5>Bank Name</h5>
-                                            {{ $manager->bank_name }}
-                                            <hr>
-                                            <h5>Account Number</h5>
-                                            {{ $manager->account_number }}
-                                            <hr>
-                                            <h5>Account Holder Name</h5>
-                                            {{ $manager->account_holder_name }}
-                                        </div>
+                            </div>
+                            <hr>
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5>Bank Name</h5>
+                                        {{ $manager->bank_name }}
+                                        <hr>
+                                        <h5>Account Number</h5>
+                                        {{ $manager->account_number }}
+                                        <hr>
+                                        <h5>Account Holder Name</h5>
+                                        {{ $manager->account_holder_name }}
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
-                                    <div class="card rounded-partner">
-                                        <div class="card-body">
-                                            <table class="table table-bordered" id="items-table">
-                                                <thead>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <table class="table table-bordered" id="items-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Item Name</th>
+                                                    <th>Qty</th>
+                                                    <th>Price</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($manager->items as $item)
                                                     <tr>
-                                                        <th>Item Name</th>
-                                                        <th>Qty</th>
-                                                        <th>Price</th>
+                                                        <td>{{ $item->item_name }}</td>
+                                                        <td>{{ $item->quantity }}</td>
+                                                        <td>{{ formatRupiah($item->unit_price) }}</td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($manager->items as $item)
-                                                        <tr>
-                                                            <td>{{ $item->item_name }}</td>
-                                                            <td>{{ $item->quantity }}</td>
-                                                            <td>{{ formatRupiah($item->unit_price) }}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                            <strong>Total Amount =
-                                            </strong>{{ formatRupiah($manager->total_amount) }}
-                                        </div>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                        <strong class="text-center mt-3">Total =
+                                            {{ formatRupiah($manager->total_amount) }}</strong>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-sm btn-danger rounded-partner"
-                                onclick="rejectExpense({{ $manager->id }})">Reject</button>
-                            <form id="reject-form-{{ $manager->id }}"
-                                action="{{ route('application.reject', $manager->id) }}" method="POST"
-                                style="display: none;">
-                                @csrf
-                                @method('PUT')
-                            </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger rounded-partner"
+                            onclick="rejectExpense({{ $manager->id }})">Reject</button>
+                        <form id="reject-form-{{ $manager->id }}"
+                            action="{{ route('application.reject', $manager->id) }}" method="POST"
+                            style="display: none;">
+                            @csrf
+                            @method('PUT')
+                        </form>
 
-                            <button class="btn btn-sm btn-success rounded-partner"
-                                onclick="approveExpense({{ $manager->id }})">Approve</button>
-                            <form id="approve-form-{{ $manager->id }}"
-                                action="{{ route('application.approve', $manager->id) }}" method="POST"
-                                style="display: none;">
-                                @csrf
-                                @method('PUT')
-                            </form>
-                        </div>
-                    </form>
+                        <button class="btn btn-sm btn-success rounded-partner"
+                            onclick="approveExpense({{ $manager->id }})">Approve</button>
+                        <form id="approve-form-{{ $manager->id }}"
+                            action="{{ route('application.approve', $manager->id) }}" method="POST"
+                            style="display: none;">
+                            @csrf
+                            @method('PUT')
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -717,95 +810,150 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('application.approve', $direktur->id) }}" method="POST"
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5>Name</h5>
+                                        {{ $direktur->user->name }}
+                                        <hr>
+                                        <h5>Department</h5>
+                                        {{ $direktur->department->name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5>Category</h5>
+                                        {{ $direktur->category }}
+                                        <hr>
+                                        <h5>Use Date</h5>
+                                        {{ $direktur->use_date->toFormattedDateString('d/m/y') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5>Bank Name</h5>
+                                        {{ $direktur->bank_name }}
+                                        <hr>
+                                        <h5>Account Number</h5>
+                                        {{ $direktur->account_number }}
+                                        <hr>
+                                        <h5>Account Holder Name</h5>
+                                        {{ $direktur->account_holder_name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <table class="table table-bordered" id="items-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Item Name</th>
+                                                    <th>Qty</th>
+                                                    <th>Price</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($direktur->items as $item)
+                                                    <tr>
+                                                        <td>{{ $item->item_name }}</td>
+                                                        <td>{{ $item->quantity }}</td>
+                                                        <td>{{ formatRupiah($item->unit_price) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                        <strong class="text-center mt-3">Total =
+                                            {{ formatRupiah($direktur->total_amount) }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger rounded-partner"
+                            onclick="rejectExpense({{ $direktur->id }})">Reject</button>
+                        <form id="reject-form-{{ $direktur->id }}"
+                            action="{{ route('application.reject', $direktur->id) }}" method="POST"
+                            style="display: none;">
+                            @csrf
+                            @method('PUT')
+                        </form>
+
+                        <button class="btn btn-sm btn-success rounded-partner"
+                            onclick="approveExpense({{ $direktur->id }})">Approve</button>
+                        <form id="approve-form-{{ $direktur->id }}"
+                            action="{{ route('application.approve', $direktur->id) }}" method="POST"
+                            style="display: none;">
+                            @csrf
+                            @method('PUT')
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    <!-- Modal Report-->
+    @foreach ($reports as $report)
+        <div class="modal fade" id="reportModal{{ $report->id }}" tabindex="-1" aria-labelledby="reportModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reportModalLabel">Report Application</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('application.report', $report->id) }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
-                        @method('PUT')
                         <div class="modal-body">
                             <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="card rounded-partner">
-                                        <div class="card-body">
-                                            <h5>Name</h5>
-                                            {{ $direktur->user->name }}
-                                            <hr>
-                                            <h5>Department</h5>
-                                            {{ $direktur->department->name }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="card rounded-partner">
-                                        <div class="card-body">
-                                            <h5>Category</h5>
-                                            {{ $direktur->category }}
-                                            <hr>
-                                            <h5>Use Date</h5>
-                                            {{ $direktur->use_date->toFormattedDateString('d/m/y') }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="col-lg-6">
-                                    <div class="card rounded-partner">
-                                        <div class="card-body">
-                                            <h5>Bank Name</h5>
-                                            {{ $direktur->bank_name }}
-                                            <hr>
-                                            <h5>Account Number</h5>
-                                            {{ $direktur->account_number }}
-                                            <hr>
-                                            <h5>Account Holder Name</h5>
-                                            {{ $direktur->account_holder_name }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     <div class="card rounded-partner">
                                         <div class="card-body">
                                             <table class="table table-bordered" id="items-table">
                                                 <thead>
                                                     <tr>
-                                                        <th>Item Name</th>
-                                                        <th>Qty</th>
-                                                        <th>Price</th>
+                                                        <th>Item</th>
+                                                        <th>Budget</th>
+                                                        <th>Used</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach ($direktur->items as $item)
+                                                    @foreach ($report->items as $item)
                                                         <tr>
                                                             <td>{{ $item->item_name }}</td>
-                                                            <td>{{ $item->quantity }}</td>
-                                                            <td>{{ formatRupiah($item->unit_price) }}</td>
+                                                            <td>{{ formatRupiah($item->total_price) }}</td>
+                                                            <td>
+                                                                <input type="text"
+                                                                    name="actual_amounts[{{ $item->id }}]"
+                                                                    class="form-control price_report"
+                                                                    placeholder="Enter Nominal" min="0"
+                                                                    step="0.01"
+                                                                    value="{{ old('actual_amounts.' . $item->id, $item->actual_amount) }}"
+                                                                    required>
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
                                             </table>
-                                            <strong>Total Amount =
-                                            </strong>{{ formatRupiah($direktur->total_amount) }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button class="btn btn-sm btn-danger rounded-partner"
-                                onclick="rejectExpense({{ $direktur->id }})">Reject</button>
-                            <form id="reject-form-{{ $direktur->id }}"
-                                action="{{ route('application.reject', $direktur->id) }}" method="POST"
-                                style="display: none;">
-                                @csrf
-                                @method('PUT')
-                            </form>
-
-                            <button class="btn btn-sm btn-success rounded-partner"
-                                onclick="approveExpense({{ $direktur->id }})">Approve</button>
-                            <form id="approve-form-{{ $direktur->id }}"
-                                action="{{ route('application.approve', $direktur->id) }}" method="POST"
-                                style="display: none;">
-                                @csrf
-                                @method('PUT')
-                            </form>
+                            <button type="submit" class="btn btn-sm btn-primary rounded-partner">Report</button>
                         </div>
                     </form>
                 </div>
@@ -992,6 +1140,16 @@
             $('#va1,#va2')
                 .prop('required', true);
         }
+
+        $('.price_report').inputmask({
+            alias: 'numeric',
+            prefix: 'Rp',
+            digits: 0,
+            groupSeparator: '.',
+            autoGroup: true,
+            removeMaskOnSubmit: true,
+            rightAlign: false
+        });
     </script>
 
     <script>
@@ -1038,6 +1196,23 @@
 
             $(function() {
                 $('#myexpenseTable').DataTable({
+                    "paging": true,
+                    'processing': true,
+                    "lengthChange": true,
+                    "searching": true,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                    // "scrollX": true,
+                    // width: "700px",
+                    // columnDefs: [{
+                    //     className: 'dtr-control',
+                    //     orderable: false,
+                    //     targets: -8
+                    // }]
+                });
+                $('#reportTable').DataTable({
                     "paging": true,
                     'processing': true,
                     "lengthChange": true,

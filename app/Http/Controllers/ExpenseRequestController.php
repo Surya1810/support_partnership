@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\ExpenseItem;
 use App\Models\ExpenseRequest;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,34 +20,56 @@ class ExpenseRequestController extends Controller
         $departments = Department::all()->except(8);
 
         //query saya
-        $my_expenses = ExpenseRequest::where('user_id', Auth::id())->get();
+        $my_expenses = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->get();
+        $reports = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['report', 'finish'])->get();
 
-        //query seluruh data
-        $all_expenses = ExpenseRequest::all();
+        if (Auth::user()->role_id == 1 || (Auth::user()->role_id == 2 || Auth::user()->department_id == 8)) {
+            //query seluruh data
+            $all_expenses = ExpenseRequest::all();
+        } else {
+            $all_expenses = [];
+        }
 
         //query manager
-        $user_by_department = User::where('department_id', Auth::user()->department_id)->pluck('id')->toArray();
-        // dd($user_by_department);
-        $managerRequests = ExpenseRequest::where('status', 'pending')
-            ->whereIn('user_id', $user_by_department)
-            ->where(function ($query) {
-                $query->where('total_amount', '<=', 150000)
-                    ->orWhere('approved_by_manager', false);
-            })
-            ->where('user_id', '!=', Auth::user()->id)
-            ->get();
+        if (Auth::user()->department_id == 3) {
+            $managerRequests = ExpenseRequest::where('status', 'pending')
+                ->whereIn('department_id', [2, 3])
+                ->where(function ($query) {
+                    $query->where('total_amount', '<=', 150000)
+                        ->orWhere('approved_by_manager', false);
+                })
+                ->where('user_id', '!=', Auth::user()->id)
+                ->get();
+        } elseif (Auth::user()->department_id == 5) {
+            $managerRequests = ExpenseRequest::where('status', 'pending')
+                ->whereIn('department_id', [5, 6, 7])
+                ->where(function ($query) {
+                    $query->where('total_amount', '<=', 150000)
+                        ->orWhere('approved_by_manager', false);
+                })
+                ->where('user_id', '!=', Auth::user()->id)
+                ->get();
+        } else {
+            $managerRequests = [];
+        }
 
         //query direktur  
-        $directorRequests = ExpenseRequest::where('status', 'pending')
-            ->where(function ($query) {
-                $query->where('total_amount', '>', 150000)
-                    ->orWhereHas('user', function ($q) {
-                        $q->where('role_id', 3);
-                    });
-            })
-            ->get();
+        if (Auth::user()->department_id == 3) {
+            $directorRequests = ExpenseRequest::where('status', 'pending')
+                ->where(function ($query) {
+                    $query->where('total_amount', '>', 150000)
+                        ->orWhereHas('user', function ($q) {
+                            $q->where('role_id', 3);
+                        });
+                })
+                ->orWhereIn('department_id', [1, 4, 8])
+                ->where('status', 'pending')
+                ->get();
+        } else {
+            $directorRequests = [];
+        }
 
-        return view('finance.application', compact('departments', 'my_expenses', 'managerRequests', 'directorRequests', 'all_expenses'));
+        return view('finance.application', compact('departments', 'my_expenses', 'managerRequests', 'directorRequests', 'all_expenses', 'reports'));
     }
 
     /**
@@ -235,8 +258,8 @@ class ExpenseRequestController extends Controller
     public function reject($id)
     {
         $expenseRequest = ExpenseRequest::findOrFail($id);
-        $expenseRequest->status = 'reject';
-        $expenseRequest->update();
+        $expenseRequest->status = 'rejected';
+        $expenseRequest->save();
 
         return redirect()->route('application.index')->with(['pesan' => 'Application rejected successfully', 'level-alert' => 'alert-danger']);
     }
@@ -251,5 +274,41 @@ class ExpenseRequestController extends Controller
         $expenseRequest->save();
 
         return redirect()->route('application.index')->with(['pesan' => 'Application processed successfully', 'level-alert' => 'alert-success']);
+    }
+
+    public function report(Request $request, $id)
+    {
+        $expenseRequest = ExpenseRequest::with('items')->findOrFail($id);
+        $expenseRequest->status = 'finish';
+
+        // Validasi input
+        $request->validate([
+            'actual_amounts' => 'required|array',
+            'actual_amounts.*' => 'numeric|min:0',
+        ]);
+
+        // Simpan actual amount ke database
+        foreach ($request->actual_amounts as $itemId => $actualAmount) {
+            $item = ExpenseItem::find($itemId);
+            if ($item) {
+                $item->update(['actual_amount' => $actualAmount]);
+            }
+        }
+
+        $expenseRequest->save();
+
+        return redirect()->route('application.index')->with(['pesan' => 'Application reported successfully', 'level-alert' => 'alert-success']);
+    }
+
+    public function pdf($id)
+    {
+        $expenseRequest = ExpenseRequest::with('items')->findOrFail($id);
+
+        $pdf = Pdf::loadView('finance.pdf', compact('expenseRequest'))
+            ->setPaper([0, 0, 595.28, 935.45], 'portrait'); // Ukuran F4 dalam mm
+
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="Application_Report.pdf"');
     }
 }

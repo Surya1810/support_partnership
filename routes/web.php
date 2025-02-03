@@ -39,7 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password/{id}', [ProfileController::class, 'password'])->name('profile.password');
     Route::delete('/profile/delete/{id}', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // User | Employee
+    // User | Employee  
     Route::resource('employee', UserController::class);
     Route::resource('user-data', UserExtensionController::class);
 
@@ -47,9 +47,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('finance', FinanceController::class);
     // Application
     Route::resource('application', ExpenseRequestController::class);
-    Route::put('/application/approve/{id}', [ExpenseRequestController::class, 'approve'])->name('application.approve');
-    Route::put('/application/reject/{id}', [ExpenseRequestController::class, 'reject'])->name('application.reject');
-    Route::put('/application/process/{id}', [ExpenseRequestController::class, 'process'])->name('application.process');
+    Route::put('/application/{id}/approve', [ExpenseRequestController::class, 'approve'])->name('application.approve');
+    Route::put('/application/{id}/reject', [ExpenseRequestController::class, 'reject'])->name('application.reject');
+    Route::put('/application/{id}/process', [ExpenseRequestController::class, 'process'])->name('application.process');
+    Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])->name('application.report');
+    Route::get('/application/{id}/pdf', [ExpenseRequestController::class, 'pdf'])->name('application.pdf');
     // Expense
     Route::resource('expense', ExpenseController::class);
 
