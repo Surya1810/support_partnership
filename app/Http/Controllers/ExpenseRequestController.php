@@ -246,7 +246,7 @@ class ExpenseRequestController extends Controller
 
     private function sendToFinance($expenseRequest)
     {
-        $expenseRequest->status = 'processing';
+        $expenseRequest->status = 'report';
         $expenseRequest->save();
     }
 
