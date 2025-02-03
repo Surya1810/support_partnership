@@ -25,7 +25,7 @@ class ExpenseRequestController extends Controller
 
         if (Auth::user()->role_id == 1 || (Auth::user()->role_id == 2 || Auth::user()->department_id == 8)) {
             //query seluruh data
-            $all_expenses = ExpenseRequest::all();
+            $all_expenses = ExpenseRequest::all()->orderBy('created_at', 'desc');
         } else {
             $all_expenses = [];
         }
@@ -62,7 +62,7 @@ class ExpenseRequestController extends Controller
                             $q->where('role_id', 3);
                         });
                 })
-                ->orWhereIn('department_id', [1, 4, 8])
+                // ->orWhereIn('department_id', [1, 4, 8])
                 ->where('status', 'pending')
                 ->get();
         } else {
