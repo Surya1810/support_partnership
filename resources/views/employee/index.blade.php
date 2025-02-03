@@ -113,12 +113,12 @@
                                         </ul> --}}
                                     </div>
                                     <div class="col-5 text-center">
-                                        <img src="{{ asset('assets/img/profile/' . Auth::user()->avatar) }}"
-                                            alt="user-avatar" class="img-circle img-fluid">
+                                        <img src="{{ asset('assets/img/profile/' . $user->avatar) }}" alt="user-avatar"
+                                            class="img-circle img-fluid">
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer">
+                            <div class="card-footer rounded-partner">
                                 <div class="text-center">
                                     <button type="button" class="btn btn-sm btn-primary rounded-partner"
                                         data-toggle="modal" data-target="#infoEmployee{{ $user->id }}">
@@ -160,43 +160,63 @@
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">NIK</label>
-                                <p>{{ $user->nik }}</p>
+                                @isset($user->extension->nik)
+                                    <p>{{ $user->extension->nik }}</p>
+                                @endisset
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">NPWP</label>
-                                <p>{{ $user->npwp }}</p>
+                                @isset($user->extension->nik)
+                                    <p>{{ $user->extension->npwp }}</p>
+                                @endisset
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">Phone</label>
-                                <p>{{ $user->phone }}</p>
+                                @isset($user->extension->nik)
+                                    <p>{{ $user->extension->phone }}</p>
+                                @endisset
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">Address</label>
-                                <p>{{ $user->address }}</p>
+                                @isset($user->extension->nik)
+                                    <p>{{ $user->extension->address }}</p>
+                                @endisset
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">Religion</label>
-                                <p>{{ $user->religion }}</p>
+                                @isset($user->extension->nik)
+                                    <p>{{ $user->extension->religion }}</p>
+                                @endisset
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">Birth</label>
-                                <p>{{ $user->pob }}, {{ $user->dob }}</p>
+                                @isset($user->extension->nik)
+                                    <p>{{ $user->extension->pob }}, {{ $user->extension->dob }}</p>
+                                @endisset
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">Congenital Disease</label>
-                                <p>{{ $user->disease }}</p>
+                                @isset($user->extension->nik)
+                                    <p>{{ $user->extension->disease }}</p>
+                                @endisset
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">Marriage Status</label>
-                                <p>{{ $user->marriage }}</p>
+                                @isset($user->extension->nik)
+                                    <p>{{ $user->extension->marriage }}</p>
+                                @endisset
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">Gender</label>
-                                <p>{{ $user->gender }}</p>
+                                @isset($user->extension->nik)
+                                    <p>{{ $user->extension->gender }}</p>
+                                @endisset
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">Language Skills</label>
-                                <p>{{ $user->language }}</p>
+                                @isset($user->extension->nik)
+                                    <p>{{ $user->extension->language }}</p>
+                                @endisset
                             </div>
                         </div>
                         <hr>
@@ -204,41 +224,54 @@
                         <p class="m-0"><strong>Company Information</strong></p>
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">Email</label>
+
                             <p>{{ $user->email }}</p>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">Position</label>
-                            <p>{{ $user->email }}</p>
+                            <p>{{ $user->role->name }}</p>
                         </div>
                         <hr>
 
                         <p class="m-0"><strong>Educational Information</strong></p>
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">Elementary School</label>
-                            <p>{{ $user->elementary }}</p>
+                            @isset($user->extension->nik)
+                                <p>{{ $user->extension->elementary }}</p>
+                            @endisset
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">Junior High School</label>
-                            <p>{{ $user->junior }}</p>
+                            @isset($user->extension->nik)
+                                <p>{{ $user->extension->junior }}</p>
+                            @endisset
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">Senior High School</label>
-                            <p>{{ $user->senior }}</p>
+                            @isset($user->extension->nik)
+                                <p>{{ $user->extension->senior }}</p>
+                            @endisset
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">College</label>
-                            <p>{{ $user->college }}</p>
+                            @isset($user->extension->nik)
+                                <p>{{ $user->extension->college }}</p>
+                            @endisset
                         </div>
                         <hr>
 
                         <p class="m-0"><strong>Account Information</strong></p>
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">Bank</label>
-                            <p>{{ $user->bank }}</p>
+                            @isset($user->extension->nik)
+                                <p>{{ $user->extension->bank }}</p>
+                            @endisset
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">Account Number</label>
-                            <p>{{ $user->number }}</p>
+                            @isset($user->extension->nik)
+                                <p>{{ $user->extension->number }}</p>
+                            @endisset
                         </div>
                         <hr>
                     </div>
