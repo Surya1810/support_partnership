@@ -54,7 +54,7 @@ class ExpenseRequestController extends Controller
         }
 
         //query direktur  
-        if (Auth::user()->department_id == 3) {
+        if (Auth::user()->id == 2) {
             $directorRequests = ExpenseRequest::where('status', 'pending')
                 ->where(function ($query) {
                     $query->where('total_amount', '>', 150000)
@@ -62,7 +62,7 @@ class ExpenseRequestController extends Controller
                             $q->where('role_id', 3);
                         });
                 })
-                // ->orWhereIn('department_id', [1, 4, 8])
+                ->orWhereIn('department_id', [1, 4, 8])
                 ->get();
         } else {
             $directorRequests = [];
