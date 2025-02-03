@@ -83,7 +83,7 @@
                                             <td>{{ formatRupiah($my_expense->total_amount) }}</td>
                                             <td>
                                                 @if ($my_expense->status == 'pending')
-                                                    <span class="badge badge-warning">{{ $my_expense->status }}</span>
+                                                    <span class="badge badge-secondary">{{ $my_expense->status }}</span>
                                                 @elseif ($my_expense->status == 'approved')
                                                     <span class="badge badge-secondary">{{ $my_expense->status }}</span>
                                                 @elseif ($my_expense->status == 'processing')
@@ -151,7 +151,7 @@
                                             <td>{{ formatRupiah($report->total_amount) }}</td>
                                             <td>
                                                 @if ($report->status == 'pending')
-                                                    <span class="badge badge-warning">{{ $report->status }}</span>
+                                                    <span class="badge badge-secondary">{{ $report->status }}</span>
                                                 @elseif ($report->status == 'finish')
                                                     <span class="badge badge-success">{{ $report->status }}</span>
                                                 @endif
@@ -229,7 +229,7 @@
                                                 <td>{{ formatRupiah($manager->total_amount) }}</td>
                                                 <td>
                                                     @if ($manager->status == 'pending')
-                                                        <span class="badge badge-warning">{{ $manager->status }}</span>
+                                                        <span class="badge badge-secondary">{{ $manager->status }}</span>
                                                     @elseif ($manager->status == 'approved')
                                                         <span class="badge badge-secondary">{{ $manager->status }}</span>
                                                     @elseif ($manager->status == 'processing')
@@ -315,7 +315,7 @@
                                                 <td>{{ formatRupiah($direktur->total_amount) }}</td>
                                                 <td>
                                                     @if ($direktur->status == 'pending')
-                                                        <span class="badge badge-warning">{{ $direktur->status }}</span>
+                                                        <span class="badge badge-secondary">{{ $direktur->status }}</span>
                                                     @elseif ($direktur->status == 'approved')
                                                         <span class="badge badge-secondary">{{ $direktur->status }}</span>
                                                     @elseif ($direktur->status == 'processing')
@@ -399,10 +399,9 @@
                                                 <td>
                                                     @if ($all_expense->status == 'pending')
                                                         <span
-                                                            class="badge badge-warning">{{ $all_expense->status }}</span>
-                                                    @elseif ($all_expense->status == 'approved')
-                                                        <span
                                                             class="badge badge-secondary">{{ $all_expense->status }}</span>
+                                                    @elseif ($all_expense->status == 'approved')
+                                                        <span class="badge badge-dark">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'processing')
                                                         <span class="badge badge-info">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'report')
