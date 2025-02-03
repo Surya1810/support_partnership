@@ -191,7 +191,7 @@
                             <div class="col-12 col-md-6">
                                 <label class="mb-0 form-label col-form-label-sm">Birth</label>
                                 @isset($user->extension->nik)
-                                    <p>{{ $user->extension->pob }}, {{ $user->extension->dob }}</p>
+                                    <p>{{ $user->extension->pob }}, {{ $user->extension->dob->format('d/m/y') }}</p>
                                 @endisset
                             </div>
                             <div class="col-12 col-md-6">
@@ -243,13 +243,13 @@
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">Junior High School</label>
                             @isset($user->extension->nik)
-                                <p>{{ $user->extension->junior }}</p>
+                                <p>{{ $user->extension->junior_high }}</p>
                             @endisset
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">Senior High School</label>
                             @isset($user->extension->nik)
-                                <p>{{ $user->extension->senior }}</p>
+                                <p>{{ $user->extension->senior_high }}</p>
                             @endisset
                         </div>
                         <div class="col-12 col-md-6">
