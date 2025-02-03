@@ -256,10 +256,13 @@
                 'processing': true,
                 "lengthChange": true,
                 "searching": true,
-                "ordering": true,
                 "info": true,
                 "autoWidth": false,
                 "responsive": true,
+                "order": [],
+                "columnDefs": [{
+                    "orderable": true,
+                }]
                 // "scrollX": true,
                 // width: "700px",
                 // columnDefs: [{
