@@ -25,7 +25,7 @@ class ExpenseRequestController extends Controller
 
         if (Auth::user()->role_id == 1 || (Auth::user()->role_id == 2 || Auth::user()->department_id == 8)) {
             //query seluruh data
-            $all_expenses = ExpenseRequest::all()->orderBy('created_at', 'desc');
+            $all_expenses = ExpenseRequest::orderBy('created_at', 'desc')->get();
         } else {
             $all_expenses = [];
         }
