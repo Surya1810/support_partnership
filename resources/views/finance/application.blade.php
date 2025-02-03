@@ -418,15 +418,17 @@
                                                 @if (auth()->user()->role_id == 1 || auth()->user()->department_id == 8)
                                                     <td>
                                                         @if (auth()->user()->role_id == 1)
-                                                            <button class="btn btn-sm btn-success rounded-partner"
-                                                                onclick="bypassExpense({{ $all_expense->id }})"><i
-                                                                    class="fa-solid fa-check"></i></button>
-                                                            <form id="bypass-form-{{ $all_expense->id }}"
-                                                                action="{{ route('application.store', $all_expense->id) }}"
-                                                                method="POST" style="display: none;">
-                                                                @csrf
-                                                                @method('PUT')
-                                                            </form>
+                                                            @if ($all_expense->status == 'pending')
+                                                                <button class="btn btn-sm btn-success rounded-partner"
+                                                                    onclick="bypassExpense({{ $all_expense->id }})"><i
+                                                                        class="fa-solid fa-check"></i></button>
+                                                                <form id="bypass-form-{{ $all_expense->id }}"
+                                                                    action="{{ route('application.approve', $all_expense->id) }}"
+                                                                    method="POST" style="display: none;">
+                                                                    @csrf
+                                                                    @method('PUT')
+                                                                </form>
+                                                            @endif
 
                                                             <button class="btn btn-sm btn-danger rounded-partner"
                                                                 onclick="deleteExpense({{ $all_expense->id }})"><i
