@@ -63,7 +63,6 @@ class ExpenseRequestController extends Controller
                         });
                 })
                 // ->orWhereIn('department_id', [1, 4, 8])
-                ->where('status', 'pending')
                 ->get();
         } else {
             $directorRequests = [];
