@@ -145,12 +145,14 @@
                             @enderror
 
                             <label for="type" class="mb-0 form-label col-form-label-sm">Type</label>
-                            <select id="type" name="type" class="form-control" required style="width: 100%;">
+                            <select id="type" name="type[]" class="form-control" multiple="multiple" required
+                                style="width: 100%;">
                                 <option></option>
                                 <option value="Invoice">Invoice</option>
                                 <option value="Kuitansi">Kuitansi</option>
                                 <option value="Penawaran">Penawaran</option>
                                 <option value="Perjanjian">Perjanjian</option>
+                                <option value="Permohonan PKL">Permohonan PKL</option>
                             </select>
 
                             <label for="date" class="mb-0 form-label col-form-label-sm">Date</label>
@@ -341,8 +343,11 @@
 
         // Inisialisasi Select2
         $('#type').select2({
+            tags: true, // Aktifkan fitur input manual
             placeholder: 'Choose type',
+            allowClear: true,
         });
+
         $('#company').select2({
             placeholder: 'Choose company',
         });

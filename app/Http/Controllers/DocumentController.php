@@ -44,7 +44,7 @@ class DocumentController extends Controller
 
         $document = new Document();
         $document->number = $request->number;
-        $document->type = $request->type;
+        $document->type = implode(",", $request->type);
         $document->date = $request->date;
         $document->purpose = $request->purpose;
         $document->company = $request->company;
