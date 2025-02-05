@@ -10,6 +10,7 @@ use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserExtensionController;
@@ -73,6 +74,10 @@ Route::middleware('auth')->group(function () {
     ]);
     Route::post('/task/{id}', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/status/{id}', [TaskController::class, 'status'])->name('task.status');
+
+    // Tag RFID
+    Route::resource('tag', TagController::class);
+    Route::post('/tag/import', [TagController::class, 'import'])->name('tag.import');
 
     // Client
     Route::resource('client', ClientController::class);

@@ -216,7 +216,7 @@
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Stock Opname</p>
                                     </a>
-                                    <a href="{{ route('coming_soon') }}" class="nav-link active">
+                                    <a href="{{ route('tag.index') }}" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>RFID Number</p>
                                     </a>
