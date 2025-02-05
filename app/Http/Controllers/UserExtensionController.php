@@ -53,7 +53,7 @@ class UserExtensionController extends Controller
         $old = session()->getOldInput();
 
         // Normalisasi nomor telepon
-        $phoneNumber = $request->number;
+        $phoneNumber = $request->phone;
         $normalizedNumber = ltrim($phoneNumber, '0'); // Hilangkan angka 0 di awal
         if (!str_starts_with($normalizedNumber, '62')) {
             $normalizedNumber = '62' . $normalizedNumber;

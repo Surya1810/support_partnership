@@ -270,7 +270,7 @@
                         <div class="col-12 col-md-6">
                             <label class="mb-0 form-label col-form-label-sm">Account Number</label>
                             @isset($user->extension->nik)
-                                <p>{{ $user->extension->number }}</p>
+                                <p>{{ $user->extension->account_number }}</p>
                             @endisset
                         </div>
                         <hr>

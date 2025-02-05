@@ -17,7 +17,7 @@ class FinanceController extends Controller
      */
     public function index()
     {
-        $expense_count = ExpenseRequest::sum('total_amount');
+        $expense_count = ExpenseItem::sum('total_price');
         $kembalian = ExpenseItem::sum('actual_amount');
 
         $expense_total = $expense_count - $kembalian;
