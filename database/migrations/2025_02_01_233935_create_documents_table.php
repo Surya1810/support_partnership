@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->string('nomor');
-            $table->string('jenis');
-            $table->date('tanggal');
-            $table->longText('tujuan');
-            $table->string('perusahaan');
-            $table->longText('desc');
+            $table->string('number');
+            $table->string('type');
+            $table->date('date');
+            $table->longText('purpose');
+            $table->string('company');
+            $table->longText('desc')->nullable();
             $table->timestamps();
         });
     }

@@ -20,7 +20,7 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     // Check
-    Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
+    // Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 
     // Coming Soon
     Route::get('/coming-soon', function () {
@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
 
     // Document
     Route::resource('document', DocumentController::class);
+    Route::post('/document/import', [DocumentController::class, 'import'])->name('document.import');
 
     // Project Management
     Route::resource('project', ProjectController::class);

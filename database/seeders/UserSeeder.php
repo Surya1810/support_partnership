@@ -30,6 +30,7 @@ class UserSeeder extends Seeder
             'username' => 'Firkie',
             'email' => 'firkie@partnership.co.id',
             'password' => bcrypt('123'),
+            'avatar' => 'firkie.jpg',
         ]);
         $user = User::create([
             'role_id' => '4',
@@ -39,6 +40,7 @@ class UserSeeder extends Seeder
             'username' => 'Novia',
             'email' => 'novia@partnership.co.id',
             'password' => bcrypt('123'),
+            'avatar' => 'novia.jpg',
         ]);
         $user = User::create([
             'role_id' => '3',
@@ -48,6 +50,7 @@ class UserSeeder extends Seeder
             'username' => 'Annisa',
             'email' => 'annisa@partnership.co.id',
             'password' => bcrypt('123'),
+            'avatar' => 'annisa.jpg',
         ]);
         $user = User::create([
             'role_id' => '3',
@@ -57,6 +60,7 @@ class UserSeeder extends Seeder
             'username' => 'Rudy',
             'email' => 'rudy@partnership.co.id',
             'password' => bcrypt('123'),
+            'avatar' => 'rudy.jpg',
         ]);
         $user = User::create([
             'role_id' => '3',
@@ -66,6 +70,7 @@ class UserSeeder extends Seeder
             'username' => 'Uci',
             'email' => 'uci@partnership.co.id',
             'password' => bcrypt('123'),
+            'avatar' => 'uci.jpg',
         ]);
         $user = User::create([
             'role_id' => '4',
@@ -75,6 +80,7 @@ class UserSeeder extends Seeder
             'username' => 'Enza',
             'email' => 'enza@partnership.co.id',
             'password' => bcrypt('123'),
+            'avatar' => 'encep.jpg',
         ]);
         $user = User::create([
             'role_id' => '4',
@@ -84,6 +90,7 @@ class UserSeeder extends Seeder
             'username' => 'Surya',
             'email' => 'surya@partnership.co.id',
             'password' => bcrypt('123'),
+            'avatar' => 'surya.jpg',
         ]);
         $user = User::create([
             'role_id' => '4',
@@ -93,6 +100,7 @@ class UserSeeder extends Seeder
             'username' => 'Duhan',
             'email' => 'duhan@partnership.co.id',
             'password' => bcrypt('123'),
+            'avatar' => 'duhan.jpg',
         ]);
         $user = User::create([
             'role_id' => '5',
@@ -102,6 +110,7 @@ class UserSeeder extends Seeder
             'username' => 'Dani',
             'email' => 'dani@partnership.co.id',
             'password' => bcrypt('123'),
+            'avatar' => 'dani.jpg',
         ]);
     }
 }
