@@ -20,8 +20,8 @@ class ExpenseRequestController extends Controller
         $departments = Department::all()->except(8);
 
         //query saya
-        $my_expenses = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->get();
-        $reports = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['report', 'finish'])->get();
+        $my_expenses = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->orderBy('created_at', 'desc')->get();
+        $reports = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['report', 'finish'])->orderBy('created_at', 'desc')->get();
 
         if (Auth::user()->role_id == 1 || (Auth::user()->role_id == 2 || Auth::user()->department_id == 8)) {
             //query seluruh data

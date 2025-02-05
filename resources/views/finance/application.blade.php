@@ -150,7 +150,7 @@
                                             <td>{{ $report->use_date->toFormattedDateString('d/m/y') }}</td>
                                             <td>{{ formatRupiah($report->total_amount) }}</td>
                                             <td>
-                                                @if ($report->status == 'pending')
+                                                @if ($report->status == 'report')
                                                     <span class="badge badge-secondary">{{ $report->status }}</span>
                                                 @elseif ($report->status == 'finish')
                                                     <span class="badge badge-success">{{ $report->status }}</span>
