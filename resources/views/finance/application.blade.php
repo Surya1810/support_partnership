@@ -151,7 +151,7 @@
                                             <td>{{ formatRupiah($report->total_amount) }}</td>
                                             <td>
                                                 @if ($report->status == 'report')
-                                                    <span class="badge badge-secondary">{{ $report->status }}</span>
+                                                    <span class="badge badge-warning">{{ $report->status }}</span>
                                                 @elseif ($report->status == 'finish')
                                                     <span class="badge badge-success">{{ $report->status }}</span>
                                                 @endif
