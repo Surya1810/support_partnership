@@ -20,7 +20,7 @@ class FinanceController extends Controller
         $expense_count = ExpenseItem::sum('total_price');
         $kembalian = ExpenseItem::sum('actual_amount');
 
-        $expense_total = $expense_count - $kembalian;
+        $expense_total = $expense_count - ($expense_count - $kembalian);
         return view('finance.index', compact('expense_total'));
     }
 
