@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tags', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('rfid_number');
+            $table->string('rfid_number')->primary()->unique();
             $table->enum('status', ['available', 'used'])->default('available');
             $table->timestamps();
         });

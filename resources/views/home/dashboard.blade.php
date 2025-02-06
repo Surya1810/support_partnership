@@ -67,10 +67,27 @@
                         </div>
                     </a>
                 </div>
+
+                <div class="col-lg-3 col-6">
+                    <a href="{{ route('asset.index') }}">
+                        <div class="small-box bg-primary">
+                            <div class="inner">
+                                <h3>{{ $assets }}</h3>
+
+                                <p>Asset</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-solid fa-clipboard-list"></i>
+                            </div>
+                            <span class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></span>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
         </div>
     </section>
+
     <!-- Modal -->
     <div id="extensionModal" class="modal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -135,8 +152,8 @@
 
                             <div class="col-12 col-md-6">
                                 <label for="religion" class="mb-0 form-label col-form-label-sm">Religion</label>
-                                <select class="form-control religion" style="width: 100%;" id="religion" name="religion"
-                                    required>
+                                <select class="form-control religion" style="width: 100%;" id="religion"
+                                    name="religion" required>
                                     <option></option>
                                     <option value="Protestant" {{ old('religion') == 'Protestant' ? 'selected' : '' }}>
                                         Protestant

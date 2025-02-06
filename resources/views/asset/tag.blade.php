@@ -78,11 +78,11 @@
                                             <td>
                                                 @if ($rfid->status === 'available')
                                                     <button class="btn btn-sm btn-danger rounded-partner"
-                                                        onclick="deleteRFID({{ $rfid->id }})"><i
+                                                        onclick="deleteRFID({{ $rfid->rfid_number }})"><i
                                                             class="fas fa-trash"></i></button>
-                                                    <form id="delete-form-{{ $rfid->id }}"
-                                                        action="{{ route('tag.destroy', $rfid->id) }}" method="POST"
-                                                        style="display: none;">
+                                                    <form id="delete-form-{{ $rfid->rfid_number }}"
+                                                        action="{{ route('tag.destroy', $rfid->rfid_number) }}"
+                                                        method="POST" style="display: none;">
                                                         @csrf
                                                         @method('DELETE')
                                                     </form>

@@ -208,7 +208,7 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="{{ route('coming_soon') }}" class="nav-link active">
+                                    <a href="{{ route('asset.index') }}" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Asset List</p>
                                     </a>
@@ -219,6 +219,14 @@
                                     <a href="{{ route('tag.index') }}" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>RFID Number</p>
+                                    </a>
+                                    <a href="{{ route('tag.index') }}" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Maintenance</p>
+                                    </a>
+                                    <a href="{{ route('tag.index') }}" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>History</p>
                                     </a>
                                 </li>
                             </ul>

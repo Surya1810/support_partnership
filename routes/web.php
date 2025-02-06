@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssetController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ExpenseController;
@@ -74,6 +75,11 @@ Route::middleware('auth')->group(function () {
     ]);
     Route::post('/task/{id}', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/status/{id}', [TaskController::class, 'status'])->name('task.status');
+
+    // Tag RFID
+    Route::resource('asset', AssetController::class);
+    Route::post('/asset/import', [AssetController::class, 'import'])->name('asset.import');
+    Route::post('/asset/maintenance', [AssetController::class, 'maintenance'])->name('asset.maintenance');
 
     // Tag RFID
     Route::resource('tag', TagController::class);

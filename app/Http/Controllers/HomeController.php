@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset;
 use App\Models\Document;
 use App\Models\ExpenseRequest;
 use App\Models\Project;
@@ -28,9 +29,9 @@ class HomeController extends Controller
     {
         $projects = Project::all()->count();
         $applications = ExpenseRequest::all()->count();
-        // $documents  =   Document::all()->count();
-        $documents  =   '-';
+        $documents  =   Document::all()->count();
+        $assets  =   Asset::all()->count();
 
-        return view('home.dashboard', compact('projects', 'applications', 'documents'));
+        return view('home.dashboard', compact('projects', 'applications', 'documents', 'assets'));
     }
 }
