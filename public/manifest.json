@@ -1,6 +1,6 @@
 {
-        "name": "Partnership Support",
-    "short_name": "Partners",
+    "name": "MyPartnership",
+    "short_name": "MyPartnership",
     "start_url": "/index.php",
     "theme_color": "#ffffff",
     "background_color": "#0055FF",
