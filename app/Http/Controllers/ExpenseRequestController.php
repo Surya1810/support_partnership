@@ -39,6 +39,7 @@ class ExpenseRequestController extends Controller
                         ->orWhere('approved_by_manager', false);
                 })
                 ->where('user_id', '!=', Auth::user()->id)
+                ->orderBy('created_at', 'desc')
                 ->get();
         } elseif (Auth::user()->department_id == 5) {
             $managerRequests = ExpenseRequest::where('status', 'pending')
@@ -48,6 +49,7 @@ class ExpenseRequestController extends Controller
                         ->orWhere('approved_by_manager', false);
                 })
                 ->where('user_id', '!=', Auth::user()->id)
+                ->orderBy('created_at', 'desc')
                 ->get();
         } else {
             $managerRequests = [];
@@ -63,6 +65,7 @@ class ExpenseRequestController extends Controller
                         });
                 })
                 ->orWhereIn('department_id', [1, 4, 8])
+                ->orderBy('created_at', 'desc')
                 ->get();
         } else {
             $directorRequests = [];

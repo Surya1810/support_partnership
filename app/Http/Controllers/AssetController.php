@@ -17,7 +17,7 @@ class AssetController extends Controller
      */
     public function index()
     {
-        $assets = Asset::all();
+        $assets = Asset::orderBy('created_at', 'desc')->get();
         $tags = Tag::where('status', 'available')->get();
         $users = User::where('is_active', true)->get()->except(1);
 

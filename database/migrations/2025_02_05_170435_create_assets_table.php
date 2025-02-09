@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('rfid_number')->unique();
+            $table->string('rfid_number')->unique()->references('rfid_number')->on('tags');
             $table->string('name');
             $table->string('code');
             $table->string('type'); // jenis inventaris : fixed asset , consumable, etc
@@ -33,8 +33,8 @@ return new class extends Migration
             $table->string('lantai');
             $table->string('ruangan');
 
-            $table->string('is_there')->default(true);
-            $table->string('is_active')->default(true);
+            $table->boolean('is_there')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

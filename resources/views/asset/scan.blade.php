@@ -37,17 +37,15 @@
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col-6">
-                                    <h3 class="card-title">Database</h3>
+                                    <h3>Asset List</h3>
                                 </div>
                                 <div class="col-6">
-                                    <button type="button" class="float-right btn btn-sm btn-primary rounded-partner ml-2"
-                                        data-toggle="modal" data-target="#addAsset">
-                                        <i class="fa-solid fa-plus"></i> Add
-                                    </button>
-                                    <button type="button" class="float-right btn btn-sm btn-primary rounded-partner ml-2"
-                                        data-toggle="modal" data-target="#importAsset">
-                                        <i class="fa-solid fa-file-import"></i> Import
-                                    </button>
+                                    <div class="float-right">
+                                        <p>Found : <span id="totalIsThereTrue">0</span>
+                                        </p>
+                                        <p>Missing : <span id="totalIsThereFalse">0</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -55,32 +53,26 @@
                             <table id="assetTable" class="table table-bordered text-nowrap text-center">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th rowspan="2">
+                                        <th rowspan="2" class="align-middle">
+                                            Status
+                                        </th>
+                                        <th rowspan="2" class="align-middle">
                                             RFID
                                         </th>
-                                        <th rowspan="2">
+                                        <th rowspan="2" class="align-middle">
                                             Code
                                         </th>
-                                        <th rowspan="2">
+                                        <th rowspan="2" class="align-middle">
                                             Name
                                         </th>
-                                        <th rowspan="2">
-                                            Type
-                                        </th>
-                                        <th rowspan="2">
+                                        <th rowspan="2" class="align-middle">
                                             Condition
                                         </th>
-                                        <th rowspan="2">
-                                            Maintenance
+                                        <th rowspan="2" class="align-middle">
+                                            PIC
                                         </th>
-                                        <th rowspan="2">
-                                            Value
-                                        </th>
-                                        <th colspan="4">
+                                        <th colspan="3" class="align-middle">
                                             Location
-                                        </th>
-                                        <th rowspan="2" style="width: 5%">
-                                            Action
                                         </th>
                                     </tr>
                                     <tr>
@@ -90,32 +82,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($assets as $key => $asset)
-                                        <tr>
-                                            <td>{{ $asset->tag->number }}</td>
-                                            <td>{{ $asset->code }}</td>
-                                            <td>{{ $asset->name }}</td>
-                                            <td>{{ $asset->type }}</td>
-                                            <td>{{ $asset->condition }}</td>
-                                            <td>{{ $asset->tgl_perawatan }}</td>
-                                            <td>{{ $asset->tahun_perolehan }} -
-                                                {{ formatRupiah($asset->harga_perolehan) }}</td>
-                                            <td>{{ $asset->gedung }}</td>
-                                            <td>{{ $asset->lantai }}</td>
-                                            <td>{{ $asset->ruangan }}</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-danger rounded-partner"
-                                                    onclick="deleteAsset({{ $asset->id }})"><i
-                                                        class="fas fa-trash"></i></button>
-                                                <form id="delete-form-{{ $asset->id }}"
-                                                    action="{{ route('asset.destroy', $asset->id) }}" method="POST"
-                                                    style="display: none;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                    <!-- Data Asset masuk real-time -->
                                 </tbody>
                             </table>
                         </div>
@@ -126,85 +93,28 @@
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col-6">
-                                    <h3 class="card-title">Database</h3>
+                                    <h3 class="card-title">Total :<span id="totalRFID">0</span>
+                                    </h3>
                                 </div>
                                 <div class="col-6">
-                                    <button type="button" class="float-right btn btn-sm btn-primary rounded-partner ml-2"
-                                        data-toggle="modal" data-target="#addAsset">
-                                        <i class="fa-solid fa-plus"></i> Add
-                                    </button>
-                                    <button type="button" class="float-right btn btn-sm btn-primary rounded-partner ml-2"
-                                        data-toggle="modal" data-target="#importAsset">
-                                        <i class="fa-solid fa-file-import"></i> Import
-                                    </button>
+                                    <h3 class="float-right">Scanned Data</h3>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body table-responsive">
-                            <table id="assetTable" class="table table-bordered text-nowrap text-center">
+                            <table id="rfidTable" class="table table-bordered text-nowrap text-center">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th rowspan="2">
+                                        <th style="width: 70%">
                                             RFID
                                         </th>
-                                        <th rowspan="2">
-                                            Code
+                                        <th style="width: 30%">
+                                            Timestamp
                                         </th>
-                                        <th rowspan="2">
-                                            Name
-                                        </th>
-                                        <th rowspan="2">
-                                            Type
-                                        </th>
-                                        <th rowspan="2">
-                                            Condition
-                                        </th>
-                                        <th rowspan="2">
-                                            Maintenance
-                                        </th>
-                                        <th rowspan="2">
-                                            Value
-                                        </th>
-                                        <th colspan="4">
-                                            Location
-                                        </th>
-                                        <th rowspan="2" style="width: 5%">
-                                            Action
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <th>Building</th>
-                                        <th>Floor</th>
-                                        <th>Room</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($assets as $key => $asset)
-                                        <tr>
-                                            <td>{{ $asset->tag->number }}</td>
-                                            <td>{{ $asset->code }}</td>
-                                            <td>{{ $asset->name }}</td>
-                                            <td>{{ $asset->type }}</td>
-                                            <td>{{ $asset->condition }}</td>
-                                            <td>{{ $asset->tgl_perawatan }}</td>
-                                            <td>{{ $asset->tahun_perolehan }} -
-                                                {{ formatRupiah($asset->harga_perolehan) }}</td>
-                                            <td>{{ $asset->gedung }}</td>
-                                            <td>{{ $asset->lantai }}</td>
-                                            <td>{{ $asset->ruangan }}</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-danger rounded-partner"
-                                                    onclick="deleteAsset({{ $asset->id }})"><i
-                                                        class="fas fa-trash"></i></button>
-                                                <form id="delete-form-{{ $asset->id }}"
-                                                    action="{{ route('asset.destroy', $asset->id) }}" method="POST"
-                                                    style="display: none;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                    <!-- Data RFID masuk real-time -->
                                 </tbody>
                             </table>
                         </div>
@@ -213,103 +123,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Modal Add Asset-->
-    <div class="modal fade" id="addAsset" tabindex="-1" aria-labelledby="addAssetLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addAssetLabel">Add Asset</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="{{ route('asset.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="tag" class="mb-0 form-label col-form-label-sm">RFID Number</label>
-                                <select class="form-control tag" style="width: 100%;" id="tag" name="tag"
-                                    required>
-                                    <option></option>
-                                    @foreach ($tags as $tag)
-                                        <option value="{{ $tag->id }}"
-                                            {{ old('tag') == $tag->id ? 'selected' : '' }}>
-                                            {{ $tag->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('tag')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <div class="col-12">
-                                <label for="name" class="mb-0 form-label col-form-label-sm">Name</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                    id="name" name="name" value="{{ old('name') }}"
-                                    placeholder="Enter asset name" required>
-                                @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <div class="col-12">
-                                <label for="code" class="mb-0 form-label col-form-label-sm">Code</label>
-                                <input type="text" class="form-control @error('code') is-invalid @enderror"
-                                    id="name" name="code" value="{{ old('code') }}"
-                                    placeholder="Enter asset code" required>
-                                @error('code')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary rounded-partner">Add</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Import Asset-->
-    <div class="modal fade" id="importAsset" tabindex="-1" aria-labelledby="importAssetLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="importAssetLabel">Import Asset</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="{{ route('asset.import') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="file" class="mb-0 form-label col-form-label-sm">Upload File</label>
-                            <input class="form-control @error('file') is-invalid @enderror" id="file" name="file"
-                                placeholder="Choose file" value="{{ old('file') }}" required type="file"
-                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                            @error('file')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary rounded-partner">Import</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('scripts')
@@ -323,60 +136,5 @@
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 
-    <script type="text/javascript">
-        $(function() {
-            $('#assetTable').DataTable({
-                "paging": true,
-                'processing': true,
-                "lengthChange": true,
-                "searching": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-                "order": [],
-                "columnDefs": [{
-                    "orderable": true,
-                }]
-                // "scrollX": true,
-                // width: "700px",
-                // columnDefs: [{
-                //     className: 'dtr-control',
-                //     orderable: false,
-                //     targets: -8
-                // }]
-            });
-        });
-
-        $(function() {
-
-            //Initialize Select2 Elements
-            $('.tag').select2({
-                placeholder: "Select RFID Number",
-                allowClear: true,
-            })
-        });
-
-        function deleteAsset(id) {
-            Swal.fire({
-                title: 'Are you sure?',
-                icon: 'warning',
-                showCancelButton: false,
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'Delete'
-            }).then((result) => {
-                if (result.value) {
-                    event.preventDefault();
-                    document.getElementById('delete-form-' + id).submit();
-                } else if (
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-                    swal(
-                        'Cancelled',
-                        'Your data is safe !',
-                        'error'
-                    )
-                }
-            })
-        }
-    </script>
+    <script src="{{ asset('build/assets/app.js') }}"></script>
 @endpush
