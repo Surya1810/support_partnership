@@ -255,7 +255,7 @@
                                 @enderror
                             </div>
                             <div class="col-12 col-md-6">
-                                <label for="gender" class="mb-0 form-label col-form-label-sm">Gender</label>
+                                <label for="gender1" class="mb-0 form-label col-form-label-sm">Gender</label>
                                 <div class="row pl-2">
                                     <div class="col-6">
                                         <div class="form-check">
