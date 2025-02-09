@@ -419,6 +419,12 @@
             })
         })
 
+        // Panggil fungsi ketika halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = 1; // ID user yang ingin dicek
+            checkUserExtension(userId);
+        });
+
         // Fungsi untuk mengecek extension
         function checkUserExtension(userId) {
             fetch(`/check-user-extension/${userId}`)
@@ -435,11 +441,5 @@
                 })
                 .catch(error => console.error('Error:', error));
         }
-
-        // Panggil fungsi ketika halaman dimuat
-        document.addEventListener('DOMContentLoaded', () => {
-            const userId = 1; // ID user yang ingin dicek
-            checkUserExtension(userId);
-        });
     </script>
 @endpush
