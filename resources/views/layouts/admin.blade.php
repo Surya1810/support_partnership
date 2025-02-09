@@ -212,9 +212,9 @@
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Asset List</p>
                                     </a>
-                                    <a href="{{ route('coming_soon') }}" class="nav-link active">
+                                    <a href="{{ route('scan.index') }}" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Stock Opname</p>
+                                        <p>Scan</p>
                                     </a>
                                     <a href="{{ route('tag.index') }}" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>

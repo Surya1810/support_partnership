@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ScanController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\TaskController;
@@ -22,7 +23,7 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     // Check
-    // Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
+    Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 
     // Coming Soon
     Route::get('/coming-soon', function () {
@@ -76,7 +77,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/task/{id}', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/status/{id}', [TaskController::class, 'status'])->name('task.status');
 
-    // Tag RFID
+    // Asset RFID
     Route::resource('asset', AssetController::class);
     Route::post('/asset/import', [AssetController::class, 'import'])->name('asset.import');
     Route::post('/asset/maintenance', [AssetController::class, 'maintenance'])->name('asset.maintenance');
@@ -84,6 +85,9 @@ Route::middleware('auth')->group(function () {
     // Tag RFID
     Route::resource('tag', TagController::class);
     Route::post('/tag/import', [TagController::class, 'import'])->name('tag.import');
+
+    // Scan RFID
+    Route::resource('scan', ScanController::class);
 
     // Client
     Route::resource('client', ClientController::class);
