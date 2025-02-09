@@ -341,8 +341,7 @@
         let deferredPrompt;
         const installButton = document.getElementById('installPWA');
 
-        window.addEventListener('beforeinstallprompt', function(e) {
-            console.log('beforeinstallprompt Event fired');
+        window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             installButton.style.display = 'block';
