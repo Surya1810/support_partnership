@@ -87,7 +87,8 @@
                         <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
                     </div> --}}
                 </li>
-                <button id="installPWA" class="btn btn-sm btn-primary rounded-partner">Install App</button>
+                <button id="installPWA" style="display: none;" class="btn btn-sm btn-primary rounded-partner">Install
+                    App</button>
             </ul>
         </nav>
 
@@ -339,33 +340,34 @@
     <!-- Install Button PWA -->
     <script>
         let deferredPrompt;
-        const installButton = document.getElementById('installPWA');
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installButton.style.display = 'block';
+        window.addEventListener('beforeinstallprompt', (event) => {
+            event.preventDefault();
+            deferredPrompt = event;
+            document.getElementById('installPWA').style.display = 'block';
         });
 
-        installButton.addEventListener('click', async () => {
+        document.getElementById('installPWA').addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const {
                     outcome
                 } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    console.log('PWA installed');
-                } else {
-                    console.log('PWA installation declined');
+                    document.getElementById('installPWA').style.display = 'none';
                 }
                 deferredPrompt = null;
             }
-            installButton.style.display = 'none';
         });
 
         window.addEventListener('appinstalled', () => {
-            console.log('PWA installed successfully');
+            document.getElementById('installPWA').style.display = 'none';
         });
+
+        // Cek apakah sudah terinstall
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            document.getElementById('installPWA').style.display = 'none';
+        }
     </script>
 
     <!-- Active Class -->
