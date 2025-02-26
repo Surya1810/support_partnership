@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('contact');
             $table->string('number');
             $table->string('position');
+            $table->string('npwp')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
