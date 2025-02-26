@@ -20,14 +20,17 @@ class ProjectController extends Controller
     {
         $today = Carbon::now()->toFormattedDateString('d/m/y');
         // $projects = Project::where('deadline', '>=', today())->get();
-        $projects = Project::where('status', '!=', 'Finished')->orWhere('deadline', '>=', today())->get();
+        $projects = Project::where('status', '!=', 'Finished')->where('deadline', '>=', today())->get();
 
         return view('project.index', compact('projects', 'today'));
     }
 
     public function archive()
     {
-        return view('project.index');
+        $today = Carbon::now()->toFormattedDateString('d/m/y');
+        $projects = Project::where('status', 'Finished')->get();
+
+        return view('project.archive', compact('projects', 'today'));
     }
 
     /**

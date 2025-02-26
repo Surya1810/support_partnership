@@ -66,11 +66,11 @@ Route::middleware('auth')->group(function () {
 
     // Project Management
     Route::resource('project', ProjectController::class);
-    // Route::get('/project/archive', [ProjectController::class, 'archive'])->name('project.archive');
     Route::get('/project/detail/{kode}', [ProjectController::class, 'detail'])->name('project.detail');
     Route::get('/project/task/{kode}', [ProjectController::class, 'task'])->name('project.task');
     Route::get('/project/review/{kode}', [ProjectController::class, 'review'])->name('project.review');
     Route::post('/project/done/{id}', [ProjectController::class, 'done'])->name('project.done');
+    Route::get('/projects/arsip', [ProjectController::class, 'archive'])->name('project.archive');
 
     //Task Management
     Route::resource('task', TaskController::class)->except([

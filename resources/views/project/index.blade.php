@@ -37,7 +37,7 @@
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col-6">
-                                    <h3 class="card-title">Project List - <a href="#"
+                                    <h3 class="card-title">Project List - <a href="{{ route('project.archive') }}"
                                             class="btn btn-xs btn-outline-secondary rounded-partner">Archive</a></h3>
                                 </div>
                                 @if (auth()->user()->role_id != 5)

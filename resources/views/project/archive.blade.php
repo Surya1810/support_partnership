@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title')
-    Project
+    Archive
 @endsection
 
 @push('css')
@@ -18,10 +18,10 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Project</h1>
+                    <h1>Archive</h1>
                     <ol class="breadcrumb text-black-50">
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
-                        <li class="breadcrumb-item active"><strong>Project</strong></li>
+                        <li class="breadcrumb-item active"><strong>Archive</strong></li>
                     </ol>
                 </div>
             </div>
@@ -33,162 +33,39 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <div class="card card-outline rounded-kraf card-orange">
+                    <div class="card card-outline rounded-partner card-primary">
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col-6">
-                                    <h3 class="card-title">Project List - <a href="{{ route('project.archive') }}"
-                                            class="btn btn-xs btn-outline-secondary rounded-kraf">Archive</a></h3>
+                                    <h3 class="card-title">Project Archive</h3>
                                 </div>
-                                @if (auth()->user()->id == 1 || auth()->user()->id == 9 || auth()->user()->id == 3)
-                                    <div class="col-6">
-                                        <a href="{{ route('project.create') }}"
-                                            class="btn btn-sm btn-kraf rounded-kraf float-right">Create
-                                            Project</a>
-
-                                    </div>
-                                @endif
                             </div>
                         </div>
                         <div class="card-body table-responsive">
                             <table id="projectTable" class="table table-bordered text-nowrap">
                                 <thead class="table-dark">
                                     <tr>
-                                        {{-- <th style="width: 5%">
-                                            Code
-                                        </th> --}}
                                         <th style="width: 50%">
                                             Project Name
                                         </th>
-                                        <th style="width: 18%">
-                                            Progress
+                                        <th style="width: 20%">
+                                            Department
                                         </th>
-                                        <th style="width: 5%">
-                                            Start Date
+                                        <th style="width: 10%">
+                                            Client
                                         </th>
-                                        <th style="width: 5%">
-                                            Due Date
+                                        <th style="width: 20%">
+                                            Review
                                         </th>
-                                        <th style="width: 5%">
-                                            Status
-                                        </th>
-                                        <th style="width: 5">
-                                            Urgency
-                                        </th>
-                                        <th style="width: 15%">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($projects as $project)
                                         <tr>
-                                            {{-- <td>{{ $project->kode }}</td> --}}
-                                            <td class="text-wrap">{{ $project->name }}
-                                                @if ($project->deadline->isPast())
-                                                    <span class="badge badge-danger">
-                                                        Overdue
-                                                    </span>
-                                                    <br>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @php
-                                                    $finished = $project->tasks->where('status', 'Done')->count();
-                                                    $total = $project->tasks->count();
-                                                    if ($finished == null || $total == null) {
-                                                        $progress = 0;
-                                                    } else {
-                                                        $progress = ($finished / $total) * 100;
-                                                    }
-                                                @endphp
-                                                <div class="progress progress-sm">
-                                                    <div class="progress-bar bg-success-2" role="progressbar"
-                                                        aria-valuenow="57" aria-valuemin="0" aria-valuemax="100"
-                                                        style="width: {{ $progress }}%">
-                                                    </div>
-                                                </div>
-                                                <small>
-                                                    @if ($progress != null)
-                                                        {{ number_format($progress, 1, ',', '') }}
-                                                    @else
-                                                        No Progress
-                                                    @endif
-                                                </small>
-                                            </td>
-                                            <td>{{ $project->start->toFormattedDateString('d/m/y') }}</td>
-                                            @if ($project->deadline->isPast())
-                                                <td bgcolor="ea9999">
-                                                    {{ $project->deadline->toFormattedDateString('d/m/y') }}
-                                                </td>
-                                            @elseif ($project->deadline->diffInDays($today) <= '7')
-                                                <td bgcolor="ffe599" class="text-black">
-                                                    {{ $project->deadline->toFormattedDateString('d/m/y') }}
-                                                </td>
-                                            @else
-                                                <td>{{ $project->deadline->toFormattedDateString('d/m/y') }}</td>
-                                            @endif
-                                            <td class="text-center">
-                                                @if ($project->status == 'Finished')
-                                                    <span class="badge badge-success">
-                                                        {{ $project->status }}
-                                                    </span>
-                                                @elseif ($project->status == 'On Going')
-                                                    <span class="badge badge-info">
-                                                        {{ $project->status }}
-                                                    </span>
-                                                @elseif ($project->status == 'Planning')
-                                                    <span class="badge badge-warning">
-                                                        {{ $project->status }}
-                                                    </span>
-                                                @else
-                                                    <span class="badge badge-light">
-                                                        {{ $project->status }}
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                @if ($project->urgency == 'High')
-                                                    <span class="badge badge-danger">
-                                                        {{ $project->urgency }}
-                                                    </span>
-                                                @elseif ($project->urgency == 'Medium')
-                                                    <span class="badge badge-orange">
-                                                        {{ $project->urgency }}
-                                                    </span>
-                                                @else
-                                                    <span class="badge badge-warning">
-                                                        {{ $project->urgency }}
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                @if (auth()->user()->id == 1 || auth()->user()->id == 9 || auth()->user()->id == 3)
-                                                    <a class="btn btn-sm btn-info rounded-kraf"
-                                                        href="{{ route('project.detail', $project->kode) }}">
-                                                        <i class="fa-solid fa-eye"></i>
-                                                    </a>
-                                                    @if ($project->status != 'Finished')
-                                                        <a class="btn btn-sm btn-success rounded-kraf"
-                                                            href="{{ route('project.edit', $project->kode) }}">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </a>
-                                                    @endif
-                                                    <button class="btn btn-sm btn-danger rounded-kraf"
-                                                        onclick="deleteProject({{ $project->id }})"><i
-                                                            class="fas fa-trash"></i></button>
-                                                    <form id="delete-form-{{ $project->id }}"
-                                                        action="{{ route('project.destroy', $project->id) }}"
-                                                        method="POST" style="display: none;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
-                                                @else
-                                                    <a class="btn btn-sm btn-info rounded-kraf"
-                                                        href="{{ route('project.detail', $project->kode) }}">
-                                                        <i class="fa-solid fa-eye"></i>
-                                                        View Project
-                                                    </a>
-                                                @endif
-                                            </td>
+                                            <td>{{ $project->name }}</td>
+                                            <td>{{ $project->department->name }}</td>
+                                            <td>{{ $project->client->name }}</td>
+                                            <td>{{ $project->review }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
