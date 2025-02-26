@@ -93,6 +93,26 @@ class UserSeeder extends Seeder
             'avatar' => 'surya.jpg',
         ]);
         $user = User::create([
+            'role_id' => '5',
+            'position_id' => '1',
+            'department_id' => '5',
+            'name' => 'Maulida',
+            'username' => 'Maulida',
+            'email' => 'maulida@partnership.co.id',
+            'password' => bcrypt('123'),
+            'avatar' => 'maulida.jpg',
+        ]);
+        $user = User::create([
+            'role_id' => '5',
+            'position_id' => '1',
+            'department_id' => '5',
+            'name' => '',
+            'username' => 'Surya',
+            'email' => 'surya@partnership.co.id',
+            'password' => bcrypt('123'),
+            'avatar' => 'surya.jpg',
+        ]);
+        $user = User::create([
             'role_id' => '4',
             'position_id' => '1',
             'department_id' => '3',
