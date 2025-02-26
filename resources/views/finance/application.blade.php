@@ -754,6 +754,7 @@
                             <div class="col-lg-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
+                                        <p>{{ $manager->title }}</p>
                                         <table class="table table-bordered" id="items-table">
                                             <thead>
                                                 <tr>
@@ -860,6 +861,7 @@
                             <div class="col-lg-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
+                                        <p>{{ $direktur->title }}</p>
                                         <table class="table table-bordered" id="items-table">
                                             <thead>
                                                 <tr>
@@ -966,6 +968,7 @@
                             <div class="col-lg-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
+                                        <p>{{ $all_expense->title }}</p>
                                         <table class="table table-bordered" id="items-table">
                                             <thead>
                                                 <tr>
@@ -1018,6 +1021,7 @@
                                 <div class="col-lg-12">
                                     <div class="card rounded-partner">
                                         <div class="card-body">
+                                            <p>{{ $manager->title }}</p>
                                             <table class="table table-bordered" id="items-table">
                                                 <thead>
                                                     <tr>
