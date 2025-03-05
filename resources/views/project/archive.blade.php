@@ -21,6 +21,8 @@
                     <h1>Archive</h1>
                     <ol class="breadcrumb text-black-50">
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a class="text-black-50"
+                                href="{{ route('project.index') }}">Projects</a>
                         <li class="breadcrumb-item active"><strong>Archive</strong></li>
                     </ol>
                 </div>
