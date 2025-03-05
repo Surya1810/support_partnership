@@ -13,6 +13,12 @@ body::-webkit-scrollbar {
     border-radius: 20px;
 }
 
+.dropdown-menu {
+    border-radius: 12px !important; /* Membulatkan sudut */
+    overflow: hidden; /* Menghindari isi yang keluar dari border */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Efek bayangan agar lebih modern */
+}
+
 /* FORM CONTROL FOCUS */
 /* .form-control:focus {
     border-color: rgba(241, 93, 75, 0.75);
