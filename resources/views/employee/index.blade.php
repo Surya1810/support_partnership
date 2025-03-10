@@ -31,65 +31,6 @@
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
-            {{-- <div class="row">
-                <div class="col-12">
-                    <div class="card card-outline rounded-partner card-primary">
-                        <div class="card-header">
-                            <div class="row align-items-center">
-                                <div class="col-6">
-                                    <h3 class="card-title">Employee List</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body table-responsive">
-                            <table id="employeeTable" class="table table-bordered text-nowrap text-center">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th style="width: 5%">
-                                            ID
-                                        </th>
-                                        <th>
-                                            Name
-                                        </th>
-                                        <th>
-                                            Position
-                                        </th>
-                                        <th>
-                                            Email
-                                        </th>
-                                        <th>
-                                            Department
-                                        </th>
-                                        <th>
-                                            Action
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($users as $key => $user)
-                                        <tr>
-                                            <td>{{ ++$key }}</td>
-                                            <td>{{ $user->name }}</td>
-                                            <td>{{ $user->role->name }}</td>
-                                            <td>{{ $user->email }}</td>
-                                            <td>
-                                                {{ $user->department->name }}
-                                            </td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-info rounded-partner"
-                                                    data-toggle="modal" data-target="#infoEmployee{{ $user->id }}">
-                                                    <i class="fas fa-regular fa-eye"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div> --}}
-
             <div class="row">
                 @foreach ($users as $user)
                     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -291,29 +232,4 @@
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
-
-    <script type="text/javascript">
-        $(function() {
-            $('#employeeTable').DataTable({
-                "paging": true,
-                'processing': true,
-                "lengthChange": true,
-                "searching": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-                "order": [],
-                "columnDefs": [{
-                    "orderable": true,
-                }]
-                // "scrollX": true,
-                // width: "700px",
-                // columnDefs: [{
-                //     className: 'dtr-control',
-                //     orderable: false,
-                //     targets: -8
-                // }]
-            });
-        });
-    </script>
 @endpush
