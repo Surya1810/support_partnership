@@ -25,6 +25,11 @@ class ExpenseRequestController extends Controller
         $my_expenses = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->orderBy('created_at', 'desc')->get();
         $reports = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['report', 'finish'])->orderBy('created_at', 'desc')->get();
 
+        return view('finance.application', compact('departments', 'projects', 'my_expenses', 'reports'));
+    }
+
+    public function test()
+    {
         if (Auth::user()->role_id == 1 || (Auth::user()->role_id == 2 || Auth::user()->department_id == 8)) {
             //query seluruh data
             $all_expenses = ExpenseRequest::orderBy('created_at', 'desc')->get();
@@ -35,7 +40,7 @@ class ExpenseRequestController extends Controller
         //query manager
         if (Auth::user()->department_id == 3) {
             $managerRequests = ExpenseRequest::where('status', 'pending')
-                ->whereIn('department_id', [2, 3])
+                ->where('department_id', 3)
                 ->where(function ($query) {
                     $query->where('total_amount', '<=', 150000)
                         ->orWhere('approved_by_manager', false);
@@ -45,7 +50,7 @@ class ExpenseRequestController extends Controller
                 ->get();
         } elseif (Auth::user()->department_id == 5) {
             $managerRequests = ExpenseRequest::where('status', 'pending')
-                ->whereIn('department_id', [5, 6, 7])
+                ->where('department_id', 5)
                 ->where(function ($query) {
                     $query->where('total_amount', '<=', 150000)
                         ->orWhere('approved_by_manager', false);
@@ -62,7 +67,7 @@ class ExpenseRequestController extends Controller
             $directorRequests = ExpenseRequest::where('status', 'pending')
                 ->where(function ($query) {
                     $query->where('total_amount', '>', 150000)
-                        ->orWhereIn('department_id', [1, 4, 8])
+                        ->orWhere('department_id', 1)
                         ->orWhereHas('user', function ($q) {
                             $q->where('role_id', 3);
                         });
@@ -73,12 +78,7 @@ class ExpenseRequestController extends Controller
             $directorRequests = [];
         }
 
-        return view('finance.application', compact('departments', 'projects', 'my_expenses', 'managerRequests', 'directorRequests', 'all_expenses', 'reports'));
-    }
-
-    public function approval()
-    {
-        return view('finance.approval', compact(''));
+        return view('finance.approval', compact('managerRequests', 'directorRequests', 'all_expenses',));
     }
 
     /**
