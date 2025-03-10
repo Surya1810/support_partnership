@@ -29,7 +29,7 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     // Check
-    // Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
+    Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 
     // Coming Soon
     Route::get('/coming-soon', function () {
