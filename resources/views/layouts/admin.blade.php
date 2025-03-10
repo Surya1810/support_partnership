@@ -66,7 +66,37 @@
                         <i class="far fa-bell"></i>
                         {{-- <span class="badge badge-warning navbar-badge">15</span> --}}
                     </a>
-                    {{-- <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <li class="nav-item dropdown user-menu">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                        <img src="{{ asset('assets/img/profile/' . Auth::user()->avatar) }}"
+                            class="user-image img-circle elevation-2" alt="User Image">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <!-- User image -->
+                        <li class="user-header">
+                            <img src="{{ asset('assets/img/profile/' . Auth::user()->avatar) }}"
+                                class="img-circle elevation-2" alt="User Image">
+
+                            <p>
+                                <strong>{{ Auth::user()->username }}</strong>
+                                <small>{{ auth()->user()->role->name }}</small>
+                            </p>
+                        </li>
+                        <!-- Menu Body -->
+                        <li class="user-body p-0 border-0">
+                            <ul class="my-2"><a href="{{ route('profile.edit') }}"><i
+                                        class="fa-solid fa-user mr-3"></i> Informasi
+                                    Pribadi</a></ul>
+                            <ul class="my-2"><a href="{{ route('profile.edit') }}"><i
+                                        class="fa-solid fa-shield-halved  mr-3"></i>
+                                    Keamanan</a></ul>
+                        </li>
+                        <!-- Menu Footer-->
+                        {{-- <li class="user-footer">
+                        </li> --}}
+                    </ul>
+                </li>
+                {{-- <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                         <span class="dropdown-item dropdown-header">15 Notifications</span>
                         <div class="dropdown-divider"></div>
                         <a href="#" class="dropdown-item">
@@ -104,20 +134,8 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <!-- Sidebar user panel (optional) -->
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
-                    <div class="image">
-                        <img src="{{ asset('assets/img/profile/' . Auth::user()->avatar) }}"
-                            class="img-circle elevation-2 " alt="User Image">
-                    </div>
-                    <div class="info">
-                        <a href="{{ route('profile.edit') }}"
-                            class="d-block link-warning"><strong>{{ Auth::user()->username }}</strong> <br>
-                            <small>{{ auth()->user()->role->name }}</small></a>
-                    </div>
-                </div>
                 <!-- Sidebar Menu -->
-                <nav class="mt-2">
+                <nav class="mt-3">
                     <ul class="nav nav-pills nav-sidebar flex-column nav-legacy nav-child-indent" data-widget="treeview"
                         role="menu" data-accordion="false">
                         <li class="nav-item">
@@ -148,17 +166,19 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="{{ route('finance.index') }}" class="nav-link active">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Report</p>
-                                    </a>
+                                    @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 3)
+                                        <a href="{{ route('finance.index') }}" class="nav-link active">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Report</p>
+                                        </a>
+                                        <a href="{{ route('application.approval') }}" class="nav-link active">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Approval</p>
+                                        </a>
+                                    @endif
                                     <a href="{{ route('application.index') }}" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Application</p>
-                                    </a>
-                                    <a href="{{ route('coming_soon') }}" class="nav-link active">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Expense</p>
                                     </a>
                                 </li>
                             </ul>
@@ -179,22 +199,6 @@
                                 <i class="nav-icon fa-solid fa-helmet-safety"></i>
                                 <p>
                                     Project
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('coming_soon') }}" class="nav-link">
-                                <i class="nav-icon fa-solid fa-list-check"></i>
-                                <p>
-                                    Daily Task
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('coming_soon') }}" class="nav-link">
-                                <i class="nav-icon fa-regular fa-calendar"></i>
-                                <p>
-                                    Schedule
                                 </p>
                             </a>
                         </li>
@@ -254,14 +258,6 @@
                                 <i class="nav-icon fa-regular fa-address-book"></i>
                                 <p>
                                     Partner
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('coming_soon') }}" class="nav-link">
-                                <i class="nav-icon fa-solid fa-box"></i>
-                                <p>
-                                    Product
                                 </p>
                             </a>
                         </li>

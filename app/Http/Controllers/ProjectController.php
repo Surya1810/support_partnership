@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Department;
+use App\Models\Income;
 use App\Models\Project;
 use App\Models\User;
 use Carbon\Carbon;
@@ -20,7 +21,7 @@ class ProjectController extends Controller
     {
         $today = Carbon::now()->toFormattedDateString('d/m/y');
         // $projects = Project::where('deadline', '>=', today())->get();
-        $projects = Project::where('status', '!=', 'Finished')->where('deadline', '>=', today())->get();
+        $projects = Project::where('status', '!=', 'Finished')->get();
 
         return view('project.index', compact('projects', 'today'));
     }
@@ -39,7 +40,7 @@ class ProjectController extends Controller
     public function create()
     {
         $users = User::where('id', '!=', '1')->get();
-        $departments = Department::all()->except(8);
+        $departments = Department::all()->except([2, 4, 6, 7, 8]);
         $clients = Client::all();
         return view('project.create', compact('users', 'clients', 'departments'));
     }
@@ -96,7 +97,7 @@ class ProjectController extends Controller
         $project = Project::where('kode', $kode)->first();
         $users = User::where('id', '!=', '1')->get();
         $clients = Client::all();
-        $departments = Department::all()->except(8);
+        $departments = Department::all()->except([2, 4, 6, 7, 8]);;
 
         return view('project.edit', compact('project', 'users', 'clients', 'departments'));
     }
@@ -198,6 +199,14 @@ class ProjectController extends Controller
         $project->status = 'Finished';
         $project->review = $request->review;
         $project->save();
+
+        $sp2d = new Income();
+        $sp2d->department_id = $project->department_id;
+        $sp2d->project_id = $project->id;
+        $sp2d->category = 'sp2d';
+        $sp2d->desc = 'pemasukan sp2d dari project ' . $project->name;
+        $sp2d->amount = $request->sp2d;
+        $sp2d->save();
 
         return redirect()->route('project.index')->with(['pesan' => 'Project Finished', 'level-alert' => 'alert-success']);
     }

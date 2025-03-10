@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\ExpenseItem;
 use App\Models\ExpenseRequest;
+use App\Models\Project;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -17,7 +18,8 @@ class ExpenseRequestController extends Controller
      */
     public function index()
     {
-        $departments = Department::all()->except(8);
+        $departments = Department::all()->except([2, 4, 6, 7, 8]);
+        $projects = Project::where('status', '!=', 'Finished')->get();
 
         //query saya
         $my_expenses = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->orderBy('created_at', 'desc')->get();
@@ -60,18 +62,23 @@ class ExpenseRequestController extends Controller
             $directorRequests = ExpenseRequest::where('status', 'pending')
                 ->where(function ($query) {
                     $query->where('total_amount', '>', 150000)
+                        ->orWhereIn('department_id', [1, 4, 8])
                         ->orWhereHas('user', function ($q) {
                             $q->where('role_id', 3);
                         });
                 })
-                ->orWhereIn('department_id', [1, 4, 8])
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
             $directorRequests = [];
         }
 
-        return view('finance.application', compact('departments', 'my_expenses', 'managerRequests', 'directorRequests', 'all_expenses', 'reports'));
+        return view('finance.application', compact('departments', 'projects', 'my_expenses', 'managerRequests', 'directorRequests', 'all_expenses', 'reports'));
+    }
+
+    public function approval()
+    {
+        return view('finance.approval', compact(''));
     }
 
     /**
@@ -106,7 +113,11 @@ class ExpenseRequestController extends Controller
         $expenseRequest->user_id = $request->user_id;
         $expenseRequest->department_id = $request->department_id;
         $expenseRequest->title = $request->title;
-        $expenseRequest->category = $request->category;
+        if (is_numeric($request->category)) {
+            $expenseRequest->project_id = $request->category;
+        } else {
+            $expenseRequest->category = $request->category;
+        }
         $expenseRequest->use_date = $request->use_date;
         if ($request->pencairan == 'saya') {
             $expenseRequest->bank_name = $user->extension->bank;
@@ -273,6 +284,7 @@ class ExpenseRequestController extends Controller
     {
         $expenseRequest = ExpenseRequest::findOrFail($id);
         $expenseRequest->status = 'report';
+        $expenseRequest->processed_by_finance = true;
         $expenseRequest->save();
 
         return redirect()->route('application.index')->with(['pesan' => 'Application processed successfully', 'level-alert' => 'alert-success']);

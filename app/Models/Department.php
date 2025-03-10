@@ -14,4 +14,8 @@ class Department extends Model
     {
         return $this->hasMany(Project::class);
     }
+    public function income()
+    {
+        return $this->hasMany(Income::class);
+    }
 }

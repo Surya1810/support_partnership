@@ -33,4 +33,12 @@ class Project extends Model
     {
         return $this->belongsTo(Client::class, 'client_id');
     }
+    public function expense()
+    {
+        return $this->hasMany(ExpenseRequest::class, 'project_id');
+    }
+    public function income()
+    {
+        return $this->hasOne(Income::class, 'project_id');
+    }
 }

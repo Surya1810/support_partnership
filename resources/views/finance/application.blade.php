@@ -39,18 +39,10 @@
             <div class="row">
                 <!-- Tabel on going application-->
                 <div class="col-12 col-md-6">
-                    <div class="card card-outline rounded-partner card-primary collapsed-card">
+                    <div class="card card-outline rounded-partner card-primary">
                         <div class="card-header">
                             <div class="card-title">
                                 <h6>My Application</h6>
-                            </div>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-tool" data-card-widget="remove">
-                                    <i class="fas fa-times"></i>
-                                </button>
                             </div>
                         </div>
                         <div class="card-body table-responsive">
@@ -78,7 +70,13 @@
                                     @foreach ($my_expenses as $my_expense)
                                         <tr>
                                             <td>{{ $my_expense->title }}</td>
-                                            <td>{{ $my_expense->category }}</td>
+                                            <td>
+                                                @if ($my_expense->category == null)
+                                                    <strong>Project</strong> {{ $my_expense->project->name }}
+                                                @else
+                                                    <strong>Rumah Tangga</strong> {{ $my_expense->category }}
+                                                @endif
+                                            </td>
                                             <td>{{ $my_expense->use_date->format('d/m/y') }}</td>
                                             <td>{{ formatRupiah($my_expense->total_amount) }}</td>
                                             <td>
@@ -104,18 +102,10 @@
 
                 <!-- Tabel report-->
                 <div class="col-12 col-md-6">
-                    <div class="card card-outline rounded-partner card-primary collapsed-card">
+                    <div class="card card-outline rounded-partner card-primary">
                         <div class="card-header">
                             <div class="card-title">
                                 <h6>Report Application</h6>
-                            </div>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-tool" data-card-widget="remove">
-                                    <i class="fas fa-times"></i>
-                                </button>
                             </div>
                         </div>
                         <div class="card-body table-responsive">
@@ -146,7 +136,13 @@
                                     @foreach ($reports as $report)
                                         <tr>
                                             <td>{{ $report->title }}</td>
-                                            <td>{{ $report->category }}</td>
+                                            <td>
+                                                @if ($report->category == null)
+                                                    <strong>Project</strong> {{ $report->project->name }}
+                                                @else
+                                                    <strong>Rumah Tangga</strong> {{ $report->category }}
+                                                @endif
+                                            </td>
                                             <td>{{ $report->use_date->toFormattedDateString('d/m/y') }}</td>
                                             <td>{{ formatRupiah($report->total_amount) }}</td>
                                             <td>
@@ -177,14 +173,20 @@
                     </div>
                 </div>
 
-                <!-- Tabel approval manajer-->
+                {{-- <!-- Tabel approval manajer-->
                 @if (auth()->user()->role_id == 3)
                     <div class="col-12">
-                        <div class="card card-outline rounded-partner card-primary">
+                        <div class="card card-outline rounded-partner card-warning">
                             <div class="card-header">
                                 <div class="row align-items-center">
                                     <div class="col-6">
-                                        <h3 class="card-title">Application Approval</h3>
+                                        <h3 class="card-title">Pending Approval</h3>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="float-right">
+                                            <span class="badge badge-warning">Pending :
+                                                {{ $managerRequests->count() }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -266,11 +268,17 @@
                 <!-- Tabel approval direktur-->
                 @if (auth()->user()->role_id == 2)
                     <div class="col-12">
-                        <div class="card card-outline rounded-partner card-primary">
+                        <div class="card card-outline rounded-partner card-warning">
                             <div class="card-header">
                                 <div class="row align-items-center">
                                     <div class="col-6">
-                                        <h3 class="card-title">Application Approval</h3>
+                                        <h3 class="card-title">Pending Approval</h3>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="float-right">
+                                            <span class="badge badge-warning">Pending :
+                                                {{ $directorRequests->count() }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -344,12 +352,12 @@
                             </div>
                         </div>
                     </div>
-                @endif
+                @endif --}}
 
                 <!-- Tabel general & proses finance & bypass approval admin-->
                 @if (auth()->user()->role_id == 1 || (auth()->user()->role_id == 2 || auth()->user()->department_id == 8))
                     <div class="col-12">
-                        <div class="card card-outline rounded-partner card-primary">
+                        <div class="card card-outline rounded-partner card-danger">
                             <div class="card-header">
                                 <div class="row align-items-center">
                                     <div class="col-6">
@@ -393,7 +401,13 @@
                                                     <small><strong>{{ $all_expense->department->name }}</strong></small>
                                                 </td>
                                                 <td class="text-wrap">{{ $all_expense->title }}</td>
-                                                <td>{{ $all_expense->category }}</td>
+                                                <td>
+                                                    @if ($all_expense->category == null)
+                                                        <strong>Project</strong> {{ $all_expense->project->name }}
+                                                    @else
+                                                        <strong>Rumah Tangga</strong> {{ $all_expense->category }}
+                                                    @endif
+                                                </td>
                                                 <td>{{ $all_expense->use_date->toFormattedDateString('d/m/y') }}</td>
                                                 <td>{{ formatRupiah($all_expense->total_amount) }}</td>
                                                 <td>
@@ -405,13 +419,11 @@
                                                     @elseif ($all_expense->status == 'processing')
                                                         <span class="badge badge-info">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'report')
-                                                        <span
-                                                            class="badge badge-warning">{{ $all_expense->status }}</span>
+                                                        <span class="badge badge-warning">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'rejected')
                                                         <span class="badge badge-danger">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'finish')
-                                                        <span
-                                                            class="badge badge-success">{{ $all_expense->status }}</span>
+                                                        <span class="badge badge-success">{{ $all_expense->status }}</span>
                                                     @endif
                                                 </td>
                                                 @if (auth()->user()->role_id == 1 || auth()->user()->department_id == 8)
@@ -506,6 +518,10 @@
                                 <select class="form-control department" style="width: 100%;" id="department_id"
                                     name="department_id" required>
                                     <option></option>
+                                    <option value="Rumah Tangga"
+                                        {{ old('category') == 'Rumah Tangga' ? 'selected' : '' }}>
+                                        Rumah Tangga
+                                    </option>
                                     @foreach ($departments as $department)
                                         <option value="{{ $department->id }}"
                                             {{ old('department_id') == $department->id ? 'selected' : '' }}>
@@ -536,54 +552,42 @@
                                 <select class="form-control category" style="width: 100%;" id="category"
                                     name="category" required>
                                     <option></option>
-                                    <option value="Reimbursement"
-                                        {{ old('category') == 'Reimbursement' ? 'selected' : '' }}>
-                                        Reimbursement
-                                    </option>
-                                    <option value="Maintanance" {{ old('category') == 'Maintanance' ? 'selected' : '' }}>
-                                        Maintanance
-                                    </option>
-                                    <option value="Business Travel"
-                                        {{ old('category') == 'Business Travel' ? 'selected' : '' }}>
-                                        Business Travel
-                                    </option>
-                                    <option value="Business Travel"
-                                        {{ old('category') == 'Business Travel' ? 'selected' : '' }}>
-                                        Cost of Goods Sold (CoGS)
-                                    </option>
-                                    <option value="Taxes" {{ old('category') == 'Taxes' ? 'selected' : '' }}>
-                                        Taxes
-                                    </option>
-                                    <option value="Marketing & Ads"
-                                        {{ old('category') == 'Marketing & Ads' ? 'selected' : '' }}>
-                                        Marketing & Ads
-                                    </option>
-                                    <option value="Office" {{ old('category') == 'Office' ? 'selected' : '' }}>
-                                        Office
-                                    </option>
-                                    <option value="Utilities" {{ old('category') == 'Utilities' ? 'selected' : '' }}>
-                                        Utilities
-                                    </option>
-                                    <option value="Internet Services"
-                                        {{ old('category') == 'Internet Services' ? 'selected' : '' }}>
-                                        Internet Services
-                                    </option>
-                                    <option value="Rent / Mortgage"
-                                        {{ old('category') == 'Rent / Mortgage' ? 'selected' : '' }}>
-                                        Rent / Mortgage
-                                    </option>
-                                    <option value="Training & Education"
-                                        {{ old('category') == 'Training & Education' ? 'selected' : '' }}>
-                                        Training & Education
-                                    </option>
-                                    <option value="Employee Wages"
-                                        {{ old('category') == 'Employee Wages' ? 'selected' : '' }}>
-                                        Employee Benefits
-                                    </option>
-                                    <option value="Employee Wages"
-                                        {{ old('category') == 'Employee Wages' ? 'selected' : '' }}>
-                                        Employee Wages
-                                    </option>
+                                    <optgroup label="Pengeluaran Project">
+                                        @foreach ($projects as $project)
+                                            <option value="{{ $project->id }}">{{ $project->name }} -
+                                                <strong>{{ $project->department->name }}</strong>
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                    <optgroup label="Pengeluaran Rumah Tangga">
+                                        <option value="Reimbursement"
+                                            {{ old('category') == 'Reimbursement' ? 'selected' : '' }}>
+                                            Reimbursement
+                                        </option>
+                                        <option value="Maintenance"
+                                            {{ old('category') == 'Maintenance' ? 'selected' : '' }}>
+                                            Maintenance
+                                        </option>
+                                        <option value="Marketing & Iklan"
+                                            {{ old('category') == 'Marketing & Iklan' ? 'selected' : '' }}>
+                                            Marketing & Iklan
+                                        </option>
+                                        <option value="Kebutuhan Kantor / Divisi"
+                                            {{ old('category') == 'Kebutuhan Kantor / Divisi' ? 'selected' : '' }}>
+                                            Kebutuhan Kantor / Divisi
+                                        </option>
+                                        <option value="Pelatihan & Pendidikan"
+                                            {{ old('category') == 'Pelatihan & Pendidikan' ? 'selected' : '' }}>
+                                            Pelatihan & Pendidikan
+                                        </option>
+                                        <option value="Salary Tim"
+                                            {{ old('category') == 'Salary Tim' ? 'selected' : '' }}>
+                                            Salary Tim
+                                        </option>
+                                        <option value="Lain-lain" {{ old('category') == 'Lain-lain' ? 'selected' : '' }}>
+                                            Lain-lain
+                                        </option>
+                                    </optgroup>
                                 </select>
                                 @error('category')
                                     <span class="invalid-feedback" role="alert">
@@ -668,20 +672,20 @@
                         <table class="table table-bordered" id="items-table">
                             <thead>
                                 <tr>
-                                    <th>Item Name</th>
-                                    <th>Qty</th>
-                                    <th>Price</th>
+                                    <th>Nama Item</th>
+                                    <th>Jumlah</th>
+                                    <th>Nilai Satuan</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td><input type="text" name="items[0][item_name]" class="form-control"
-                                            placeholder="Enter item" required></td>
+                                            placeholder="Enter nama item" required></td>
                                     <td><input type="number" name="items[0][quantity]" class="form-control"
-                                            placeholder="Enter quantity" min="1" value="1" required></td>
+                                            placeholder="Enter jumlah" min="1" value="1" required></td>
                                     <td><input type="text" name="items[0][unit_price]" class="form-control price"
-                                            placeholder="Enter Price" min="0" step="0.01" required></td>
+                                            placeholder="Enter nilai satuan" min="0" step="0.01" required></td>
                                     <td><button type="button"
                                             class="btn btn-danger btn-sm remove-item rounded-partner"><i
                                                 class="fas fa-trash"></i></button></td>
@@ -699,7 +703,7 @@
         </div>
     </div>
 
-    <!-- Modal Manager Approval-->
+    {{-- <!-- Modal Manager Approval-->
     @foreach ($managerRequests as $manager)
         <!-- Modal Show Approval-->
         <div class="modal fade text-sm" id="editStepModal{{ $manager->id }}" tabindex="-1"
@@ -911,7 +915,7 @@
                 </div>
             </div>
         </div>
-    @endforeach
+    @endforeach --}}
 
     <!-- Modal Finance-->
     @foreach ($all_expenses as $all_expense)
@@ -972,9 +976,9 @@
                                         <table class="table table-bordered" id="items-table">
                                             <thead>
                                                 <tr>
-                                                    <th>Item Name</th>
-                                                    <th>Qty</th>
-                                                    <th>Price</th>
+                                                    <th>Nama Item</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Nilai Satuan</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1021,7 +1025,7 @@
                                 <div class="col-lg-12">
                                     <div class="card rounded-partner">
                                         <div class="card-body">
-                                            <p>{{ $manager->title }}</p>
+                                            <p>{{ $report->title }}</p>
                                             <table class="table table-bordered" id="items-table">
                                                 <thead>
                                                     <tr>
@@ -1104,42 +1108,24 @@
             $('#myexpenseTable').DataTable({
                 "paging": true,
                 'processing': true,
-                "lengthChange": true,
-                "searching": true,
+                "searching": false,
                 "info": true,
-                "autoWidth": false,
-                "responsive": true,
+                "scrollX": true,
                 "order": [],
                 "columnDefs": [{
                     "orderable": true,
                 }]
-                // "scrollX": true,
-                // width: "700px",
-                // columnDefs: [{
-                //     className: 'dtr-control',
-                //     orderable: false,
-                //     targets: -8
-                // }]
             });
             $('#reportTable').DataTable({
                 "paging": true,
                 'processing': true,
-                "lengthChange": true,
-                "searching": true,
+                "searching": false,
                 "info": true,
-                "autoWidth": false,
-                "responsive": true,
+                "scrollX": true,
                 "order": [],
                 "columnDefs": [{
                     "orderable": true,
                 }]
-                // "scrollX": true,
-                // width: "700px",
-                // columnDefs: [{
-                //     className: 'dtr-control',
-                //     orderable: false,
-                //     targets: -8
-                // }]
             });
             $('#managerTable').DataTable({
                 "paging": true,
@@ -1368,9 +1354,9 @@
             $('#add-item').click(function() {
                 const newRow = `
                     <tr>
-                        <td><input type="text" name="items[${itemIndex}][item_name]" class="form-control" placeholder="Enter item"></td>
-                        <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control" placeholder="Enter quantity" min="1" value="1"></td>
-                        <td><input type="text" name="items[${itemIndex}][unit_price]" class="form-control price" placeholder="Enter Price" min="0" step="0.01"></td>
+                        <td><input type="text" name="items[${itemIndex}][item_name]" class="form-control" placeholder="Enter nama item"></td>
+                        <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control" placeholder="Enter jumlah" min="1" value="1"></td>
+                        <td><input type="text" name="items[${itemIndex}][unit_price]" class="form-control price" placeholder="Enter nilai satuan" min="0" step="0.01"></td>
                         <td><button type="button" class="btn btn-danger btn-sm rounded-partner remove-item"><i class="fas fa-trash"></i></button></td>
                     </tr>
                 `;

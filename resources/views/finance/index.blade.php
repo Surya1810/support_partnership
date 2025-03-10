@@ -32,82 +32,139 @@
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
+            <h4>Laporan Umum</h4>
             <div class="row">
                 <div class="col-12 col-md-4">
                     <div class="card card-outline rounded-partner card-primary">
                         <div class="card-body">
-                            <p><strong>Cash Balance</strong></p>
-                            <h3>Rp<i class="fa-solid fa-infinity"></i></h3>
-                            <small>current</small>
-                            <hr>
+                            <p><strong>Total Kas</strong></p>
+                            <h3>{{ formatRupiah($total_cash_balance) }}</h3>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
                     <div class="card card-outline rounded-partner card-primary">
                         <div class="card-body">
-                            <p><strong>Expenses</strong></p>
-                            <h3>{{ formatRupiah($expense_total) }}</h3>
-                            <small>this year</small>
-                            <hr>
+                            <p><strong>Total Pengeluaran</strong></p>
+                            <h3>{{ formatRupiah($household_expense + $project_expense) }}</h3>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
                     <div class="card card-outline rounded-partner card-primary">
                         <div class="card-body">
-                            <p><strong>Net Profit</strong></p>
-                            <h3>Rp<i class="fa-solid fa-infinity"></i></h3>
-                            <small>this year</small>
-                            <hr>
+                            <p><strong>Total Saldo</strong></p>
+                            <h3>{{ formatRupiah($total_saldo) }}</h3>
                         </div>
                     </div>
                 </div>
                 <hr>
-                <div class="col-12 col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">
-                                <h5>Expenditure</h5>
-                            </div>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button type="button" class="btn btn-tool" data-card-widget="remove">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
+            </div>
+
+            <hr>
+            <h4>Laporan Divisi</h4>
+            <!-- Department -->
+            <div class="row">
+                <div class="col-12 col-md-4">
+                    <div class="card rounded-partner bg-primary">
                         <div class="card-body">
-                            <canvas id="pieChart"
-                                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            <p><strong>Procurement</strong></p>
+                            <h3>{{ formatRupiah($procurement_saldo) }}</h3>
+                            <small>Saldo</small>
+                            <hr>
+                            <div class="row">
+                                <div class="col-6">
+                                    <small><strong>Pengeluaran Rumah Tangga</strong></small><br>
+                                    <small>{{ formatRupiah($procurement_household_expense) }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Modal Project</strong></small><br>
+                                    <small>{{ formatRupiah($procurement_project_expense) }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Pendapatan Kas</strong></small><br>
+                                    <small>{{ formatRupiah($procurement_income) }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Penyusutan</strong></small><br>
+                                    <small>{{ formatRupiah($procurement_debts->whereIn('category', ['development', 'debt'])->sum('amount') - $procurement_debts->where('category', 'payment')->sum('amount')) }}</small>
+                                </div>
+                            </div>
                         </div>
+                        <a class="text-white" href="{{ route('procurement.report') }}">
+                            <div class="card-footer rounded-partner">
+                                View Recap
+                            </div>
+                        </a>
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">
-                                <h5>Expenditure</h5>
-                            </div>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button type="button" class="btn btn-tool" data-card-widget="remove">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
+                <div class="col-12 col-md-4">
+                    <div class="card rounded-partner bg-indigo">
                         <div class="card-body">
-                            <div class="chart">
-                                <canvas id="barChart"
-                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            <p><strong>Technology</strong></p>
+                            <h3>{{ formatRupiah($technology_saldo) }}</h3>
+                            <small>Saldo</small>
+                            <hr>
+                            <div class="row">
+                                <div class="col-6">
+                                    <small><strong>Pengeluaran Rumah Tangga</strong></small><br>
+                                    <small>{{ formatRupiah($technology_household_expense) }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Modal Project</strong></small><br>
+                                    <small>{{ formatRupiah($technology_project_expense) }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Pendapatan Kas</strong></small><br>
+                                    <small>{{ formatRupiah($technology_income) }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Penyusutan</strong></small><br>
+                                    <small>{{ formatRupiah($technology_debts->whereIn('category', ['development', 'debt'])->sum('amount') - $technology_debts->where('category', 'payment')->sum('amount')) }}</small>
+                                </div>
                             </div>
                         </div>
+                        <a class="text-white" href="{{ route('technology.report') }}">
+                            <div class="card-footer rounded-partner">
+                                View Recap
+                            </div>
+                        </a>
                     </div>
                 </div>
+                <div class="col-12 col-md-4">
+                    <div class="card rounded-partner bg-orange">
+                        <div class="card-body">
+                            <p><strong>Construction</strong></p>
+                            <h3>{{ formatRupiah($construction_saldo) }}</h3>
+                            <small>Saldo</small>
+                            <hr>
+                            <div class="row">
+                                <div class="col-6">
+                                    <small><strong>Pengeluaran Rumah Tangga</strong></small><br>
+                                    <small>{{ formatRupiah($construction_household_expense) }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Modal Project</strong></small><br>
+                                    <small>{{ formatRupiah($construction_project_expense) }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Pendapatan Kas</strong></small><br>
+                                    <small>{{ formatRupiah($construction_income) }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small><strong>Penyusutan</strong></small><br>
+                                    <small>{{ formatRupiah($construction_debts->whereIn('category', ['development', 'debt'])->sum('amount') - $construction_debts->where('category', 'payment')->sum('amount')) }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="text-white" href="{{ route('construction.report') }}">
+                            <div class="card-footer rounded-partner">
+                                View Recap
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <hr>
             </div>
         </div>
     </section>

@@ -222,7 +222,7 @@
     </div>
 
     <!-- Modal Finish-->
-    <div class="modal fade" id="finishModal" tabindex="-1" aria-labelledby="finishModalLabel" aria-hidden="true">
+    <div class="modal fade" id="finishModal" aria-labelledby="finishModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -235,16 +235,18 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
-                            <div class="form-group">
-                                <label for="review" class="mb-0 form-label col-form-label-sm">Review</label>
-                                <textarea class="form-control @error('review') is-invalid @enderror" rows="4"
-                                    placeholder="Enter Project review..." id="review" name="review" required>{{ old('review') }}</textarea>
-                                @error('review')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                            <label for="sp2d" class="mb-0 form-label col-form-label-sm">SP2D</label>
+                            <input type="text" name="sp2d" class="form-control price" placeholder="Enter SP2D"
+                                min="0" step="0.01" value="{{ old('sp2d') }}" required>
+
+                            <label for="review" class="mb-0 form-label col-form-label-sm">Review</label>
+                            <textarea class="form-control @error('review') is-invalid @enderror" rows="4"
+                                placeholder="Enter Project review..." id="review" name="review" required>{{ old('review') }}</textarea>
+                            @error('review')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -324,7 +326,19 @@
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 
+    <script src="{{ asset('assets/adminLTE/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
+
     <script type="text/javascript">
+        $('.price').inputmask({
+            alias: 'numeric',
+            prefix: 'Rp',
+            digits: 0,
+            groupSeparator: '.',
+            autoGroup: true,
+            removeMaskOnSubmit: true,
+            rightAlign: false
+        });
+
         $(document).ready(function() {
             $(function() {
                 $('#taskTable').DataTable({
