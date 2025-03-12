@@ -174,7 +174,7 @@
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Report</p>
                                         </a>
-                                        <a href="{{ route('application.anjing') }}" class="nav-link active">
+                                        <a href="{{ route('application.approval') }}" class="nav-link active">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Approval</p>
                                         </a>
