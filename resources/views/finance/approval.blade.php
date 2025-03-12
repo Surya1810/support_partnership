@@ -217,7 +217,7 @@
                 <!-- Tabel general & proses finance & bypass approval admin-->
                 @if (auth()->user()->role_id == 1 || (auth()->user()->role_id == 2 || auth()->user()->department_id == 8))
                     <div class="col-12">
-                        <div class="card card-outline rounded-partner card-danger">
+                        <div class="card card-outline rounded-partner card-primary">
                             <div class="card-header">
                                 <div class="row align-items-center">
                                     <div class="col-6">
@@ -674,7 +674,6 @@
                 'processing': true,
                 "searching": false,
                 "info": true,
-                "responsive": true,
                 "scrollX": true,
                 "order": [],
                 "columnDefs": [{
@@ -686,7 +685,6 @@
                 'processing': true,
                 "searching": false,
                 "info": true,
-                "responsive": true,
                 "scrollX": true,
                 "order": [],
                 "columnDefs": [{
@@ -698,7 +696,6 @@
                 'processing': true,
                 "searching": false,
                 "info": true,
-                "responsive": true,
                 "scrollX": true,
                 "order": [],
                 "columnDefs": [{

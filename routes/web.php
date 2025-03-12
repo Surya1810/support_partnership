@@ -57,7 +57,7 @@ Route::middleware('auth')->group(function () {
     // Application
     Route::resource('application', ExpenseRequestController::class);
     Route::put('/application/{id}/approve', [ExpenseRequestController::class, 'approve'])->name('application.approve');
-    Route::get('/approval', [ExpenseRequestController::class, 'test'])->name('application.anjing');
+    Route::get('/approval', [ExpenseRequestController::class, 'approval'])->name('application.approval');
     Route::put('/application/{id}/reject', [ExpenseRequestController::class, 'reject'])->name('application.reject');
     Route::put('/application/{id}/process', [ExpenseRequestController::class, 'process'])->name('application.process');
     Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])->name('application.report');

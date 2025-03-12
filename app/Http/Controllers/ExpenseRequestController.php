@@ -28,7 +28,7 @@ class ExpenseRequestController extends Controller
         return view('finance.application', compact('departments', 'projects', 'my_expenses', 'reports'));
     }
 
-    public function test()
+    public function approval()
     {
         if (Auth::user()->role_id == 1 || (Auth::user()->role_id == 2 || Auth::user()->department_id == 8)) {
             //query seluruh data
@@ -248,7 +248,7 @@ class ExpenseRequestController extends Controller
             $this->sendToFinance($expenseRequest);
             $expenseRequest->save();
 
-            return redirect()->route('application.index')->with(['pesan' => 'Application approved successfully by admin', 'level-alert' => 'alert-success']);
+            return redirect()->route('application.approval')->with(['pesan' => 'Application approved successfully by admin', 'level-alert' => 'alert-success']);
         }
 
         // Cek apakah approval selesai
@@ -261,7 +261,7 @@ class ExpenseRequestController extends Controller
 
         $expenseRequest->save();
 
-        return redirect()->route('application.index')->with(['pesan' => 'Application approved successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('application.approval')->with(['pesan' => 'Application approved successfully', 'level-alert' => 'alert-success']);
     }
 
     private function sendToFinance($expenseRequest)
@@ -280,7 +280,7 @@ class ExpenseRequestController extends Controller
         $expenseRequest->status = 'rejected';
         $expenseRequest->save();
 
-        return redirect()->route('application.index')->with(['pesan' => 'Application rejected successfully', 'level-alert' => 'alert-danger']);
+        return redirect()->route('application.approval')->with(['pesan' => 'Application rejected successfully', 'level-alert' => 'alert-danger']);
     }
 
     /**
@@ -293,7 +293,7 @@ class ExpenseRequestController extends Controller
         $expenseRequest->processed_by_finance = true;
         $expenseRequest->save();
 
-        return redirect()->route('application.index')->with(['pesan' => 'Application processed successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('application.approval')->with(['pesan' => 'Application processed successfully', 'level-alert' => 'alert-success']);
     }
 
     public function report(Request $request, $id)
