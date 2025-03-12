@@ -111,7 +111,12 @@ class ExpenseRequestController extends Controller
         // Simpan data pengajuan biaya
         $expenseRequest = new ExpenseRequest();
         $expenseRequest->user_id = $request->user_id;
-        $expenseRequest->department_id = $request->department_id;
+        if ($request->department_id == 1) {
+            $expenseRequest->department_id = $request->department_id;
+            $expenseRequest->approved_by_manager = true;
+        } else {
+            $expenseRequest->department_id = $request->department_id;
+        }
         $expenseRequest->title = $request->title;
         if (is_numeric($request->category)) {
             $expenseRequest->project_id = $request->category;
@@ -226,6 +231,7 @@ class ExpenseRequestController extends Controller
 
         // Logika untuk Direktur
         if ($userRole === 'Director') {
+            // if (!$expenseRequest->approved_by_manager && $expenseRequest->total_amount > 150000) {
             if (!$expenseRequest->approved_by_manager && $expenseRequest->total_amount > 150000) {
                 return redirect()->back()->with(['pesan' => 'Application must approved by manager first', 'level-alert' => 'alert-danger']);
             }
