@@ -317,7 +317,7 @@
     <!-- AdminLTE App -->
     <script src="{{ asset('assets/adminLTE/dist/js/adminlte.min.js') }}"></script>
 
-    <!-- Service Worker -->
+    {{-- <!-- Service Worker -->
     <script src="{{ asset('/sw.js') }}"></script>
     <script>
         if ("serviceWorker" in navigator) {
@@ -367,7 +367,7 @@
         if (window.matchMedia('(display-mode: standalone)').matches) {
             document.getElementById('installPWA').style.display = 'none';
         }
-    </script>
+    </script> --}}
 
     <!-- Active Class -->
     <script>
