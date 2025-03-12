@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Route;
 //     return view('maintenance');
 // });
 
+Route::get('/', [HomeController::class, 'index'])->name('dashboard');
+
 Auth::routes();
 
 Route::middleware('auth')->group(function () {
@@ -35,8 +37,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/coming-soon', function () {
         return view('coming_soon');
     })->name('coming_soon');
-
-    Route::get('/', [HomeController::class, 'index'])->name('dashboard');
 
     // Profile Section
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
