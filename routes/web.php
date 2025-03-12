@@ -21,9 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    // Maintenance
-    return view('maintenance');
-    // return redirect('dashboard');
+    return redirect()->route('dashboard');
 });
 
 Auth::routes();
