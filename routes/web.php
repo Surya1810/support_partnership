@@ -20,11 +20,11 @@ use App\Http\Controllers\UserExtensionController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Maintenance
-Route::get('/', function () {
-    // return view('maintenance');
-    return redirect()->route('dashboard');
-});
+// Route::get('/', function () {
+//     // Maintenance
+//     // return view('maintenance');
+//     return redirect('dashboard');
+// });
 
 Auth::routes();
 
