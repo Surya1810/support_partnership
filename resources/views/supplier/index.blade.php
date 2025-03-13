@@ -270,22 +270,13 @@
             $('#supplierTable').DataTable({
                 "paging": true,
                 'processing': true,
-                "lengthChange": true,
-                "searching": true,
+                "searching": false,
                 "info": true,
-                "autoWidth": false,
-                "responsive": true,
+                "scrollX": true,
                 "order": [],
                 "columnDefs": [{
                     "orderable": true,
                 }]
-                // "scrollX": true,
-                // width: "700px",
-                // columnDefs: [{
-                //     className: 'dtr-control',
-                //     orderable: false,
-                //     targets: -8
-                // }]
             });
         });
 

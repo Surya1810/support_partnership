@@ -43,14 +43,6 @@ body::-webkit-scrollbar {
     box-shadow: 0 0 0 0.35rem rgba(0, 85, 255, 0.25);
 }
 
-/* Asset */
-.badge-orange {
-    /* border: 1px solid;
-    border-color: rgba(241, 93, 75, 1); */
-    background-color: #ff9130;
-    color: #fff;
-}
-
 /* Nav Rounded */
 .nav-tabs .rounded {
     border-top-left-radius: 20px !important;
@@ -101,6 +93,27 @@ body::-webkit-scrollbar {
 }
 .bg-danger-2 {
     background-color: #ea9999;
+}
+
+/* Style Partnership */
+.nav-pills .nav-link {
+    border-radius: 20px;
+    padding: 10px 15px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: #0055ff !important;
+    color: #ffffff !important;
+    font-weight: bold;
+}
+
+.nav-pills .nav-link.logout,
+.nav-pills .show > .nav-link {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+    font-weight: bold;
 }
 
 .sidebar-collapse

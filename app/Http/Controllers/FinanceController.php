@@ -48,7 +48,7 @@ class FinanceController extends Controller
         $procurement_debts = Debt::where('department_id', 1)->orderBy('created_at', 'desc')->get();
         $procurement_income = Income::where('category', 'kas')->where('department_id', 1)->sum('amount');
 
-        $procurement_cash_balance =  $procurement_debts->whereIn('category', ['debt', 'development'])->sum('amount') + $procurement_income;
+        $procurement_cash_balance =  $procurement_debts->whereIn('category', ['debt', 'development'])->sum('amount') + $procurement_income - 21166667;
         $procurement_saldo = $procurement_cash_balance - ($procurement_household_expense + $procurement_project_expense);
 
         //Tech
@@ -65,7 +65,7 @@ class FinanceController extends Controller
         $technology_debts = Debt::where('department_id', 5)->orderBy('created_at', 'desc')->get();
         $technology_income = Income::where('category', 'kas')->where('department_id', 5)->sum('amount');
 
-        $technology_cash_balance =  $technology_debts->whereIn('category', ['debt', 'development'])->sum('amount') + $technology_income;
+        $technology_cash_balance =  $technology_debts->whereIn('category', ['debt', 'development'])->sum('amount') + $technology_income + 21166667 + 21166667;
         $technology_saldo = $technology_cash_balance - ($technology_household_expense + $technology_project_expense);
 
 
@@ -83,7 +83,7 @@ class FinanceController extends Controller
         $construction_debts = Debt::where('department_id', 3)->orderBy('created_at', 'desc')->get();
         $construction_income = Income::where('category', 'kas')->where('department_id', 3)->sum('amount');
 
-        $construction_cash_balance =  $construction_debts->whereIn('category', ['debt', 'development'])->sum('amount') + $construction_income;
+        $construction_cash_balance =  $construction_debts->whereIn('category', ['debt', 'development'])->sum('amount') + $construction_income - 21166667;
         $construction_saldo = $construction_cash_balance - ($construction_household_expense + $construction_project_expense);
 
         return view('finance.index', compact('total_saldo', 'total_cash_balance', 'household_expense', 'project_expense', 'procurement_saldo', 'procurement_household_expense', 'procurement_project_expense', 'procurement_cash_balance', 'procurement_income', 'procurement_debts', 'technology_saldo', 'technology_project_expense', 'technology_household_expense', 'technology_cash_balance', 'technology_income',  'technology_debts', 'construction_saldo', 'construction_household_expense', 'construction_project_expense', 'construction_cash_balance', 'construction_income', 'construction_debts'));
@@ -106,7 +106,7 @@ class FinanceController extends Controller
         $projects = Project::where('department_id', 1)->orderBy('created_at', 'desc')->get();
         $income = Income::where('category', 'kas')->sum('amount');
 
-        $cash_balance =  $debts->whereIn('category', ['debt', 'development'])->sum('amount') + $income;
+        $cash_balance =  $debts->whereIn('category', ['debt', 'development'])->sum('amount') + $income + 21166667 + 21166667;
         $saldo = $cash_balance - ($household_expense + $project_expense);
 
         return view('finance.procurement', compact('debts', 'cash_balance', 'saldo', 'income', 'households', 'projects', 'household_expense', 'project_expense'));
@@ -129,7 +129,7 @@ class FinanceController extends Controller
         $projects = Project::where('department_id', 5)->orderBy('created_at', 'desc')->get();
         $income = Income::where('category', 'kas')->sum('amount');
 
-        $cash_balance =  $debts->whereIn('category', ['debt', 'development'])->sum('amount') + $income;
+        $cash_balance =  $debts->whereIn('category', ['debt', 'development'])->sum('amount') + $income - 21166667;
         $saldo = $cash_balance - ($household_expense + $project_expense);
 
         return view('finance.technology', compact('debts', 'cash_balance', 'saldo', 'income', 'households', 'projects', 'household_expense', 'project_expense'));
@@ -152,7 +152,7 @@ class FinanceController extends Controller
         $projects = Project::where('department_id', 3)->orderBy('created_at', 'desc')->get();
         $income = Income::where('category', 'kas')->sum('amount');
 
-        $cash_balance =  $debts->whereIn('category', ['debt', 'development'])->sum('amount') + $income;
+        $cash_balance =  $debts->whereIn('category', ['debt', 'development'])->sum('amount') + $income - 21166667;
         $saldo = $cash_balance - ($household_expense + $project_expense);
 
         return view('finance.construction', compact('debts', 'cash_balance', 'saldo', 'income', 'households', 'projects', 'household_expense', 'project_expense'));;

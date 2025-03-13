@@ -136,7 +136,7 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-3">
-                    <ul class="nav nav-pills nav-sidebar flex-column nav-legacy nav-child-indent" data-widget="treeview"
+                    <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview"
                         role="menu" data-accordion="false">
                         <li class="nav-item">
                             <a href="{{ route('dashboard') }}" class="nav-link">
@@ -170,16 +170,16 @@
                                             auth()->user()->role_id == 2 ||
                                             auth()->user()->role_id == 3 ||
                                             auth()->user()->department_id == 8)
-                                        <a href="{{ route('finance.index') }}" class="nav-link active">
+                                        <a href="{{ route('finance.index') }}" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Report</p>
                                         </a>
-                                        <a href="{{ route('application.approval') }}" class="nav-link active">
+                                        <a href="{{ route('application.approval') }}" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Approval</p>
                                         </a>
                                     @endif
-                                    <a href="{{ route('application.index') }}" class="nav-link active">
+                                    <a href="{{ route('application.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Application</p>
                                     </a>
@@ -216,23 +216,23 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="{{ route('asset.index') }}" class="nav-link active">
+                                    <a href="{{ route('asset.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Asset List</p>
                                     </a>
-                                    <a href="{{ route('scan.index') }}" class="nav-link active">
+                                    <a href="{{ route('scan.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Scan</p>
                                     </a>
-                                    <a href="{{ route('tag.index') }}" class="nav-link active">
+                                    <a href="{{ route('tag.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>RFID Number</p>
                                     </a>
-                                    <a href="{{ route('tag.index') }}" class="nav-link active">
+                                    <a href="{{ route('tag.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Maintenance</p>
                                     </a>
-                                    <a href="{{ route('tag.index') }}" class="nav-link active">
+                                    <a href="{{ route('tag.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>History</p>
                                     </a>
