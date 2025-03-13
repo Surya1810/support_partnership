@@ -48,7 +48,7 @@ class FinanceController extends Controller
         $procurement_debts = Debt::where('department_id', 1)->orderBy('created_at', 'desc')->get();
         $procurement_income = Income::where('category', 'kas')->where('department_id', 1)->sum('amount');
 
-        $procurement_cash_balance =  $procurement_debts->whereIn('category', ['debt', 'development'])->sum('amount') + $procurement_income - 21166667;
+        $procurement_cash_balance =  $procurement_debts->whereIn('category', ['debt', 'development'])->sum('amount') + $procurement_income + 21166667 + 21166667;
         $procurement_saldo = $procurement_cash_balance - ($procurement_household_expense + $procurement_project_expense);
 
         //Tech
@@ -65,7 +65,7 @@ class FinanceController extends Controller
         $technology_debts = Debt::where('department_id', 5)->orderBy('created_at', 'desc')->get();
         $technology_income = Income::where('category', 'kas')->where('department_id', 5)->sum('amount');
 
-        $technology_cash_balance =  $technology_debts->whereIn('category', ['debt', 'development'])->sum('amount') + $technology_income + 21166667 + 21166667;
+        $technology_cash_balance =  $technology_debts->whereIn('category', ['debt', 'development'])->sum('amount') + $technology_income - 21166667;
         $technology_saldo = $technology_cash_balance - ($technology_household_expense + $technology_project_expense);
 
 
