@@ -268,7 +268,7 @@
             $('#clientTable').DataTable({
                 "paging": true,
                 'processing': true,
-                "searching": false,
+                "searching": true,
                 "info": true,
                 "scrollX": true,
                 "order": [],

@@ -187,6 +187,33 @@
                             </ul>
                         </li>
                         <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fa-solid fa-circle-info"></i>
+
+                                <p>
+                                    Izin
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    @if (auth()->user()->role_id == 1 ||
+                                            auth()->user()->role_id == 2 ||
+                                            auth()->user()->role_id == 3 ||
+                                            auth()->user()->department_id == 8)
+                                        <a href="{{ route('izin.approval') }}" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Approval</p>
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('izin.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Pengajuan</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('document.index') }}" class="nav-link">
                                 <i class="nav-icon fa-regular fa-folder-open"></i>
                                 <i class=""></i>

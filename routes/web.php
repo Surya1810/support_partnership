@@ -8,6 +8,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseRequestController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\IzinController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
@@ -57,12 +58,21 @@ Route::middleware('auth')->group(function () {
     // Application
     Route::resource('application', ExpenseRequestController::class);
     Route::put('/application/{id}/approve', [ExpenseRequestController::class, 'approve'])->name('application.approve');
-    Route::get('/approval', [ExpenseRequestController::class, 'approval'])->name('application.approval');
+    Route::get('/approval/pengajuan', [ExpenseRequestController::class, 'approval'])->name('application.approval');
     Route::post('/application/{id}/reject', [ExpenseRequestController::class, 'reject'])->name('application.reject');
     Route::post('/application/bulk-action', [ExpenseRequestController::class, 'bulkAction'])->name('application.bulkAction');
     Route::put('/application/{id}/process', [ExpenseRequestController::class, 'process'])->name('application.process');
     Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])->name('application.report');
     Route::get('/application/{id}/pdf', [ExpenseRequestController::class, 'pdf'])->name('application.pdf');
+
+    // Debt
+    Route::resource('izin', IzinController::class);
+    Route::get('/approval/izin', [IzinController::class, 'approval'])->name('izin.approval');
+    Route::put('/izin/{id}/approve', [IzinController::class, 'approve'])->name('izin.approve');
+    Route::put('/izin/{id}/reject', [IzinController::class, 'reject'])->name('izin.reject');
+    Route::post('/izin/bulk-action', [IzinController::class, 'bulkAction'])->name('izin.bulkAction');
+
+
     // Debt
     Route::resource('debt', DebtController::class);
 
