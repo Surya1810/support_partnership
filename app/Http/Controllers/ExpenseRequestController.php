@@ -274,10 +274,15 @@ class ExpenseRequestController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
+        $request->validate([
+            'reason' => 'required|string|max:1000'
+        ]);
+
         $expenseRequest = ExpenseRequest::findOrFail($id);
         $expenseRequest->status = 'rejected';
+        $expenseRequest->rejection_reason = $request->input('reason');
         $expenseRequest->save();
 
         return redirect()->route('application.approval')->with(['pesan' => 'Application rejected successfully', 'level-alert' => 'alert-danger']);
@@ -319,6 +324,74 @@ class ExpenseRequestController extends Controller
 
         return redirect()->route('application.index')->with(['pesan' => 'Application reported successfully', 'level-alert' => 'alert-success']);
     }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'selected_ids' => 'required|array',
+            'action' => 'required|in:approve,reject',
+        ]);
+
+        $userRole = Auth::user()->role->name;
+        $approvedCount = 0;
+        $rejectedCount = 0;
+
+        foreach ($request->selected_ids as $id) {
+            $expenseRequest = ExpenseRequest::find($id);
+
+            if (!$expenseRequest) continue;
+
+            // Skip jika sudah di-approve
+            if ($expenseRequest->status === 'approved') continue;
+
+            if ($request->action === 'approve') {
+                if ($userRole === 'Manager') {
+                    if ($expenseRequest->total_amount > 150000) {
+                        $expenseRequest->approved_by_manager = true;
+                    } else {
+                        $expenseRequest->approved_by_manager = true;
+                        $expenseRequest->approved_by_director = true;
+                    }
+                }
+
+                if ($userRole === 'Director') {
+                    if (!$expenseRequest->approved_by_manager && $expenseRequest->total_amount > 150000) {
+                        continue; // Lewati jika belum disetujui manager
+                    }
+                    $expenseRequest->approved_by_director = true;
+                }
+
+                if ($userRole === 'Administrator') {
+                    $expenseRequest->approved_by_manager = true;
+                    $expenseRequest->approved_by_director = true;
+                    $expenseRequest->status = 'approved';
+                    $this->sendToFinance($expenseRequest);
+                    $expenseRequest->save();
+                    $approvedCount++;
+                    continue;
+                }
+
+                // Cek apakah sudah lengkap approve
+                if ($expenseRequest->approved_by_manager && $expenseRequest->approved_by_director) {
+                    $expenseRequest->status = 'approved';
+                    $this->sendToFinance($expenseRequest);
+                }
+
+                $expenseRequest->save();
+                $approvedCount++;
+            }
+
+            if ($request->action === 'reject') {
+                $expenseRequest->status = 'rejected';
+                $expenseRequest->rejection_reason = 'Mass rejection';
+                $expenseRequest->save();
+                $rejectedCount++;
+            }
+        }
+
+        return redirect()->back()->with(['pesan' => "Application $approvedCount approved, $rejectedCount rejected.", 'level-alert' => 'alert-success']);
+    }
+
 
     public function pdf($id)
     {

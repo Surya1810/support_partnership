@@ -51,9 +51,27 @@
                                 </div>
                             </div>
                             <div class="card-body table-responsive">
-                                <table id="managerTable" class="table table-bordered text-nowrap">
+                                <div class="mb-2">
+                                    <button type="button" class="btn btn-success btn-sm rounded-partner"
+                                        onclick="submitBulkAction('approve')">
+                                        <i class="fa fa-check"></i> Approve Selected
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm rounded-partner"
+                                        onclick="submitBulkAction('reject')">
+                                        <i class="fa fa-times"></i> Reject Selected
+                                    </button>
+                                    <form id="bulkActionForm" method="POST" action="{{ route('application.bulkAction') }}">
+                                        @csrf
+                                        <input type="hidden" name="action" id="bulkActionType">
+                                    </form>
+                                </div>
+
+                                <table id="managerTable" class="table table-bordered">
                                     <thead class="table-dark">
                                         <tr>
+                                            <th style="width: 5%">
+                                                <input type="checkbox" id="selectAll">
+                                            </th>
                                             <th style="width: 10%">
                                                 User
                                             </th>
@@ -82,6 +100,10 @@
                                     <tbody>
                                         @foreach ($managerRequests as $manager)
                                             <tr>
+                                                <td>
+                                                    <input type="checkbox" class="select-box" name="selected_ids[]"
+                                                        value="{{ $manager->id }}">
+                                                </td>
                                                 <td>{{ $manager->user->name }} <br>
                                                     <small><strong>{{ $manager->department->name }}</strong></small>
                                                 </td>
@@ -143,13 +165,32 @@
                                 </div>
                             </div>
                             <div class="card-body table-responsive">
-                                <table id="direkturTable" class="table table-bordered text-nowrap">
+                                <div class="mb-2">
+                                    <button type="button" class="btn btn-success btn-sm rounded-partner"
+                                        onclick="submitBulkAction('approve')">
+                                        <i class="fa fa-check"></i> Approve Selected
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm rounded-partner"
+                                        onclick="submitBulkAction('reject')">
+                                        <i class="fa fa-times"></i> Reject Selected
+                                    </button>
+                                    <form id="bulkActionForm" method="POST"
+                                        action="{{ route('application.bulkAction') }}">
+                                        @csrf
+                                        <input type="hidden" name="action" id="bulkActionType">
+                                    </form>
+                                </div>
+
+                                <table id="direkturTable" class="table table-bordered">
                                     <thead class="table-dark">
                                         <tr>
+                                            <th style="width: 5%">
+                                                <input type="checkbox" id="selectAll">
+                                            </th>
                                             <th style="width: 10%">
                                                 User
                                             </th>
-                                            <th style="width: 45%">
+                                            <th style="width: 40%">
                                                 Title
                                             </th>
                                             <th style="width: 10%">
@@ -174,10 +215,14 @@
                                     <tbody>
                                         @foreach ($directorRequests as $direktur)
                                             <tr>
+                                                <td>
+                                                    <input type="checkbox" class="select-box" name="selected_ids[]"
+                                                        value="{{ $direktur->id }}">
+                                                </td>
                                                 <td>{{ $direktur->user->name }} <br>
                                                     <small><strong>{{ $direktur->department->name }}</strong></small>
                                                 </td>
-                                                <td class="text-wrap">{{ $direktur->title }}</td>
+                                                <td>{{ $direktur->title }}</td>
                                                 <td>{{ $direktur->category }}</td>
                                                 <td>{{ $direktur->use_date->toFormattedDateString('d/m/y') }}</td>
                                                 <td>{{ formatRupiah($direktur->total_amount) }}</td>
@@ -226,7 +271,7 @@
                                 </div>
                             </div>
                             <div class="card-body table-responsive">
-                                <table id="allTable" class="table table-bordered text-nowrap">
+                                <table id="allTable" class="table table-bordered">
                                     <thead class="table-dark">
                                         <tr>
                                             <th style="width: 10%">
@@ -260,7 +305,7 @@
                                                 <td>{{ $all_expense->user->name }} <br>
                                                     <small><strong>{{ $all_expense->department->name }}</strong></small>
                                                 </td>
-                                                <td class="text-wrap">{{ $all_expense->title }}</td>
+                                                <td>{{ $all_expense->title }}</td>
                                                 <td>
                                                     @if ($all_expense->category == null)
                                                         <strong>Project</strong> {{ $all_expense->project->name }}
@@ -435,7 +480,7 @@
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-sm btn-danger rounded-partner"
-                            onclick="rejectExpense({{ $manager->id }})">Reject</button>
+                            onclick="closeModalAndReject({{ $manager->id }})">Reject</button>
                         <form id="reject-form-{{ $manager->id }}"
                             action="{{ route('application.reject', $manager->id) }}" method="POST"
                             style="display: none;">
@@ -542,7 +587,7 @@
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-sm btn-danger rounded-partner"
-                            onclick="rejectExpense({{ $direktur->id }})">Reject</button>
+                            onclick="closeModalAndReject({{ $direktur->id }})">Reject</button>
                         <form id="reject-form-{{ $direktur->id }}"
                             action="{{ route('application.reject', $direktur->id) }}" method="POST"
                             style="display: none;">
@@ -704,28 +749,51 @@
             });
         });
 
+        function closeModalAndReject(id) {
+            // Hapus fokus dari tombol agar tidak menyebabkan error aria-hidden
+            document.activeElement.blur();
+
+            const modal = $('#editStepModal' + id);
+
+            // Tunggu sampai modal selesai ditutup
+            modal.one('hidden.bs.modal', function() {
+                rejectExpense(id);
+            });
+
+            modal.modal('hide');
+        }
+
+
         function rejectExpense(id) {
             Swal.fire({
                 title: 'Are you sure?',
+                text: 'Please provide a reason for rejection:',
                 icon: 'warning',
-                showCancelButton: false,
+                input: 'textarea',
+                inputPlaceholder: 'Type your reason here...',
+                inputAttributes: {
+                    'aria-label': 'Rejection reason'
+                },
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'You need to write a reason!'
+                    }
+                },
                 confirmButtonColor: '#d33',
                 confirmButtonText: 'Reject'
             }).then((result) => {
-                if (result.value) {
-                    event.preventDefault();
-                    document.getElementById('reject-form-' + id).submit();
-                } else if (
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-                    swal(
-                        'Cancelled',
-                        'Your data is safe !',
-                        'error'
-                    )
+                if (result.isConfirmed) {
+                    let form = document.getElementById('reject-form-' + id);
+                    let input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'reason';
+                    input.value = result.value;
+                    form.appendChild(input);
+                    form.submit();
                 }
-            })
+            });
         }
+
 
         function deleteExpense(id) {
             Swal.fire({
@@ -817,6 +885,57 @@
                     )
                 }
             })
+        }
+
+        document.getElementById('selectAll').addEventListener('click', function() {
+            let checkboxes = document.querySelectorAll('.select-box');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        function submitBulkAction(actionType) {
+            const selectedCheckboxes = document.querySelectorAll('.select-box:checked');
+            if (selectedCheckboxes.length === 0) {
+                Swal.fire('Warning', 'Please select at least one item.', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: `Are you sure to ${actionType}?`,
+                icon: 'warning',
+                confirmButtonColor: '#5cb85c',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('bulkActionForm');
+                    form.innerHTML = ''; // Clear existing input
+
+                    // CSRF
+                    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    const csrf = document.createElement('input');
+                    csrf.type = 'hidden';
+                    csrf.name = '_token';
+                    csrf.value = token;
+                    form.appendChild(csrf);
+
+                    // Action type
+                    const actionInput = document.createElement('input');
+                    actionInput.type = 'hidden';
+                    actionInput.name = 'action';
+                    actionInput.value = actionType;
+                    form.appendChild(actionInput);
+
+                    // Selected IDs
+                    selectedCheckboxes.forEach(cb => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'selected_ids[]';
+                        input.value = cb.value;
+                        form.appendChild(input);
+                    });
+
+                    form.submit();
+                }
+            });
         }
     </script>
 @endpush

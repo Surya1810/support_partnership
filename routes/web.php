@@ -58,7 +58,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('application', ExpenseRequestController::class);
     Route::put('/application/{id}/approve', [ExpenseRequestController::class, 'approve'])->name('application.approve');
     Route::get('/approval', [ExpenseRequestController::class, 'approval'])->name('application.approval');
-    Route::put('/application/{id}/reject', [ExpenseRequestController::class, 'reject'])->name('application.reject');
+    Route::post('/application/{id}/reject', [ExpenseRequestController::class, 'reject'])->name('application.reject');
+    Route::post('/application/bulk-action', [ExpenseRequestController::class, 'bulkAction'])->name('application.bulkAction');
     Route::put('/application/{id}/process', [ExpenseRequestController::class, 'process'])->name('application.process');
     Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])->name('application.report');
     Route::get('/application/{id}/pdf', [ExpenseRequestController::class, 'pdf'])->name('application.pdf');
