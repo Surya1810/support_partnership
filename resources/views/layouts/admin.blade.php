@@ -142,7 +142,7 @@
                             <a href="{{ route('dashboard') }}" class="nav-link">
                                 <i class="nav-icon fa-solid fa-house"></i>
                                 <p>
-                                    Home
+                                    Dashboard
                                 </p>
                             </a>
                         </li>
@@ -151,7 +151,7 @@
                             <a href="{{ route('employee.index') }}" class="nav-link">
                                 <i class="nav-icon fa-solid fa-id-card"></i>
                                 <p>
-                                    Employee
+                                    Karyawan
                                 </p>
                             </a>
                         </li>
@@ -172,7 +172,7 @@
                                             auth()->user()->department_id == 8)
                                         <a href="{{ route('finance.index') }}" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
-                                            <p>Report</p>
+                                            <p>Laporan</p>
                                         </a>
                                         <a href="{{ route('application.approval') }}" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
@@ -181,7 +181,7 @@
                                     @endif
                                     <a href="{{ route('application.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Application</p>
+                                        <p>Pengajuan</p>
                                     </a>
                                 </li>
                             </ul>
@@ -218,7 +218,7 @@
                                 <i class="nav-icon fa-solid fa-file"></i>
                                 <i class=""></i>
                                 <p>
-                                    Document
+                                    Dokumen
                                 </p>
                             </a>
                         </li>
@@ -279,7 +279,7 @@
                             <a href="{{ route('client.index') }}" class="nav-link">
                                 <i class="nav-icon fa-regular fa-handshake"></i>
                                 <p>
-                                    Client
+                                    Klien
                                 </p>
                             </a>
                         </li>
@@ -295,7 +295,7 @@
                             <a href="{{ route('partner.index') }}" class="nav-link">
                                 <i class="nav-icon fa-regular fa-address-book"></i>
                                 <p>
-                                    Partner
+                                    Rekanan
                                 </p>
                             </a>
                         </li>
