@@ -215,7 +215,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('document.index') }}" class="nav-link">
-                                <i class="nav-icon fa-regular fa-folder-open"></i>
+                                <i class="nav-icon fa-solid fa-file"></i>
                                 <i class=""></i>
                                 <p>
                                     Document
@@ -233,6 +233,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('files.index') }}" class="nav-link">
+                                <i class="nav-icon fa-solid fa-folder-open"></i>
+                                <p>
+                                    Files
+                                </p>
+                            </a>
+                        </li>
+                        {{-- <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fa-solid fa-clipboard-list"></i>
 
@@ -265,7 +273,7 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li>
+                        </li> --}}
                         <li class="nav-header mt-3">DATABASE</li>
                         <li class="nav-item">
                             <a href="{{ route('client.index') }}" class="nav-link">

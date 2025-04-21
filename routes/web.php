@@ -6,6 +6,7 @@ use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseRequestController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IzinController;
@@ -24,6 +25,17 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
+
+Route::get('/share/{id}', function ($id) {
+    $file = \App\Models\File::findOrFail($id);
+    $path = storage_path('app/public/' . $file->file_path);
+
+    if (!file_exists($path)) {
+        abort(404, 'File not found');
+    }
+
+    return response()->download($path);
+})->name('files.share');
 
 Auth::routes();
 
@@ -72,7 +84,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/izin/{id}/reject', [IzinController::class, 'reject'])->name('izin.reject');
     Route::post('/izin/bulk-action', [IzinController::class, 'bulkAction'])->name('izin.bulkAction');
 
-
     // Debt
     Route::resource('debt', DebtController::class);
 
@@ -87,6 +98,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/project/review/{kode}', [ProjectController::class, 'review'])->name('project.review');
     Route::post('/project/done/{id}', [ProjectController::class, 'done'])->name('project.done');
     Route::get('/projects/arsip', [ProjectController::class, 'archive'])->name('project.archive');
+
+    // Files
+    Route::resource('files', FileController::class);
 
     //Task Management
     Route::resource('task', TaskController::class)->except([

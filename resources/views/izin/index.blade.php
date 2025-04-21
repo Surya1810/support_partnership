@@ -124,9 +124,13 @@
                                     <option value="Cuti Tahunan" {{ old('jenis') == 'Cuti Tahunan' ? 'selected' : '' }}>
                                         Cuti tahunan (Sisa: {{ $sisaCuti }})
                                     </option>
-                                    <option value="Lembur / tukar off"
-                                        {{ old('jenis') == 'Lembur / tukar off' ? 'selected' : '' }}>
-                                        Lembur / tukar off
+                                    <option value="Lembur / tukar off 1 hari"
+                                        {{ old('jenis') == 'Lembur / tukar off 1 hari' ? 'selected' : '' }}>
+                                        Lembur / tukar off 1 hari
+                                    </option>
+                                    <option value="Lembur / tukar off setengah hari"
+                                        {{ old('jenis') == 'Lembur / tukar off setengah hari' ? 'selected' : '' }}>
+                                        Lembur / tukar off setengah hari
                                     </option>
                                     <option value="Izin tidak masuk"
                                         {{ old('jenis') == 'Izin tidak masuk' ? 'selected' : '' }}>
