@@ -130,3 +130,12 @@ Route::middleware('auth')->group(function () {
     // Partner
     Route::resource('partner', PartnerController::class);
 });
+
+Route::get('/debug-session', function () {
+    session(['check' => 'testing']);
+    return redirect('/check-session');
+});
+
+Route::get('/check-session', function () {
+    return session('check', 'no session found');
+});
