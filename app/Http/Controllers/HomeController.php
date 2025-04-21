@@ -55,7 +55,7 @@ class HomeController extends Controller
 
         $user = Auth::user();
 
-        if ($user->role_id == 1) {
+        if ($user->role_id == 1 || $user->department_id == 8) {
             // admin atau khusus bisa akses semua
             $my_approval_dana = ExpenseRequest::where('status', 'pending')->get()->count();
         } elseif (in_array($user->department_id, [3, 5])) {
