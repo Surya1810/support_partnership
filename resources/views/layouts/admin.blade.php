@@ -181,7 +181,7 @@
                                     @endif
                                     <a href="{{ route('application.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Pengajuan</p>
+                                        <p>Pengajuan Saya</p>
                                     </a>
                                 </li>
                             </ul>
@@ -208,7 +208,7 @@
                                     @endif
                                     <a href="{{ route('izin.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Pengajuan</p>
+                                        <p>Pengajuan Saya</p>
                                     </a>
                                 </li>
                             </ul>
