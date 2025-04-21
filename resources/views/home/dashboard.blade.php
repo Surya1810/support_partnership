@@ -11,9 +11,6 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Home</h1>
-                </div>
             </div>
         </div>
     </section>
@@ -22,9 +19,38 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-3 col-6">
+                <div class="col-12">
+                    <div class="card card-outline rounded-partner card-primary">
+                        <div class="card-body pb-0">
+                            <h4>Hello, <strong>{{ Auth::user()->name }}</strong></h4>
+                            <p>Selamat datang di <strong>MyPartnership!</strong> Selamat bekerja...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h4>Menu</h4>
+            <div class="row">
+
+                <div class="col-lg-2 col-6">
+                    <a href="{{ route('employee.index') }}">
+                        <div class="small-box bg-primary rounded-partner">
+                            <div class="inner">
+                                <h3>{{ $users }}</h3>
+
+                                <p>Data Karyawan</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-solid fa-id-card"></i>
+                            </div>
+                            <span class="small-box-footer rounded-partner">More info <i
+                                    class="fas fa-arrow-circle-right"></i></span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-2 col-6">
                     <a href="{{ route('project.index') }}">
-                        <div class="small-box bg-primary">
+                        <div class="small-box bg-primary rounded-partner">
                             <div class="inner">
                                 <h3>{{ $projects }}</h3>
 
@@ -33,53 +59,170 @@
                             <div class="icon">
                                 <i class="fas fa-solid fa-paste"></i>
                             </div>
-                            <span class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></span>
+                            <span class="small-box-footer rounded-partner">More info <i
+                                    class="fas fa-arrow-circle-right"></i></span>
                         </div>
                     </a>
                 </div>
-                <div class="col-lg-3 col-6">
+                <div class="col-lg-2 col-6">
                     <a href="{{ route('application.index') }}">
-                        <div class="small-box bg-primary">
+                        <div class="small-box bg-primary rounded-partner">
                             <div class="inner">
                                 <h3>{{ $applications }}</h3>
 
-                                <p>Application</p>
+                                <p>Pengajuan Dana</p>
                             </div>
                             <div class="icon">
-                                <i class="fas fa-solid fa-file-invoice"></i>
+                                <i class="fas fa-solid fa-money-check-dollar"></i>
                             </div>
-                            <span class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></span>
+                            <span class="small-box-footer rounded-partner">More info <i
+                                    class="fas fa-arrow-circle-right"></i></span>
                         </div>
                     </a>
                 </div>
-                <div class="col-lg-3 col-6">
+
+                <div class="col-lg-2 col-6">
+                    <a href="{{ route('izin.index') }}">
+                        <div class="small-box bg-primary rounded-partner">
+                            <div class="inner">
+                                <h3>{{ $izins }}</h3>
+
+                                <p>Pengajuan Izin</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-solid fa-briefcase"></i>
+                            </div>
+                            <span class="small-box-footer rounded-partner">More info <i
+                                    class="fas fa-arrow-circle-right"></i></span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-2 col-6">
                     <a href="{{ route('document.index') }}">
-                        <div class="small-box bg-primary">
+                        <div class="small-box bg-primary rounded-partner">
                             <div class="inner">
                                 <h3>{{ $documents }}</h3>
 
-                                <p>Document</p>
+                                <p>Document Number</p>
                             </div>
                             <div class="icon">
-                                <i class="fas fa-regular fa-folder-open"></i>
+                                <i class="fas fa-solid fa-file"></i>
                             </div>
-                            <span class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></span>
+                            <span class="small-box-footer rounded-partner">More info <i
+                                    class="fas fa-arrow-circle-right"></i></span>
                         </div>
                     </a>
                 </div>
 
-                <div class="col-lg-3 col-6">
-                    <a href="{{ route('asset.index') }}">
-                        <div class="small-box bg-primary">
+                <div class="col-lg-2 col-6">
+                    <a href="{{ route('files.index') }}">
+                        <div class="small-box bg-primary rounded-partner">
                             <div class="inner">
-                                <h3>{{ $assets }}</h3>
+                                <h3>{{ $files }}</h3>
 
-                                <p>Asset</p>
+                                <p>Files</p>
                             </div>
                             <div class="icon">
-                                <i class="fas fa-solid fa-clipboard-list"></i>
+                                <i class="fas fa-solid fa-folder-open"></i>
                             </div>
-                            <span class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></span>
+                            <span class="small-box-footer rounded-partner">More info <i
+                                    class="fas fa-arrow-circle-right"></i></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <hr>
+
+            @if (auth()->user()->role_id == 1 ||
+                    auth()->user()->role_id == 2 ||
+                    auth()->user()->role_id == 3 ||
+                    auth()->user()->department_id == 8)
+                <h4>Approval</h4>
+                <div class="row">
+                    <div class="col-lg-3 col-6">
+                        <a href="{{ route('application.approval') }}">
+                            <div class="small-box bg-warning rounded-partner">
+                                <div class="inner">
+                                    <h3>{{ $my_approval_dana }}</h3>
+
+                                    <p>Pengajuan Dana</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-solid fa-circle-check"></i>
+                                </div>
+                                <span class="small-box-footer text-dark rounded-partner">More info <i
+                                        class="fas fa-arrow-circle-right"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <a href="{{ route('izin.approval') }}">
+                            <div class="small-box bg-warning rounded-partner">
+                                <div class="inner">
+                                    <h3>{{ $my_approval_izin }}</h3>
+
+                                    <p>Pengajuan Izin</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-solid fa-circle-check"></i>
+                                </div>
+                                <span class="small-box-footer text-dark rounded-partner">More info <i
+                                        class="fas fa-arrow-circle-right"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <hr>
+            @endif
+
+            <h4>Database</h4>
+            <div class="row">
+                <div class="col-lg-4 col-6">
+                    <a href="{{ route('client.index') }}">
+                        <div class="small-box bg-info rounded-partner">
+                            <div class="inner">
+                                <h3>{{ $clients }}</h3>
+
+                                <p>Klien</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-regular fa-handshake"></i>
+                            </div>
+                            <span class="small-box-footer rounded-partner">More info <i
+                                    class="fas fa-arrow-circle-right"></i></span>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-4 col-6">
+                    <a href="{{ route('supplier.index') }}">
+                        <div class="small-box bg-info rounded-partner">
+                            <div class="inner">
+                                <h3>{{ $suppliers }}</h3>
+
+                                <p>Supplier</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-solid fa-warehouse"></i>
+                            </div>
+                            <span class="small-box-footer rounded-partner">More info <i
+                                    class="fas fa-arrow-circle-right"></i></span>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-4 col-6">
+                    <a href="{{ route('partner.index') }}">
+                        <div class="small-box bg-info rounded-partner">
+                            <div class="inner">
+                                <h3>{{ $partners }}</h3>
+
+                                <p>Rekanan</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-regular fa-address-book"></i>
+                            </div>
+                            <span class="small-box-footer rounded-partner">More info <i
+                                    class="fas fa-arrow-circle-right"></i></span>
                         </div>
                     </a>
                 </div>
@@ -101,8 +244,9 @@
                         <div class="row w-100">
                             <div class="col-12 col-md-6">
                                 <label for="nik" class="mb-0 form-label col-form-label-sm">NIK</label>
-                                <input type="text" class="form-control @error('nik') is-invalid @enderror" id="nik"
-                                    name="nik" value="{{ old('nik') }}" placeholder="Enter NIK" required>
+                                <input type="text" class="form-control @error('nik') is-invalid @enderror"
+                                    id="nik" name="nik" value="{{ old('nik') }}" placeholder="Enter NIK"
+                                    required>
 
                                 @error('nik')
                                     <span class="invalid-feedback" role="alert">
@@ -140,8 +284,8 @@
                             <div class="col-12 col-md-6">
                                 <label for="address" class="mb-0 form-label col-form-label-sm">Address</label>
                                 <input type="text" class="form-control @error('address') is-invalid @enderror"
-                                    id="address" name="address" value="{{ old('address') }}" placeholder="Enter address"
-                                    required>
+                                    id="address" name="address" value="{{ old('address') }}"
+                                    placeholder="Enter address" required>
 
                                 @error('address')
                                     <span class="invalid-feedback" role="alert">
