@@ -113,12 +113,12 @@ class FileController extends Controller
      */
     public function destroy(File $file)
     {
-        // Tentukan path file yang ada di public folder
-        $filePath = public_path('storage/' . $file->file_path);
+        // Tentukan path file yang ada di public storage
+        $filePath = storage_path('app/public/' . $file->file_path);
 
         // Cek apakah file ada di path tersebut
         if (file_exists($filePath)) {
-            // Menghapus file dari public folder
+            // Menghapus file dari storage
             unlink($filePath);
         } else {
             return back()->with(['pesan' => 'File tidak ditemukan di storage.', 'level-alert' => 'alert-warning']);
