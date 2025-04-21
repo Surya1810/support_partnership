@@ -43,7 +43,7 @@ class HomeController extends Controller
 
         $manager = User::where('role_id', 3)->pluck('id');
 
-        if (Auth::user()->role_id == 1) {
+        if (Auth::user()->role_id == 1 || Auth::user()->department_id == 8) {
             $my_approval_izin = Izin::where('status', 'pending')->get()->count();
         } elseif (Auth::user()->role_id == 2) {
             $my_approval_izin = Izin::where('status', 'pending')->whereIn('user_id', $manager)->get()->count();
