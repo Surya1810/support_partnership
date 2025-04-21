@@ -29,7 +29,7 @@ class IzinController extends Controller
     {
         $manager = User::where('role_id', 3)->pluck('id');
 
-        if (Auth::user()->role_id == 1) {
+        if (Auth::user()->role_id == 1 || Auth::user()->department_id == 8) {
             $pending = Izin::where('status', 'pending')->get();
         } elseif (Auth::user()->role_id == 2) {
             $pending = Izin::where('status', 'pending')->whereIn('user_id', $manager)->get();
