@@ -57,7 +57,7 @@ class FileController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'file' => 'required|mimes:pdf,doc,docx,xlsx,xls|max:10240', // 10MB max
+            'file' => 'required|file|max:262144', // 256MB max
             'category' => 'required|string|max:255',
         ]);
 

@@ -54,9 +54,14 @@
                                         <label for="kategori" class="mb-0 form-label col-form-label-sm">Kategori</label>
                                         <select name="category" class="form-control select2" required>
                                             <option></option>
-                                            <option value="Surat Penawaran">Surat Penawaran</option>
-                                            <option value="Invoice">Invoice</option>
-                                            <option value="Dokumen Lain">Dokumen Lain</option>
+                                            <option value="Data Administrasi & Umum">Data Administrasi & Umum</option>
+                                            <option value="Data Keuangan">Data Keuangan</option>
+                                            <option value="Data Proyek / Operasional">Data Proyek / Operasional</option>
+                                            <option value="Data Aset & Inventaris">Data Aset & Inventaris</option>
+                                            <option value="Data Penjualan & Pemasaran">Data Penjualan & Pemasaran</option>
+                                            <option value="Dokumen Legal">Dokumen Legal</option>
+                                            <option value="Dokumentasi">Dokumentasi</option>
+                                            <option value="Lainnya">Lainnya</option>
                                         </select>
                                         @error('kategori')
                                             <span class="invalid-feedback" role="alert">

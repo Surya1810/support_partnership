@@ -55,13 +55,33 @@
                                         <label for="kategori" class="mb-0 form-label col-form-label-sm">Kategori</label>
                                         <select name="category" class="form-control select2" required>
                                             <option></option>
-                                            <option value="Surat Penawaran"
-                                                {{ $file->category == 'Surat Penawaran' ? 'selected' : '' }}>Surat Penawaran
+                                            <option value="Data Administrasi & Umum"
+                                                {{ $file->category == 'Data Administrasi & Umum' ? 'selected' : '' }}>Data
+                                                Administrasi & Umum
                                             </option>
-                                            <option value="Invoice" {{ $file->category == 'Invoice' ? 'selected' : '' }}>
-                                                Invoice</option>
-                                            <option value="Dokumen Lain"
-                                                {{ $file->category == 'Dokumen Lain' ? 'selected' : '' }}>Dokumen Lain
+                                            <option value="Data Keuangan"
+                                                {{ $file->category == 'Data Keuangan' ? 'selected' : '' }}>Data Keuangan
+                                            </option>
+                                            <option value="Data Proyek / Operasional"
+                                                {{ $file->category == 'Data Proyek / Operasional' ? 'selected' : '' }}>Data
+                                                Proyek / Operasional
+                                            </option>
+                                            <option value="Data Aset & Inventaris"
+                                                {{ $file->category == 'Data Aset & Inventaris' ? 'selected' : '' }}>Data
+                                                Aset & Inventaris
+                                            </option>
+                                            <option value="Data Penjualan & Pemasaran"
+                                                {{ $file->category == 'Data Penjualan & Pemasaran' ? 'selected' : '' }}>Data
+                                                Penjualan & Pemasaran
+                                            </option>
+                                            <option value="Dokumen Legal"
+                                                {{ $file->category == 'Dokumen Legal' ? 'selected' : '' }}>
+                                                Dokumen Legal</option>
+                                            <option value="Dokumentasi"
+                                                {{ $file->category == 'Dokumentasi' ? 'selected' : '' }}>Dokumentasi
+                                            </option>
+                                            <option value="Lainnya" {{ $file->category == 'Lainnya' ? 'selected' : '' }}>
+                                                Lainnya
                                             </option>
                                         </select>
                                         @error('kategori')

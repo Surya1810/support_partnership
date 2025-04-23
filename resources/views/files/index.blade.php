@@ -58,14 +58,29 @@
                                     <div class="col-md-2">
                                         <select name="category" class="form-control">
                                             <option value="">-- Semua Kategori --</option>
-                                            <option value="Surat Penawaran"
-                                                {{ request('category') == 'Surat Penawaran' ? 'selected' : '' }}>Surat
-                                                Penawaran</option>
-                                            <option value="Invoice"
-                                                {{ request('category') == 'Invoice' ? 'selected' : '' }}>Invoice</option>
-                                            <option value="Dokumen Lain"
-                                                {{ request('category') == 'Dokumen Lain' ? 'selected' : '' }}>Dokumen Lain
+                                            <option value="Data Administrasi & Umum"
+                                                {{ request('category') == 'Data Administrasi & Umum' ? 'selected' : '' }}>
+                                                Data Administrasi & Umum</option>
+                                            <option value="Data Keuangan"
+                                                {{ request('category') == 'Data Keuangan' ? 'selected' : '' }}>Data Keuangan
                                             </option>
+                                            <option value="Data Proyek / Operasional"
+                                                {{ request('category') == 'Data Proyek / Operasional' ? 'selected' : '' }}>
+                                                Data Proyek / Operasional</option>
+                                            <option value="Data Aset & Inventaris"
+                                                {{ request('category') == 'Data Aset & Inventaris' ? 'selected' : '' }}>
+                                                Data Aset & Inventaris</option>
+                                            <option value="Data Penjualan & Pemasaran"
+                                                {{ request('category') == 'Data Penjualan & Pemasaran' ? 'selected' : '' }}>
+                                                Data Penjualan & Pemasaran</option>
+                                            <option value="Dokumen Legal"
+                                                {{ request('category') == 'Dokumen Legal' ? 'selected' : '' }}>Dokumen
+                                                Legal</option>
+                                            <option value="Dokumentasi"
+                                                {{ request('category') == 'Dokumentasi' ? 'selected' : '' }}>Dokumentasi
+                                            </option>
+                                            <option value="Lainnya"
+                                                {{ request('category') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                                         </select>
                                     </div>
                                     <div class="col-md-2">
