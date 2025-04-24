@@ -224,7 +224,7 @@
                 <form action="{{ route('debt.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
                     @csrf
                     <div class="modal-body">
-                        <input type="text" name="department" hidden value="3">
+                        <input type="text" name="department" hidden value="1">
                         <div class="row">
                             <div class="col-12 col-md-6">
                                 <label for="title" class="mb-0 form-label col-form-label-sm">Judul</label>
