@@ -14,8 +14,18 @@
 
     <style>
         .pagination svg {
-            width: 16px;
-            height: 16px;
+            width: 1rem !important;
+            height: 1rem !important;
+            vertical-align: middle;
+        }
+
+        .pagination .relative {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .pagination nav>div:first-child {
+            display: none;
         }
     </style>
 @endpush
