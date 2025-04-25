@@ -11,6 +11,13 @@
         href="{{ asset('assets/adminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/adminLTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/adminLTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+
+    <style>
+        .pagination svg {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -78,6 +85,9 @@
                                                 Legal</option>
                                             <option value="Dokumentasi"
                                                 {{ request('category') == 'Dokumentasi' ? 'selected' : '' }}>Dokumentasi
+                                            </option>
+                                            <option value="Template"
+                                                {{ request('category') == 'Template' ? 'selected' : '' }}>Template
                                             </option>
                                             <option value="Lainnya"
                                                 {{ request('category') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>

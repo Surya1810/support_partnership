@@ -80,6 +80,9 @@
                                             <option value="Dokumentasi"
                                                 {{ $file->category == 'Dokumentasi' ? 'selected' : '' }}>Dokumentasi
                                             </option>
+                                            <option value="Template" {{ $file->category == 'Template' ? 'selected' : '' }}>
+                                                Template
+                                            </option>
                                             <option value="Lainnya" {{ $file->category == 'Lainnya' ? 'selected' : '' }}>
                                                 Lainnya
                                             </option>

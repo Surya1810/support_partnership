@@ -61,6 +61,7 @@
                                             <option value="Data Penjualan & Pemasaran">Data Penjualan & Pemasaran</option>
                                             <option value="Dokumen Legal">Dokumen Legal</option>
                                             <option value="Dokumentasi">Dokumentasi</option>
+                                            <option value="Template">Template</option>
                                             <option value="Lainnya">Lainnya</option>
                                         </select>
                                         @error('kategori')

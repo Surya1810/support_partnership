@@ -353,29 +353,44 @@
                         @enderror
 
                         <label for="items" class="mb-0 form-label col-form-label-sm">Items</label>
-                        <table class="table table-bordered" id="items-table">
-                            <thead>
-                                <tr>
-                                    <th>Nama Item</th>
-                                    <th>Jumlah</th>
-                                    <th>Nilai Satuan</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input type="text" name="items[0][item_name]" class="form-control"
-                                            placeholder="Tulis nama item" required></td>
-                                    <td><input type="number" name="items[0][quantity]" class="form-control"
-                                            placeholder="Tulis jumlah" min="1" value="1" required></td>
-                                    <td><input type="text" name="items[0][unit_price]" class="form-control price"
-                                            placeholder="Tulis nilai satuan" min="0" step="0.01" required></td>
-                                    <td><button type="button"
-                                            class="btn btn-danger btn-sm remove-item rounded-partner"><i
-                                                class="fas fa-trash"></i></button></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-sm" id="items-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-nowrap text-sm">Nama Item</th>
+                                        <th class="text-nowrap text-sm">Jumlah</th>
+                                        <th class="text-nowrap text-sm">Nilai Satuan</th>
+                                        <th class="text-nowrap text-sm"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <input type="text" name="items[0][item_name]"
+                                                class="form-control form-control-sm" placeholder="Tulis nama item"
+                                                required>
+                                        </td>
+                                        <td>
+                                            <input type="number" name="items[0][quantity]"
+                                                class="form-control form-control-sm" placeholder="Jumlah" min="1"
+                                                value="1" required>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="items[0][unit_price]"
+                                                class="form-control form-control-sm price" placeholder="Nilai satuan"
+                                                min="0" step="0.01" required>
+                                        </td>
+                                        <td>
+                                            <button type="button"
+                                                class="btn btn-danger btn-sm remove-item rounded-partner">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                         <button type="button" id="add-item" class="btn btn-primary btn-sm rounded-partner"><i
                                 class="fas fa-plus"></i></button>
                     </div>
