@@ -13,19 +13,11 @@
     <link rel="stylesheet" href="{{ asset('assets/adminLTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
 
     <style>
-        .pagination svg {
-            width: 1rem !important;
-            height: 1rem !important;
-            vertical-align: middle;
-        }
-
-        .pagination .relative {
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .pagination nav>div:first-child {
-            display: none;
+        .pagination .inline-flex {
+            padding: 0.25rem 0.5rem !important;
+            /* lebih kecil dari px-4 py-2 */
+            font-size: 0.75rem !important;
+            /* text-sm atau lebih kecil */
         }
     </style>
 @endpush
