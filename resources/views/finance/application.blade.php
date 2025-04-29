@@ -343,44 +343,44 @@
 
                         <label for="title" class="mb-0 form-label col-form-label-sm">Keterangan <small
                                 class="text-danger">*Wajib Detail & Lengkap</small></label>
-                        <input type="text" class="form-control @error('title') is-invalid @enderror" id="title"
-                            name="title" value="{{ old('title') }}" placeholder="Tulis tujuan atau hal yang diajukan"
-                            required>
+                        <textarea type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title"
+                            value="{{ old('title') }}" placeholder="Tulis tujuan atau hal yang diajukan" required></textarea>
                         @error('title')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>
                         @enderror
 
-                        <label for="items" class="mb-0 form-label col-form-label-sm">Items</label>
+                        <label for="items" class="mb-0 form-label col-form-label-sm">Rincian Item</label>
                         <div class="table-responsive">
                             <table class="table table-sm" id="items-table">
-                                <thead>
-                                    <tr>
-                                        <th class="text-nowrap text-sm">Nama Item</th>
-                                        <th class="text-nowrap text-sm">Jumlah</th>
-                                        <th class="text-nowrap text-sm">Nilai Satuan</th>
-                                        <th class="text-nowrap text-sm"></th>
-                                    </tr>
-                                </thead>
                                 <tbody>
                                     <tr>
                                         <td>
+                                            <label for="title" class="mb-0 form-label col-form-label-sm">Nama
+                                                Item</label>
                                             <input type="text" name="items[0][item_name]"
                                                 class="form-control form-control-sm" placeholder="Tulis nama item"
                                                 required>
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <label for="title"
+                                                        class="mb-0 form-label col-form-label-sm">Jumlah</label>
+                                                    <input type="number" name="items[0][quantity]"
+                                                        class="form-control form-control-sm" placeholder="Jumlah"
+                                                        min="1" value="1" required>
+                                                </div>
+                                                <div class="col-8">
+                                                    <label for="title" class="mb-0 form-label col-form-label-sm">Nilai
+                                                        Satuan</label>
+                                                    <input type="text" name="items[0][unit_price]"
+                                                        class="form-control form-control-sm price"
+                                                        placeholder="Nilai satuan" min="0" step="0.01"
+                                                        required>
+                                                </div>
+                                            </div>
                                         </td>
-                                        <td>
-                                            <input type="number" name="items[0][quantity]"
-                                                class="form-control form-control-sm" placeholder="Jumlah" min="1"
-                                                value="1" required>
-                                        </td>
-                                        <td>
-                                            <input type="text" name="items[0][unit_price]"
-                                                class="form-control form-control-sm price" placeholder="Nilai satuan"
-                                                min="0" step="0.01" required>
-                                        </td>
-                                        <td>
+                                        <td class="text-center align-middle">
                                             <button type="button"
                                                 class="btn btn-danger btn-sm remove-item rounded-partner">
                                                 <i class="fas fa-trash"></i>
@@ -426,24 +426,34 @@
                                             <table class="table table-bordered" id="items-table">
                                                 <thead>
                                                     <tr>
-                                                        <th>Item</th>
-                                                        <th>Budget</th>
-                                                        <th>Used</th>
+                                                        <th>Rincian Item</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     @foreach ($report->items as $item)
                                                         <tr>
-                                                            <td>{{ $item->item_name }}</td>
-                                                            <td>{{ formatRupiah($item->total_price) }}</td>
                                                             <td>
-                                                                <input type="text"
-                                                                    name="actual_amounts[{{ $item->id }}]"
-                                                                    class="form-control price_report"
-                                                                    placeholder="Tulis Nominal" min="0"
-                                                                    step="0.01"
-                                                                    value="{{ old('actual_amounts.' . $item->id, $item->actual_amount) }}"
-                                                                    required>
+                                                                <label class="mb-0 form-label col-form-label-sm">Nama
+                                                                    item</label><br>
+                                                                {{ $item->item_name }}
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <label
+                                                                            class="mb-0 form-label col-form-label-sm">Diajukan</label>
+                                                                        {{ formatRupiah($item->total_price) }}
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label for="actual_amounts[{{ $item->id }}]"
+                                                                            class="mb-0 form-label col-form-label-sm">Terpakai</label>
+                                                                        <input type="text"
+                                                                            name="actual_amounts[{{ $item->id }}]"
+                                                                            class="form-control form-control-sm price_report"
+                                                                            placeholder="Tulis Nominal" min="0"
+                                                                            step="0.01"
+                                                                            value="{{ old('actual_amounts.' . $item->id, $item->actual_amount) }}"
+                                                                            required>
+                                                                    </div>
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -576,10 +586,26 @@
             $('#add-item').click(function() {
                 const newRow = `
                     <tr>
-                        <td><input type="text" name="items[${itemIndex}][item_name]" class="form-control" placeholder="Tulis nama item"></td>
-                        <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control" placeholder="Tulis jumlah" min="1" value="1"></td>
-                        <td><input type="text" name="items[${itemIndex}][unit_price]" class="form-control price" placeholder="Tulis nilai satuan" min="0" step="0.01"></td>
-                        <td><button type="button" class="btn btn-danger btn-sm rounded-partner remove-item"><i class="fas fa-trash"></i></button></td>
+                        <td>
+                            <label for="title" class="mb-0 form-label col-form-label-sm">Nama
+                                Item</label>
+                            <input type="text" name="items[${itemIndex}][item_name]" class="form-control form-control-sm" placeholder="Tulis nama item">
+                            <div class="row">
+                                <div class="col-4">
+                                    <label for="title"
+                                        class="mb-0 form-label col-form-label-sm">Jumlah</label>
+                                    <input type="number" name="items[${itemIndex}][quantity]" class="form-control form-control-sm" placeholder="Tulis jumlah" min="1" value="1">
+                                </div>
+                                <div class="col-8">
+                                    <label for="title" class="mb-0 form-label col-form-label-sm">Nilai
+                                        Satuan</label>
+                                   <input type="text" name="items[${itemIndex}][unit_price]" class="form-control form-control-sm price" placeholder="Tulis nilai satuan" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center align-middle">
+                            <button type="button" class="btn btn-danger btn-sm rounded-partner remove-item"><i class="fas fa-trash"></i></button>
+                        </td>
                     </tr>
                 `;
                 $('#items-table tbody').append(newRow);
