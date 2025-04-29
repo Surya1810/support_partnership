@@ -32,7 +32,8 @@ class IzinController extends Controller
         if (Auth::user()->role_id == 1 || Auth::user()->department_id == 8) {
             $pending = Izin::where('status', 'pending')->get();
         } elseif (Auth::user()->role_id == 2) {
-            $pending = Izin::where('status', 'pending')->whereIn('user_id', $manager)->get();
+            // $pending = Izin::where('status', 'pending')->whereIn('user_id', $manager)->get();
+            $pending = Izin::where('status', 'pending')->get();
         } else {
             $pending = Izin::where('status', 'pending')->whereNotIn('user_id', $manager)->get();
         }
