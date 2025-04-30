@@ -19,11 +19,26 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserExtensionController;
+use App\Models\ExpenseItem;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB as FacadesDB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
+});
+
+Route::get('/rekap', function () {
+    $items = ExpenseItem::select(
+        '*',
+        FacadesDB::raw('ABS(total_price - actual_amount) AS selisih')
+    )
+        ->whereNotNull('actual_amount')
+        ->whereColumn('total_price', '!=', 'actual_amount')
+        ->get();
+
+    // Keluarkan dalam format JSON
+    return response()->json($items);
 });
 
 Route::get('/share/{id}', function ($id) {
