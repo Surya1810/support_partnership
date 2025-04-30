@@ -37,8 +37,7 @@ Route::get('/rekap', function () {
         ->whereColumn('total_price', '!=', 'actual_amount')
         ->get();
 
-    // Keluarkan dalam format JSON
-    return response()->json($items);
+    return response()->json($items, 200, [], JSON_PRETTY_PRINT);
 });
 
 Route::get('/share/{id}', function ($id) {
