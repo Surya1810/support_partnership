@@ -26,7 +26,7 @@ class ExpenseRequestController extends Controller
         $reports = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['report', 'finish'])->orderBy('created_at', 'desc')->get();
 
         $user_department = Auth::user()->department_id;
-        $limit = ExpenseRequest::where('department_id', $user_department)->count();
+        $limit = ExpenseRequest::where('department_id', $user_department)->where('status', '!=', 'finish')->count();
 
         return view('finance.application', compact('departments', 'projects', 'my_expenses', 'reports', 'limit'));
     }
