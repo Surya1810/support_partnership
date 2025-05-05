@@ -29,7 +29,7 @@ class ExpenseRequestController extends Controller
         $limit = ExpenseRequest::where('department_id', $user_department)
             ->whereNotNull('status')
             ->whereNotIn('status', ['finish', 'rejected'])
-            ->get();
+            ->count();
 
         return view('finance.application', compact('departments', 'projects', 'my_expenses', 'reports', 'limit'));
     }
