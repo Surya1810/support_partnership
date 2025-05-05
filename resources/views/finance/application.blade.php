@@ -35,7 +35,8 @@
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col-6">
-                                    <h3 class="card-title">Pengajuan Saya</h3>
+                                    <h3 class="card-title">Pengajuan Saya <span
+                                            class="badge badge-info">{{ $limit }}</span></h3>
                                 </div>
                                 <div class="col-6">
                                     @if ($limit > 3)
