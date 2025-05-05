@@ -39,15 +39,15 @@
                                             class="badge badge-info">{{ $limit }}</span></h3>
                                 </div>
                                 <div class="col-6">
-                                    @if ($limit > 3)
+                                    {{-- @if ($limit > 3)
                                         <small class="text-danger float-right">*Harap selesaikan 3 pengajuan sebelumnya di
                                             divisimu.</small>
-                                    @else
+                                    @else --}}
                                         <button type="button" class="btn btn-sm btn-primary rounded-partner float-right"
                                             data-toggle="modal" data-target="#addApplication"><i class="fas fa-plus"></i>
                                             Buat
                                             Pengajuan</button>
-                                    @endif
+                                    {{-- @endif --}}
                                 </div>
                             </div>
                         </div>
