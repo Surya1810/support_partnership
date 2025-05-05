@@ -39,7 +39,8 @@
                                 </div>
                                 <div class="col-6">
                                     @if ($limit > 3)
-                                        <small class="text-danger">Harap selesaikan pengajuan sebelumnya</small>
+                                        <small class="text-danger float-right">*Harap selesaikan 3 pengajuan sebelumnya di
+                                            divisimu.</small>
                                     @else
                                         <button type="button" class="btn btn-sm btn-primary rounded-partner float-right"
                                             data-toggle="modal" data-target="#addApplication"><i class="fas fa-plus"></i>
