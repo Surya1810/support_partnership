@@ -25,7 +25,10 @@ class ExpenseRequestController extends Controller
         $my_expenses = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->orderBy('created_at', 'desc')->get();
         $reports = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['report', 'finish'])->orderBy('created_at', 'desc')->get();
 
-        return view('finance.application', compact('departments', 'projects', 'my_expenses', 'reports'));
+        $user_department = Auth::user()->department_id;
+        $limit = ExpenseRequest::where('department_id', $user_department)->count();
+
+        return view('finance.application', compact('departments', 'projects', 'my_expenses', 'reports', 'limit'));
     }
 
     public function approval()
@@ -303,26 +306,35 @@ class ExpenseRequestController extends Controller
 
     public function report(Request $request, $id)
     {
-        $expenseRequest = ExpenseRequest::with('items')->findOrFail($id);
-        $expenseRequest->status = 'finish';
-
-        // Validasi input
+        // Validasi awal input dasar
         $request->validate([
             'actual_amounts' => 'required|array',
             'actual_amounts.*' => 'numeric|min:0',
         ]);
 
-        // Simpan actual amount ke database
+        $expenseRequest = ExpenseRequest::with('items')->findOrFail($id);
+
         foreach ($request->actual_amounts as $itemId => $actualAmount) {
-            $item = ExpenseItem::find($itemId);
-            if ($item) {
-                $item->update(['actual_amount' => $actualAmount]);
+            $item = ExpenseItem::findOrFail($itemId);
+
+            // Validasi terhadap total_price
+            if ($actualAmount > $item->total_price) {
+                return back()->withErrors([
+                    "actual_amounts.{$itemId}" => "Nilai terpakai tidak boleh lebih besar dari nilai diajukan: Rp " . number_format($item->total_price, 0, ',', '.')
+                ])->withInput();
             }
+
+            // Simpan jika valid
+            $item->update(['actual_amount' => $actualAmount]);
         }
 
+        $expenseRequest->status = 'finish';
         $expenseRequest->save();
 
-        return redirect()->route('application.index')->with(['pesan' => 'Application reported successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('application.index')->with([
+            'pesan' => 'Application reported successfully',
+            'level-alert' => 'alert-success'
+        ]);
     }
 
     public function bulkAction(Request $request)

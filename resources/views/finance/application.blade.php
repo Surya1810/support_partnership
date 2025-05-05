@@ -38,9 +38,14 @@
                                     <h3 class="card-title">Pengajuan Saya</h3>
                                 </div>
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-sm btn-primary rounded-partner float-right"
-                                        data-toggle="modal" data-target="#addApplication"><i class="fas fa-plus"></i> Buat
-                                        Pengajuan</button>
+                                    @if ($limit > 3)
+                                        <small class="text-danger">Harap selesaikan pengajuan sebelumnya</small>
+                                    @else
+                                        <button type="button" class="btn btn-sm btn-primary rounded-partner float-right"
+                                            data-toggle="modal" data-target="#addApplication"><i class="fas fa-plus"></i>
+                                            Buat
+                                            Pengajuan</button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -409,7 +414,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="reportModalLabel">Report Application</h5>
+                        <h5 class="modal-title" id="reportModalLabel">Laporan Pertanggungjawaban Pengajuan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
