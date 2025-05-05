@@ -165,7 +165,7 @@ class ExpenseRequestController extends Controller
         $expenseRequest->total_amount = $totalAmount;
         $expenseRequest->save();
 
-        return redirect()->route('application.index')->with(['pesan' => 'Application created successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('application.index')->with(['pesan' => 'Pengajuan created successfully', 'level-alert' => 'alert-success']);
     }
 
     /**
@@ -203,7 +203,7 @@ class ExpenseRequestController extends Controller
         // Hapus pengajuan
         $expenseRequest->delete();
 
-        return redirect()->route('application.index')->with(['pesan' => 'Application deleted successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('application.index')->with(['pesan' => 'Pengajuan deleted successfully', 'level-alert' => 'alert-success']);
     }
 
     /**
@@ -215,7 +215,7 @@ class ExpenseRequestController extends Controller
 
         // Pastikan pengajuan belum disetujui
         if ($expenseRequest->status === 'approved') {
-            return redirect()->back()->with(['pesan' => 'Application approved before', 'level-alert' => 'alert-warning']);
+            return redirect()->back()->with(['pesan' => 'Pengajuan approved before', 'level-alert' => 'alert-warning']);
         }
 
         // Ambil role pengguna dari auth
@@ -236,7 +236,7 @@ class ExpenseRequestController extends Controller
         if ($userRole === 'Director') {
             // if (!$expenseRequest->approved_by_manager && $expenseRequest->total_amount > 150000) {
             if (!$expenseRequest->approved_by_manager && $expenseRequest->total_amount > 150000) {
-                return redirect()->back()->with(['pesan' => 'Application must approved by manager first', 'level-alert' => 'alert-danger']);
+                return redirect()->back()->with(['pesan' => 'Pengajuan must approved by manager first', 'level-alert' => 'alert-danger']);
             }
             $expenseRequest->approved_by_director = true;
         }
@@ -251,7 +251,7 @@ class ExpenseRequestController extends Controller
             $this->sendToFinance($expenseRequest);
             $expenseRequest->save();
 
-            return redirect()->route('application.approval')->with(['pesan' => 'Application approved successfully by admin', 'level-alert' => 'alert-success']);
+            return redirect()->route('application.approval')->with(['pesan' => 'Pengajuan approved successfully by admin', 'level-alert' => 'alert-success']);
         }
 
         // Cek apakah approval selesai
@@ -264,7 +264,7 @@ class ExpenseRequestController extends Controller
 
         $expenseRequest->save();
 
-        return redirect()->route('application.approval')->with(['pesan' => 'Application approved successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('application.approval')->with(['pesan' => 'Pengajuan approved successfully', 'level-alert' => 'alert-success']);
     }
 
     private function sendToFinance($expenseRequest)
@@ -288,7 +288,7 @@ class ExpenseRequestController extends Controller
         $expenseRequest->rejection_reason = $request->input('reason');
         $expenseRequest->save();
 
-        return redirect()->route('application.approval')->with(['pesan' => 'Application rejected successfully', 'level-alert' => 'alert-danger']);
+        return redirect()->route('application.approval')->with(['pesan' => 'Pengajuan rejected successfully', 'level-alert' => 'alert-danger']);
     }
 
     /**
@@ -301,7 +301,7 @@ class ExpenseRequestController extends Controller
         $expenseRequest->processed_by_finance = true;
         $expenseRequest->save();
 
-        return redirect()->route('application.approval')->with(['pesan' => 'Application processed successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('application.approval')->with(['pesan' => 'Pengajuan processed successfully', 'level-alert' => 'alert-success']);
     }
 
     public function report(Request $request, $id)
@@ -332,7 +332,7 @@ class ExpenseRequestController extends Controller
         $expenseRequest->save();
 
         return redirect()->route('application.index')->with([
-            'pesan' => 'Application reported successfully',
+            'pesan' => 'Pengajuan reported successfully',
             'level-alert' => 'alert-success'
         ]);
     }
@@ -401,7 +401,7 @@ class ExpenseRequestController extends Controller
             }
         }
 
-        return redirect()->back()->with(['pesan' => "Application $approvedCount approved, $rejectedCount rejected.", 'level-alert' => 'alert-success']);
+        return redirect()->back()->with(['pesan' => "Pengajuan $approvedCount approved, $rejectedCount rejected.", 'level-alert' => 'alert-success']);
     }
 
 
