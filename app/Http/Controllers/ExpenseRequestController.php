@@ -31,8 +31,6 @@ class ExpenseRequestController extends Controller
             ->whereNotIn('status', ['finish', 'rejected'])
             ->get();
 
-        dd($limit);
-
         return view('finance.application', compact('departments', 'projects', 'my_expenses', 'reports', 'limit'));
     }
 
