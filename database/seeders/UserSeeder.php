@@ -32,16 +32,16 @@ class UserSeeder extends Seeder
         //     'password' => bcrypt('123'),
         //     'avatar' => 'firkie.jpg',
         // ]);
-        // $user = User::create([
-        //     'role_id' => '4',
-        //     'position_id' => '1',
-        //     'department_id' => '8',
-        //     'name' => 'Novia Fadhilah',
-        //     'username' => 'Novia',
-        //     'email' => 'novia@partnership.co.id',
-        //     'password' => bcrypt('123'),
-        //     'avatar' => 'novia.jpg',
-        // ]);
+        $user = User::create([
+            'role_id' => '4',
+            'position_id' => '1',
+            'department_id' => '8',
+            'name' => 'Novia Fadhilah',
+            'username' => 'Novia',
+            'email' => 'novia@partnership.co.id',
+            'password' => bcrypt('123'),
+            'avatar' => 'novia.jpg',
+        ]);
         // $user = User::create([
         //     'role_id' => '3',
         //     'position_id' => '1',
@@ -92,26 +92,26 @@ class UserSeeder extends Seeder
         //     'password' => bcrypt('123'),
         //     'avatar' => 'surya.jpg',
         // ]);
-        $user = User::create([
-            'role_id' => '5',
-            'position_id' => '1',
-            'department_id' => '5',
-            'name' => 'Suhaefi',
-            'username' => 'Suhaefi',
-            'email' => 'Suhaefi@partnership.co.id',
-            'password' => bcrypt('123'),
-            'avatar' => 'profile.jpg',
-        ]);
-        $user = User::create([
-            'role_id' => '1',
-            'position_id' => '1',
-            'department_id' => '5',
-            'name' => 'Ibnu',
-            'username' => 'Ibnu',
-            'email' => 'Ibnu@partnership.co.id',
-            'password' => bcrypt('123'),
-            'avatar' => 'profile.jpg',
-        ]);
+        // $user = User::create([
+        //     'role_id' => '5',
+        //     'position_id' => '1',
+        //     'department_id' => '5',
+        //     'name' => 'Suhaefi',
+        //     'username' => 'Suhaefi',
+        //     'email' => 'Suhaefi@partnership.co.id',
+        //     'password' => bcrypt('123'),
+        //     'avatar' => 'profile.jpg',
+        // ]);
+        // $user = User::create([
+        //     'role_id' => '1',
+        //     'position_id' => '1',
+        //     'department_id' => '5',
+        //     'name' => 'Ibnu',
+        //     'username' => 'Ibnu',
+        //     'email' => 'Ibnu@partnership.co.id',
+        //     'password' => bcrypt('123'),
+        //     'avatar' => 'profile.jpg',
+        // ]);
         // $user = User::create([
         //     'role_id' => '4',
         //     'position_id' => '1',

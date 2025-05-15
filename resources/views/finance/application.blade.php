@@ -43,10 +43,10 @@
                                         <small class="text-danger float-right">*Harap selesaikan 3 pengajuan sebelumnya di
                                             divisimu.</small>
                                     @else --}}
-                                        <button type="button" class="btn btn-sm btn-primary rounded-partner float-right"
-                                            data-toggle="modal" data-target="#addApplication"><i class="fas fa-plus"></i>
-                                            Buat
-                                            Pengajuan</button>
+                                    <button type="button" class="btn btn-sm btn-primary rounded-partner float-right"
+                                        data-toggle="modal" data-target="#addApplication"><i class="fas fa-plus"></i>
+                                        Buat
+                                        Pengajuan</button>
                                     {{-- @endif --}}
                                 </div>
                             </div>
@@ -211,12 +211,22 @@
                                 <select class="form-control department" style="width: 100%;" id="department_id"
                                     name="department_id" required>
                                     <option></option>
-                                    @foreach ($departments as $department)
-                                        <option value="{{ $department->id }}"
-                                            {{ old('department_id') == $department->id ? 'selected' : '' }}>
-                                            {{ $department->name }}
-                                        </option>
-                                    @endforeach
+                                    @if (auth()->user()->role_id)
+                                        @foreach ($departments as $department)
+                                            <option value="{{ $department->id }}"
+                                                {{ auth()->user()->department_id == $department->id ? 'selected' : '' }}
+                                            >
+                                                {{ $department->name }}
+                                            </option>
+                                        @endforeach
+                                    @else
+                                        @foreach ($departments as $department)
+                                            <option value="{{ $department->id }}"
+                                                {{ old('department_id') == $department->id ? 'selected' : '' }}>
+                                                {{ $department->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
                                 </select>
                                 @error('department_id')
                                     <span class="invalid-feedback" role="alert">

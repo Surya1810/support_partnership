@@ -183,13 +183,22 @@
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Pengajuan Saya</p>
                                     </a>
+
+                                    {{-- ! Date:  15052025 -Under Development --}}
+                                    @if (auth()->user()->role_id == 1 ||
+                                            auth()->user()->role_id == 2 ||
+                                            auth()->user()->role_id == 3)
+                                    <a href="{{ route('cost.center.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Cost Center</p>
+                                    </a>
+                                    @endif
                                 </li>
                             </ul>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fa-solid fa-circle-info"></i>
-
                                 <p>
                                     Izin
                                     <i class="right fas fa-angle-left"></i>
@@ -485,5 +494,4 @@
         @endif
     </script>
 </body>
-
 </html>

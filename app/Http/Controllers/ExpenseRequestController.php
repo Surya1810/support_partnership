@@ -68,7 +68,7 @@ class ExpenseRequestController extends Controller
             $managerRequests = [];
         }
 
-        //query direktur  
+        //query direktur
         if (Auth::user()->id == 2) {
             $directorRequests = ExpenseRequest::where('status', 'pending')
                 ->where(function ($query) {

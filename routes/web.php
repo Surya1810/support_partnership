@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DocumentController;
@@ -55,7 +56,7 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     // Check
-    Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
+    // Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 
     // Coming Soon
     Route::get('/coming-soon', function () {
@@ -70,7 +71,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password/{id}', [ProfileController::class, 'password'])->name('profile.password');
     Route::delete('/profile/delete/{id}', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // User | Employee  
+    // User | Employee
     Route::resource('employee', UserController::class);
     Route::resource('user-data', UserExtensionController::class);
 
@@ -143,6 +144,15 @@ Route::middleware('auth')->group(function () {
 
     // Partner
     Route::resource('partner', PartnerController::class);
+
+    /**
+     * Date: 25
+     */
+    Route::controller(CostCenterController::class)
+        ->prefix('cost-center')
+        ->group(function () {
+            Route::get('', 'index')->name('cost.center.index');
+        });
 });
 
 Route::get('/debug-session', function () {
