@@ -184,15 +184,11 @@
                                         <p>Pengajuan Saya</p>
                                     </a>
 
-                                    {{-- ! Date:  15052025 -Under Development --}}
-                                    @if (auth()->user()->role_id == 1 ||
-                                            auth()->user()->role_id == 2 ||
-                                            auth()->user()->role_id == 3)
+                                    {{-- ! Date:  15052025 - Under Development --}}
                                     <a href="{{ route('cost.center.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Cost Center</p>
                                     </a>
-                                    @endif
                                 </li>
                             </ul>
                         </li>

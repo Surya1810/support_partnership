@@ -146,10 +146,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('partner', PartnerController::class);
 
     /**
-     * Date: 25
+     * Date: 15-05-2025
      */
     Route::controller(CostCenterController::class)
-        ->prefix('cost-center')
+        ->prefix('cost-centers')
         ->group(function () {
             Route::get('', 'index')->name('cost.center.index');
         });

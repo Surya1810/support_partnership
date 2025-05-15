@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('cost_center_subs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cost_center_id')->constrained()->onDelete('set null')->nullable();
+            $table->foreignId('cost_center_id')->nullable()->constrained()->onDelete('set null');
             $table->string('name');
             $table->decimal('amount', 15, 2)->nullable();
             $table->timestamps();

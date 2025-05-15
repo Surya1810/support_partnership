@@ -17,55 +17,67 @@ class CostCenterSeeder extends Seeder
         // Teknologi
         CostCenter::create([
             'department_id' => 5,
-            'name' => 'Kas'
+            'name' => 'Kas',
+            'code' => '03-25-1'
         ]);
         CostCenter::create([
             'department_id' => 5,
-            'name' => 'Project'
+            'name' => 'Project',
+            'code' => '03-25-2'
         ]);
         CostCenter::create([
             'department_id' => 5,
-            'name' => 'Gaji'
+            'name' => 'Gaji',
+            'code' => '03-25-3'
         ]);
         CostCenter::create([
             'department_id' => 5,
-            'name' => 'Kebutuhan Rumah Tangga'
+            'name' => 'Rumah Tangga',
+            'code' => '03-25-4'
         ]);
 
         // Procurement
         CostCenter::create([
             'department_id' => 1,
-            'name' => 'Kas'
+            'name' => 'Kas',
+            'code' => '01-25-1'
         ]);
         CostCenter::create([
             'department_id' => 1,
-            'name' => 'Project'
+            'name' => 'Project',
+            'code' => '01-25-2'
         ]);
         CostCenter::create([
             'department_id' => 1,
-            'name' => 'Gaji'
+            'name' => 'Gaji',
+            'code' => '01-25-3'
         ]);
         CostCenter::create([
             'department_id' => 1,
-            'name' => 'Kebutuhan Rumah Tangga'
+            'name' => 'Rumah Tangga',
+            'code' => '01-25-4'
         ]);
 
-        // Procurement
+        // Construction
         CostCenter::create([
             'department_id' => 3,
-            'name' => 'Kas'
+            'name' => 'Kas',
+            'code' => '02-25-1'
         ]);
         CostCenter::create([
             'department_id' => 3,
-            'name' => 'Project'
+            'name' => 'Project',
+            'code' => '02-25-1'
         ]);
         CostCenter::create([
             'department_id' => 3,
-            'name' => 'Gaji'
+            'name' => 'Gaji',
+            'code' => '02-25-1'
         ]);
         CostCenter::create([
             'department_id' => 3,
-            'name' => 'Kebutuhan Rumah Tangga'
+            'name' => 'Rumah Tangga',
+            'code' => '02-25-1'
         ]);
     }
 }
