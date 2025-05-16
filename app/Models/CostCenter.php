@@ -11,4 +11,8 @@ class CostCenter extends Model
     public function department() {
         return $this->belongsTo(Department::class);
     }
+
+    public function subs() {
+        return $this->hasMany(CostCenterSub::class);
+    }
 }

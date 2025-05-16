@@ -87,10 +87,11 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 @endif
-                                                <a href="#{{ $item->id }}" class="badge badge-info btn-sm p-1"
-                                                    data-toggle="modal">
+                                                <button onclick="modalDetail(this)"
+                                                    class="badge badge-info btn-sm p-1 border-0"
+                                                    data-id="{{ $item->id }}" data-toggle="modal">
                                                     <i class="fas fa-eye"></i>
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -243,10 +244,10 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 @endif
-                                                <a href="#{{ $item->id }}" class="badge badge-info p-1"
-                                                    data-toggle="modal">
+                                                <button onclick="modalDetail(this)" class="badge badge-info p-1"
+                                                    data-toggle="modal" data-id="{{ $item->id }}">
                                                     <i class="fas fa-eye"></i>
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -373,6 +374,83 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    {{-- Modal Detail Cost Center --}}
+    <div class="modal fade" id="modal-detail-cost-center" tabindex="-1" role="dialog"
+        aria-labelledby="modalDetailTitle" aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Cost Center</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="detail-cost-center-id">
+                    <p><strong>Kode:</strong> <span id="detail-cost-center-kode"></span></p>
+                    <p><strong>Nama:</strong> <span id="detail-cost-center-nama"></span></p>
+                    <p><strong>Amount:</strong> Rp<span id="detail-cost-center-amount"></span></p>
+                    <hr>
+                    <h6>Sub Cost Center</h6>
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Amount</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sub-cost-center-table-body">
+                            <tr>
+                                <td colspan="4" class="text-center">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="form-group mt-3">
+                        <label>Tambah Sub Cost Center</label>
+                        <input type="text" class="form-control mb-2" placeholder="Nama Sub Cost Center"
+                            id="sub-cost-center-name" required>
+                        <input type="text" class="form-control price mb-2" placeholder="Amount"
+                            id="sub-cost-center-amount" min="0" step="0.01" required>
+                        <button type="button" class="btn btn-sm btn-success"
+                            onclick="addSubCostCenter()">Tambah</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modal Edit Sub Cost Center --}}
+    <div class="modal fade" id="modal-edit-sub" tabindex="-1" role="dialog" aria-labelledby="modalEditSubTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <form id="form-edit-sub">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Sub Cost Center</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="edit-sub-id">
+                        <div class="form-group">
+                            <label>Nama</label>
+                            <input type="text" class="form-control" id="edit-sub-name">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" class="form-control" id="edit-sub-amount">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-sm btn-success">Simpan</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 @endsection
@@ -518,5 +596,176 @@
             $('#import-department-id').val(departmentId);
             $('#modalImportCostCenter').modal('show');
         }
+
+        function modalDetail(button) {
+            const id = $(button).data('id');
+            $('#detail-cost-center-id').val(id);
+            $('#sub-cost-center-table-body').html('<tr><td colspan="3" class="text-center">Loading...</td></tr>');
+
+            $.get("{{ route('cost.center.show', ':id') }}".replace(':id', id), function(data) {
+                $('#detail-cost-center-kode').text(data.code);
+                $('#detail-cost-center-nama').text(data.name);
+                $('#detail-cost-center-amount').text(formatRupiah(data.amount));
+                $('#modal-detail-cost-center').modal('show');
+
+                let rows = '';
+                if (data.subs.length > 0) {
+                    data.subs.forEach(sub => {
+                        rows += `<tr>
+                        <td>${sub.name}</td>
+                        <td>Rp${formatRupiah(sub.amount)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="editSubCostCenter(${sub.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteSubCostCenter(${sub.id}, '${data.id}')"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                    });
+                } else {
+                    rows = '<tr><td colspan="4" class="text-center">Belum ada sub cost center</td></tr>';
+                }
+
+                $('#sub-cost-center-table-body').html(rows);
+            });
+        }
+
+        function addSubCostCenter() {
+            const parentId = $('#detail-cost-center-id').val();
+            const name = $('#sub-cost-center-name').val();
+            const amount = $('#sub-cost-center-amount').inputmask('unmaskedvalue');
+
+            if (!name || isNaN(amount)) {
+                return alert('Nama dan Amount harus diisi');
+            }
+
+            // Cek total amount
+            $.get('/cost-center/' + parentId, function(data) {
+                const totalSubAmount = data.subs.reduce((sum, item) => sum + item.amount, 0);
+                if (totalSubAmount + amount > data.amount) {
+                    return alert('Total amount sub cost center melebihi batas cost center induk!');
+                }
+
+                // Kirim POST
+                $.post('/sub-cost-center', {
+                    _token: '{{ csrf_token() }}',
+                    parent_id: parentId,
+                    name: name,
+                    amount: amount
+                }, function() {
+                    modalDetail({
+                        dataset: {
+                            id: parentId
+                        }
+                    }); // Reload modal
+                    $('#sub-cost-center-name').val('');
+                    $('#sub-cost-center-amount').val('');
+                });
+            });
+        }
+
+        function editSubCostCenter(id) {
+            $.get('/sub-cost-center/' + id, function(data) {
+                $('#edit-sub-id').val(data.id);
+                $('#edit-sub-name').val(data.name);
+                $('#edit-sub-amount').val(data.amount);
+                $('#modal-edit-sub').modal('show');
+            });
+        }
+
+        $('#form-edit-sub').submit(function(e) {
+            e.preventDefault();
+
+            const id = $('#edit-sub-id').val();
+            const name = $('#edit-sub-name').val();
+            const amount = $('#edit-sub-amount').val();
+
+            $.ajax({
+                url: '/sub-cost-center/' + id,
+                method: 'PUT',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    name: name,
+                    amount: amount
+                },
+                success: function() {
+                    $('#modal-edit-sub').modal('hide');
+                    modalDetail({
+                        dataset: {
+                            id: $('#detail-cost-center-id').val()
+                        }
+                    });
+                }
+            });
+        });
+
+        function deleteSubCostCenter(id, parentId) {
+            Swal.fire({
+                title: 'Hapus Sub Cost Center?',
+                text: "Data tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/sub-cost-center/' + id,
+                        method: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function() {
+                            Swal.fire('Terhapus!', 'Sub Cost Center berhasil dihapus.', 'success');
+                            modalDetail({
+                                dataset: {
+                                    id: parentId
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function formatRupiah(angka) {
+            if (!angka || isNaN(angka)) {
+                return '0';
+            }
+            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function editSubCostCenter(id) {
+            $.get("{{ route('cost.center.sub.show', ':id') }}".replace(':id', id), function(data) {
+                $('#edit-sub-id').val(data.id);
+                $('#edit-sub-name').val(data.name);
+                $('#edit-sub-amount').val(data.amount);
+                $('#modal-edit-sub').modal('show');
+            });
+        }
+
+        $('#form-edit-sub').submit(function(e) {
+            e.preventDefault();
+
+            const id = $('#edit-sub-id').val();
+            const name = $('#edit-sub-name').val();
+            const amount = $('#edit-sub-amount').val();
+
+            $.ajax({
+                url: "{{ route('cost.center.sub.update', ':id') }}".replace(':id', id),
+                method: 'PUT',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    name: name,
+                    amount: amount
+                },
+                success: function() {
+                    $('#modal-edit-sub').modal('hide');
+                    modalDetail({
+                        dataset: {
+                            id: $('#detail-cost-center-id').val()
+                        }
+                    });
+                }
+            });
+        });
     </script>
 @endpush

@@ -6,6 +6,7 @@ use App\Models\CostCenter;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\CostCenterSub;
 
 use App\Imports\CostCenterImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -58,7 +59,7 @@ class CostCenterController extends Controller
 
     public function show($id)
     {
-        $costCenter = CostCenter::where('id', $id)->first();
+        $costCenter = CostCenter::with('subs')->where('id', $id)->first();
 
         if ($costCenter->exists()) {
             return response()->json($costCenter);
@@ -141,5 +142,47 @@ class CostCenterController extends Controller
         Excel::import(new CostCenterImport($request->department_id), $request->file('import_file'));
 
         return redirect()->back()->with(['pesan' => "Import data cost center berhasil", 'level-alert' => 'alert-success']);
+    }
+
+    public function storeSub(Request $request)
+    {
+        $request->validate([
+            'parent_id' => 'required|exists:cost_centers,id',
+            'name' => 'required',
+            'amount' => 'required|numeric',
+        ]);
+
+        $parent = CostCenter::find($request->parent_id);
+
+        $parent->subs()->create([
+            'cost_center_id' => $request->parent_id,
+            'name' => $request->name,
+            'amount' => $request->amount
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function showSub($id)
+    {
+        return CostCenterSub::findOrFail($id);
+    }
+
+    public function updateSub(Request $request, $id)
+    {
+        $sub = CostCenterSub::findOrFail($id);
+        $sub->update([
+            'name' => $request->name,
+            'amount' => $request->amount
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function destroySub($id)
+    {
+        $sub = CostCenterSub::findOrFail($id);
+        $sub->delete();
+        return response()->json(['success' => true]);
     }
 }

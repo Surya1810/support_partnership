@@ -147,17 +147,22 @@ Route::middleware('auth')->group(function () {
     Route::resource('partner', PartnerController::class);
 
     /**
-     * Date: 25
+     * Date: 15-05-2025
      */
     Route::controller(CostCenterController::class)
-        ->prefix('cost-center')
+        ->prefix('cost-centers')
         ->group(function () {
             Route::get('', 'index')->name('cost.center.index');
             Route::post('', 'store')->name('cost.center.store');
             Route::post('/import', 'importExcel')->name('cost.center.import');
+            Route::post('/sub-cost-center', 'storeSub')->name('cost.center.sub.store');
+            Route::get('/sub-cost-center/{id}', 'showSub')->name('cost.center.sub.show');
+            Route::put('/sub-cost-center/{id}', 'updateSub')->name('cost.center.sub.update');
+            Route::delete('/sub-cost-center/{id}', 'destroySub')->name('cost.center.sub.delete');
+            Route::get('/show/{id}/json', 'show')->name('cost.center.show');
             Route::delete('{id}', 'delete')->name('cost.center.delete');
             Route::put('{id}', 'update')->name('cost.center.update');
-            Route::get('/show/{id}/json', 'show')->name('cost.center.show');
+            Route::post('{id}', 'update')->name('cost.center.sub.update');
         });
 });
 
