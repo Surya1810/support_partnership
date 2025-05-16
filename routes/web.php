@@ -153,6 +153,11 @@ Route::middleware('auth')->group(function () {
         ->prefix('cost-center')
         ->group(function () {
             Route::get('', 'index')->name('cost.center.index');
+            Route::post('', 'store')->name('cost.center.store');
+            Route::post('/import', 'importExcel')->name('cost.center.import');
+            Route::delete('{id}', 'delete')->name('cost.center.delete');
+            Route::put('{id}', 'update')->name('cost.center.update');
+            Route::get('/show/{id}/json', 'show')->name('cost.center.show');
         });
 });
 
