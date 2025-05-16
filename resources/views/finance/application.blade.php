@@ -59,7 +59,7 @@
                                             Judul
                                         </th>
                                         <th style="width: 10%">
-                                            Kategori
+                                            Cost Center
                                         </th>
                                         <th style="width: 5%">
                                             Tanggal Digunakan
@@ -77,12 +77,19 @@
                                         <tr>
                                             <td>{{ $my_expense->title }}</td>
                                             <td>
-                                                @if ($my_expense->category == null)
-                                                    <strong>Project</strong> {{ $my_expense->project->name }}
+                                                @if ($my_expense->project_id)
+                                                <strong>Project</strong> {{ $my_expense->project->name }}
                                                 @else
-                                                    <strong>Rumah Tangga</strong> {{ $my_expense->category }}
+                                                @php
+                                                $ids = explode(',', $my_expense->category);
+                                                $costCenters = \App\Models\CostCenter::whereIn('id', $ids)->get();
+                                                @endphp
+                                                <strong>Cost Center ({{ $my_expense->department->name }})</strong><br>
+                                                @foreach ($costCenters as $cc)
+                                                <div>{{ $cc->name }}</div>
+                                                @endforeach
                                                 @endif
-                                            </td>
+                                            </td>                                                                                      
                                             <td>{{ $my_expense->use_date->format('d/m/y') }}</td>
                                             <td>{{ formatRupiah($my_expense->total_amount) }}</td>
                                             <td>
@@ -124,7 +131,7 @@
                                             Judul
                                         </th>
                                         <th style="width: 10%">
-                                            Kategori
+                                            Cost Center
                                         </th>
                                         <th style="width: 5%">
                                             Tanggal Digunakan
@@ -214,8 +221,9 @@
                             </div>
 
                             <div class="col-12 col-md-6">
+                                <input type="hidden" value="{{ auth()->user()->department_id }}" id="department_id" name="department_id">
                                 <label for="department_id" class="mb-0 form-label col-form-label-sm">Divisi</label>
-                                <select class="form-control department" style="width: 100%;" id="department_id" name="department_id" disabled>
+                                <select class="form-control department" style="width: 100%;" disabled>
                                     @php
                                     $userDepartment = $departments->firstWhere('id', auth()->user()->department_id);
                                     @endphp
@@ -244,54 +252,24 @@
                             </div>
 
                             <div class="col-12 col-md-6">
-                                <label for="category" class="mb-0 form-label col-form-label-sm">Kategori</label>
-                                <select class="form-control category" style="width: 100%;" id="category"
-                                    name="category" required>
-                                    <option></option>
-                                    <optgroup label="Pengeluaran Project">
-                                        @foreach ($projects as $project)
-                                            <option value="{{ $project->id }}">{{ $project->name }} -
-                                                <strong>{{ $project->department->name }}</strong>
-                                            </option>
-                                        @endforeach
-                                    </optgroup>
-                                    <optgroup label="Pengeluaran Rumah Tangga">
-                                        <option value="Reimbursement"
-                                            {{ old('category') == 'Reimbursement' ? 'selected' : '' }}>
-                                            Reimbursement
-                                        </option>
-                                        <option value="Maintenance"
-                                            {{ old('category') == 'Maintenance' ? 'selected' : '' }}>
-                                            Maintenance
-                                        </option>
-                                        <option value="Marketing & Iklan"
-                                            {{ old('category') == 'Marketing & Iklan' ? 'selected' : '' }}>
-                                            Marketing & Iklan
-                                        </option>
-                                        <option value="Kebutuhan Kantor / Divisi"
-                                            {{ old('category') == 'Kebutuhan Kantor / Divisi' ? 'selected' : '' }}>
-                                            Kebutuhan Kantor / Divisi
-                                        </option>
-                                        <option value="Pelatihan & Pendidikan"
-                                            {{ old('category') == 'Pelatihan & Pendidikan' ? 'selected' : '' }}>
-                                            Pelatihan & Pendidikan
-                                        </option>
-                                        <option value="Salary Tim"
-                                            {{ old('category') == 'Salary Tim' ? 'selected' : '' }}>
-                                            Salary Tim
-                                        </option>
-                                        <option value="Lain-lain" {{ old('category') == 'Lain-lain' ? 'selected' : '' }}>
-                                            Lain-lain
-                                        </option>
-                                    </optgroup>
+                                <label for="category" class="mb-0 form-label col-form-label-sm">Cost Center</label>
+                                <select class="form-control category select2" style="width: 100%;" id="category" name="category[]" multiple
+                                    required>
+                                    <option disabled>Pilih Cost Center Pengeluaran</option>
+                                    @foreach ($costCenters as $cc)
+                                    <option value="{{ $cc->id }}" {{ (collect(old('category'))->contains($cc->id)) ? 'selected' : '' }}>
+                                        {{ $cc->name }} - {{ formatRupiah($cc->amount) }}
+                                    </option>
+                                    @endforeach
                                 </select>
-                                @error('category')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                @error('category    ')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
                                 @enderror
-                            </div>
+                            </div>                            
                         </div>
+
                         <label for="pencairan" class="mb-0 form-label col-form-label-sm">Metode Pembayaran</label>
                         <div class="row">
                             <div class="col-4">
@@ -516,7 +494,7 @@
                 allowClear: true,
             })
             $('.category').select2({
-                placeholder: "Pilih Kategori",
+                placeholder: "Pilih Cost Center",
                 allowClear: true,
             })
         })
