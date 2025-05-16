@@ -87,11 +87,14 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 @endif
-                                                <button onclick="modalDetail(this)"
-                                                    class="badge badge-info btn-sm p-1 border-0"
-                                                    data-id="{{ $item->id }}" data-toggle="modal">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
+
+                                                @if (strtolower($item->name) == 'project')
+                                                    <button onclick="modalDetail(this)"
+                                                        class="badge badge-info btn-sm p-1 border-0"
+                                                        data-id="{{ $item->id }}" data-toggle="modal">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -166,10 +169,13 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 @endif
-                                                <a href="#{{ $item->id }}" class="badge badge-info p-1"
-                                                    data-toggle="modal">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
+
+                                                @if (strtolower($item->name) == 'project')
+                                                    <button onclick="modalDetail(this)" data-id="{{ $item->id }}"
+                                                        class="badge badge-info p-1 border-0" data-toggle="modal">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -244,10 +250,14 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 @endif
-                                                <button onclick="modalDetail(this)" class="badge badge-info p-1"
-                                                    data-toggle="modal" data-id="{{ $item->id }}">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
+
+                                                @if (strtolower($item->name) == 'project')
+                                                    <button onclick="modalDetail(this)"
+                                                        class="badge badge-info p-1 border-0" data-toggle="modal"
+                                                        data-id="{{ $item->id }}">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -443,7 +453,8 @@
                         </div>
                         <div class="form-group">
                             <label>Amount</label>
-                            <input type="number" class="form-control" id="edit-sub-amount">
+                            <input type="text" class="form-control price" id="edit-sub-amount" min="0"
+                                step="0.01">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -466,6 +477,8 @@
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
     <script type="text/javascript">
+        let dataDetailCostCenter = null;
+
         $(function() {
             $('#tableCostCenterProcurement, #tableCostCenterConstruction, #tableCostCenterTechnology').DataTable({
                 "lengthChange": false,
@@ -598,7 +611,22 @@
         }
 
         function modalDetail(button) {
-            const id = $(button).data('id');
+            let id;
+
+            // Cek apakah button adalah elemen HTML atau objek JS biasa
+            if (button instanceof HTMLElement) {
+                id = $(button).data('id');
+            } else if (button.dataset && button.dataset.id) {
+                id = button.dataset.id;
+            } else if (button.id) {
+                id = button.id;
+            }
+
+            if (!id) {
+                console.error("ID Cost Center tidak ditemukan.");
+                return;
+            }
+
             $('#detail-cost-center-id').val(id);
             $('#sub-cost-center-table-body').html('<tr><td colspan="3" class="text-center">Loading...</td></tr>');
 
@@ -608,15 +636,17 @@
                 $('#detail-cost-center-amount').text(formatRupiah(data.amount));
                 $('#modal-detail-cost-center').modal('show');
 
+                dataDetailCostCenter = data;
                 let rows = '';
+
                 if (data.subs.length > 0) {
                     data.subs.forEach(sub => {
                         rows += `<tr>
                         <td>${sub.name}</td>
                         <td>Rp${formatRupiah(sub.amount)}</td>
                             <td>
-                                <button class="btn btn-sm btn-primary" onclick="editSubCostCenter(${sub.id})"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteSubCostCenter(${sub.id}, '${data.id}')"><i class="fas fa-trash"></i></button>
+                                <button class="badge badge-primary border-0" onclick="editSubCostCenter(${sub.id})"><i class="fas fa-edit"></i></button>
+                                <button class="badge badge-danger border-0" onclick="deleteSubCostCenter(${sub.id}, '${data.id}')"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>`;
                     });
@@ -638,14 +668,22 @@
             }
 
             // Cek total amount
-            $.get('/cost-center/' + parentId, function(data) {
-                const totalSubAmount = data.subs.reduce((sum, item) => sum + item.amount, 0);
-                if (totalSubAmount + amount > data.amount) {
-                    return alert('Total amount sub cost center melebihi batas cost center induk!');
+            $.get('/cost-centers/show/' + parentId + '/json', function(data) {
+                const totalSubAmount = data.subs.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+                const sisaAmount = data.amount - totalSubAmount;
+
+                // Cegah penambahan jika sisa amount sudah habis atau amount melebihi sisa
+                if (sisaAmount <= 0 || amount > sisaAmount) {
+                    return Swal.fire(
+                        'Error',
+                        `Tidak dapat menambahkan sub cost center.
+                        Sisa anggaran dari cost center induk adalah Rp${formatRupiah(sisaAmount)}.`,
+                        'error'
+                    );
                 }
 
                 // Kirim POST
-                $.post('/sub-cost-center', {
+                $.post('/cost-centers/sub-cost-center', {
                     _token: '{{ csrf_token() }}',
                     parent_id: parentId,
                     name: name,
@@ -663,7 +701,7 @@
         }
 
         function editSubCostCenter(id) {
-            $.get('/sub-cost-center/' + id, function(data) {
+            $.get('/cost-centers/sub-cost-center/' + id, function(data) {
                 $('#edit-sub-id').val(data.id);
                 $('#edit-sub-name').val(data.name);
                 $('#edit-sub-amount').val(data.amount);
@@ -676,10 +714,26 @@
 
             const id = $('#edit-sub-id').val();
             const name = $('#edit-sub-name').val();
-            const amount = $('#edit-sub-amount').val();
+            const amount = parseFloat($('#edit-sub-amount').inputmask('unmaskedvalue'));
+            const parentAmount = parseFloat(dataDetailCostCenter.amount);
+
+            // Hitung total sub amount lain (selain yang sedang diedit)
+            const totalOtherSubs = dataDetailCostCenter.subs
+                .filter(sub => sub.id != id)
+                .reduce((sum, sub) => sum + parseFloat(sub.amount), 0);
+
+            const sisaAmount = parentAmount - totalOtherSubs;
+
+            if (sisaAmount <= 0 || amount > sisaAmount) {
+                return Swal.fire(
+                    'Error',
+                    `Sub cost center yang diedit (Rp${formatRupiah(amount)}) melebihi sisa anggaran (Rp${formatRupiah(sisaAmount)}) dari cost center induk!`,
+                    'error'
+                );
+            }
 
             $.ajax({
-                url: '/sub-cost-center/' + id,
+                url: '/cost-centers/sub-cost-center/' + id,
                 method: 'PUT',
                 data: {
                     _token: '{{ csrf_token() }}',
@@ -708,7 +762,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/sub-cost-center/' + id,
+                        url: '/cost-centers/sub-cost-center/' + id,
                         method: 'DELETE',
                         data: {
                             _token: '{{ csrf_token() }}'
@@ -741,31 +795,5 @@
                 $('#modal-edit-sub').modal('show');
             });
         }
-
-        $('#form-edit-sub').submit(function(e) {
-            e.preventDefault();
-
-            const id = $('#edit-sub-id').val();
-            const name = $('#edit-sub-name').val();
-            const amount = $('#edit-sub-amount').val();
-
-            $.ajax({
-                url: "{{ route('cost.center.sub.update', ':id') }}".replace(':id', id),
-                method: 'PUT',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    name: name,
-                    amount: amount
-                },
-                success: function() {
-                    $('#modal-edit-sub').modal('hide');
-                    modalDetail({
-                        dataset: {
-                            id: $('#detail-cost-center-id').val()
-                        }
-                    });
-                }
-            });
-        });
     </script>
 @endpush

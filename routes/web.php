@@ -162,7 +162,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/show/{id}/json', 'show')->name('cost.center.show');
             Route::delete('{id}', 'delete')->name('cost.center.delete');
             Route::put('{id}', 'update')->name('cost.center.update');
-            Route::post('{id}', 'update')->name('cost.center.sub.update');
         });
 });
 

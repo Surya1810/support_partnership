@@ -160,7 +160,7 @@ class CostCenterController extends Controller
             'amount' => $request->amount
         ]);
 
-        return response()->json(['success' => true]);
+        return response()->json(['status' => 'success']);
     }
 
     public function showSub($id)
@@ -176,13 +176,13 @@ class CostCenterController extends Controller
             'amount' => $request->amount
         ]);
 
-        return response()->json(['success' => true]);
+        return response()->json(['status' => 'success']);
     }
 
     public function destroySub($id)
     {
         $sub = CostCenterSub::findOrFail($id);
         $sub->delete();
-        return response()->json(['success' => true]);
+        return response()->json(['status' => 'success']);
     }
 }
