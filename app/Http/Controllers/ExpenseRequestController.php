@@ -21,9 +21,17 @@ class ExpenseRequestController extends Controller
         $departments = Department::all()->except([2, 4, 6, 7, 8]);
         $projects = Project::where('status', '!=', 'Finished')->get();
 
-        //query saya
-        $my_expenses = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->orderBy('created_at', 'desc')->get();
-        $reports = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['report', 'finish'])->orderBy('created_at', 'desc')->get();
+        // Query pengajuan user (status proses)
+        $my_expenses = ExpenseRequest::where('user_id', Auth::id())
+            ->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Query laporan user, termasuk status checking
+        $reports = ExpenseRequest::where('user_id', Auth::id())
+            ->whereIn('status', ['report', 'checking', 'finish'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         $user_department = Auth::user()->department_id;
         $limit = ExpenseRequest::where('department_id', $user_department)
@@ -309,10 +317,11 @@ class ExpenseRequestController extends Controller
 
     public function report(Request $request, $id)
     {
-        // Validasi awal input dasar
+        // Validasi input
         $request->validate([
             'actual_amounts' => 'required|array',
             'actual_amounts.*' => 'numeric|min:0',
+            'report_file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // 2MB, opsional
         ]);
 
         $expenseRequest = ExpenseRequest::with('items')->findOrFail($id);
@@ -331,7 +340,13 @@ class ExpenseRequestController extends Controller
             $item->update(['actual_amount' => $actualAmount]);
         }
 
-        $expenseRequest->status = 'finish';
+        // Simpan file bukti jika diupload
+        if ($request->hasFile('report_file')) {
+            $path = $request->file('report_file')->store('reports', 'public');
+            $expenseRequest->report_file = $path; // Pastikan kolom ini ada di tabel
+        }
+
+        $expenseRequest->status = 'checking';
         $expenseRequest->save();
 
         return redirect()->route('application.index')->with([
@@ -339,6 +354,22 @@ class ExpenseRequestController extends Controller
             'level-alert' => 'alert-success'
         ]);
     }
+
+    public function check($id)
+    {
+        $expenseRequest = ExpenseRequest::findOrFail($id);
+
+        if ($expenseRequest->status == 'checking') {
+            $expenseRequest->status = 'finish';
+            $expenseRequest->save();
+        }
+
+        return redirect()->back()->with([
+            'pesan' => 'Laporan berhasil diverifikasi dan status menjadi finish',
+            'level-alert' => 'alert-success'
+        ]);
+    }
+
 
     public function bulkAction(Request $request)
     {

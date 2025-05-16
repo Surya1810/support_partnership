@@ -92,6 +92,8 @@
                                                     <span class="badge badge-secondary">{{ $my_expense->status }}</span>
                                                 @elseif ($my_expense->status == 'processing')
                                                     <span class="badge badge-info">{{ $my_expense->status }}</span>
+                                                @elseif ($my_expense->status == 'checking')
+                                                    <span class="badge badge-info">{{ $my_expense->status }}</span>
                                                 @elseif ($my_expense->status == 'rejected')
                                                     <span class="badge badge-danger">{{ $my_expense->status }}</span>
                                                 @elseif ($my_expense->status == 'finish')
@@ -153,24 +155,29 @@
                                             <td>{{ formatRupiah($report->total_amount) }}</td>
                                             <td>
                                                 @if ($report->status == 'report')
-                                                    <span class="badge badge-warning">{{ $report->status }}</span>
+                                                <span class="badge badge-warning">{{ $report->status }}</span>
+                                                @elseif ($report->status == 'checking')
+                                                <span class="badge badge-info">{{ $report->status }}</span>
                                                 @elseif ($report->status == 'finish')
-                                                    <span class="badge badge-success">{{ $report->status }}</span>
+                                                <span class="badge badge-success">{{ $report->status }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if ($report->status == 'report')
-                                                    <button type="button" class="btn btn-sm btn-warning rounded-partner"
-                                                        data-toggle="modal" data-target="#reportModal{{ $report->id }}">
-                                                        <i class="fa-regular fa-flag"></i>
-                                                    </button>
+                                                <button type="button" class="btn btn-sm btn-warning rounded-partner" data-toggle="modal"
+                                                    data-target="#reportModal{{ $report->id }}">
+                                                    <i class="fa-regular fa-flag"></i>
+                                                </button>
+                                                @elseif ($report->status == 'checking')
+                                                <span class="btn btn-sm btn-info rounded-partner disabled">
+                                                    <i class="fa-solid fa-spinner fa-spin"></i> Checking
+                                                </span>
                                                 @elseif ($report->status == 'finish')
-                                                    <a href="{{ route('application.pdf', $report->id) }}"
-                                                        class="btn btn-sm btn-info rounded-partner" target="_blank">
-                                                        <i class="fa-regular fa-file-pdf"></i>
-                                                    </a>
+                                                <a href="{{ route('application.pdf', $report->id) }}" class="btn btn-sm btn-info rounded-partner" target="_blank">
+                                                    <i class="fa-regular fa-file-pdf"></i>
+                                                </a>
                                                 @endif
-                                            </td>
+                                            </td>                                            
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -208,32 +215,22 @@
 
                             <div class="col-12 col-md-6">
                                 <label for="department_id" class="mb-0 form-label col-form-label-sm">Divisi</label>
-                                <select class="form-control department" style="width: 100%;" id="department_id"
-                                    name="department_id" required>
-                                    <option></option>
-                                    @if (auth()->user()->role_id)
-                                        @foreach ($departments as $department)
-                                            <option value="{{ $department->id }}"
-                                                {{ auth()->user()->department_id == $department->id ? 'selected' : '' }}
-                                            >
-                                                {{ $department->name }}
-                                            </option>
-                                        @endforeach
+                                <select class="form-control department" style="width: 100%;" id="department_id" name="department_id" disabled>
+                                    @php
+                                    $userDepartment = $departments->firstWhere('id', auth()->user()->department_id);
+                                    @endphp
+                                    @if($userDepartment)
+                                    <option value="{{ $userDepartment->id }}" selected>{{ $userDepartment->name }}</option>
                                     @else
-                                        @foreach ($departments as $department)
-                                            <option value="{{ $department->id }}"
-                                                {{ old('department_id') == $department->id ? 'selected' : '' }}>
-                                                {{ $department->name }}
-                                            </option>
-                                        @endforeach
+                                    <option value="" selected>- Divisi tidak ditemukan -</option>
                                     @endif
                                 </select>
                                 @error('department_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
                                 @enderror
-                            </div>
+                            </div>                                                      
 
                             <div class="col-12 col-md-6">
                                 <label for="use_date" class="mb-0 form-label col-form-label-sm">Tanggal Digunakan</label>
@@ -470,6 +467,12 @@
                                                                             value="{{ old('actual_amounts.' . $item->id, $item->actual_amount) }}"
                                                                             required>
                                                                     </div>
+                                                                    <div class="form-group mt-3">
+                                                                        <label for="report_file_{{ $report->id }}" class="form-label">Upload Bukti Report (opsional)</label>
+                                                                        <input type="file" name="report_file" id="report_file_{{ $report->id }}" class="form-control form-control-sm"
+                                                                            accept=".jpg,.jpeg,.png,.pdf">
+                                                                        <small class="text-muted">Format yang diizinkan: JPG, PNG, atau PDF. Maks 2MB.</small>
+                                                                    </div>                                                                    
                                                                 </div>
                                                             </td>
                                                         </tr>
