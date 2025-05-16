@@ -7,6 +7,7 @@ use App\Models\ExpenseItem;
 use App\Models\ExpenseRequest;
 use App\Models\Project;
 use App\Models\User;
+use App\Models\CostCenter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,8 @@ class ExpenseRequestController extends Controller
     {
         $departments = Department::all()->except([2, 4, 6, 7, 8]);
         $projects = Project::where('status', '!=', 'Finished')->get();
+        $user_department_id = Auth::user()->department_id;
+        $costCenters = CostCenter::where('department_id', $user_department_id)->get();
 
         // Query pengajuan user (status proses)
         $my_expenses = ExpenseRequest::where('user_id', Auth::id())
@@ -39,7 +42,7 @@ class ExpenseRequestController extends Controller
             ->whereNotIn('status', ['finish', 'rejected'])
             ->count();
 
-        return view('finance.application', compact('departments', 'projects', 'my_expenses', 'reports', 'limit'));
+        return view('finance.application', compact('departments', 'projects', 'my_expenses', 'reports', 'limit', 'costCenters'));
     }
 
     public function approval()
@@ -132,8 +135,8 @@ class ExpenseRequestController extends Controller
             $expenseRequest->department_id = $request->department_id;
         }
         $expenseRequest->title = $request->title;
-        if (is_numeric($request->category)) {
-            $expenseRequest->project_id = $request->category;
+        if (is_array($request->category)) {
+            $expenseRequest->category = implode(',', $request->category);
         } else {
             $expenseRequest->category = $request->category;
         }
