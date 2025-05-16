@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/application/bulk-action', [ExpenseRequestController::class, 'bulkAction'])->name('application.bulkAction');
     Route::put('/application/{id}/process', [ExpenseRequestController::class, 'process'])->name('application.process');
     Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])->name('application.report');
+    Route::put('/application/{id}/check', [ExpenseRequestController::class, 'check'])->name('application.check');
     Route::get('/application/{id}/pdf', [ExpenseRequestController::class, 'pdf'])->name('application.pdf');
 
     // Debt
@@ -146,10 +147,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('partner', PartnerController::class);
 
     /**
-     * Date: 15-05-2025
+     * Date: 25
      */
     Route::controller(CostCenterController::class)
-        ->prefix('cost-centers')
+        ->prefix('cost-center')
         ->group(function () {
             Route::get('', 'index')->name('cost.center.index');
         });

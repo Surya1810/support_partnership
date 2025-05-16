@@ -120,6 +120,8 @@
                                                         <span class="badge badge-info">{{ $manager->status }}</span>
                                                     @elseif ($manager->status == 'report')
                                                         <span class="badge badge-warning">{{ $manager->status }}</span>
+                                                    @elseif ($manager->status == 'checking')
+                                                        <span class="badge badge-warning">{{ $manager->status }}</span>
                                                     @elseif ($my_expense->status == 'rejected')
                                                         <span class="badge badge-danger">{{ $my_expense->status }}</span>
                                                     @elseif ($manager->status == 'finish')
@@ -235,6 +237,8 @@
                                                         <span class="badge badge-info">{{ $direktur->status }}</span>
                                                     @elseif ($direktur->status == 'report')
                                                         <span class="badge badge-warning">{{ $direktur->status }}</span>
+                                                    @elseif ($direktur->status == 'checking')
+                                                        <span class="badge badge-warning">{{ $direktur->status }}</span>
                                                     @elseif ($direktur->status == 'rejected')
                                                         <span class="badge badge-danger">{{ $my_expense->status }}</span>
                                                     @elseif ($direktur->status == 'finish')
@@ -326,6 +330,8 @@
                                                     @elseif ($all_expense->status == 'report')
                                                         <span
                                                             class="badge badge-warning">{{ $all_expense->status }}</span>
+                                                    @elseif ($all_expense->status == 'checking')
+                                                            <span class="badge badge-warning">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'rejected')
                                                         <span class="badge badge-danger">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'finish')
@@ -373,6 +379,15 @@
                                                                 @csrf
                                                                 @method('PUT')
                                                             </form>
+                                                        @endif
+                                                        @if (auth()->user()->department_id == 8 && $all_expense->status == 'checking')
+                                                        <button class="btn btn-sm btn-success rounded-partner" onclick="processExpense({{ $all_expense->id }})"><i
+                                                                class="fa-solid fa-check"></i></button>
+                                                        <form id="process-form-{{ $all_expense->id }}" action="{{ route('application.check', $all_expense->id) }}"
+                                                            method="POST" style="display: none;">
+                                                            @csrf
+                                                            @method('PUT')
+                                                        </form>
                                                         @endif
                                                         @if ($all_expense->status == 'finish')
                                                             <a href="{{ route('application.pdf', $all_expense->id) }}"
@@ -687,6 +702,19 @@
                                             <strong class="text-center">Total =
                                                 {{ formatRupiah($all_expense->total_amount) }}</strong>
                                         </div>
+                                        @if ($all_expense->report_file)
+                                        <div class="col-lg-12 mt-3">
+                                            <div class="card rounded-partner">
+                                                <div class="card-body">
+                                                    <h5>Bukti Laporan</h5>
+                                                    <a href="{{ asset('storage/' . $all_expense->report_file) }}" target="_blank">
+                                                        <img src="{{ asset('storage/' . $all_expense->report_file) }}" alt="Bukti Laporan"
+                                                            class="img-fluid rounded" style="max-height: 300px;">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
