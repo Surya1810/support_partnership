@@ -29,10 +29,57 @@
         </div>
     </section>
 
+    {{-- Modal Export File --}}
+    <div class="modal fade" id="modal-export" tabindex="-1" role="dialog" aria-labelledby="modalExportLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <form action="#" method="GET">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalExportLabel">Export Filter</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="filter-by">Filter Berdasarkan</label>
+                            <select class="form-control" id="filter-by" name="filter_by">
+                                <option value="">-- Pilih Filter --</option>
+                                <option value="user">User</option>
+                                <option value="cost_center">Cost Center</option>
+                                <option value="division">Divisi</option>
+                                <option value="period">Periode Waktu</option>
+                                <option value="project">Project</option>
+                            </select>
+                        </div>
+
+                        <div id="filter-fields"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success" id="export-submit" disabled>Export</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
-            <h4>Laporan Umum</h4>
+            <div class="row align-items-center mb-3">
+                <div class="col-md-6">
+                    <h4 class="mb-0">Laporan Umum</h4>
+                </div>
+                <div class="col-md-6 text-right">
+                    <button class="btn btn-success" type="button" onclick="modalExport()">
+                        Export
+                    </button>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-12 col-md-4">
                     <div class="card card-outline rounded-partner card-primary">
@@ -324,6 +371,112 @@
                 //     targets: -8
                 // }]
             });
+        });
+
+        function modalExport() {
+            $('#modal-export').modal('show');
+            $('#filter-fields').html('');
+            $('#export-submit').prop('disabled', true);
+        }
+
+        $('#filter-by').on('change', function() {
+            const value = $(this).val();
+            let html = '';
+            $('#export-submit').prop('disabled', false); // enable tombol by default
+
+            switch (value) {
+                case 'user':
+                    html = `
+                    <div class="form-group">
+                        <label for="user">Pilih User</label>
+                        <select class="form-control" name="user_id" required>
+                            @if ($users->count())
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
+                            @else
+                                <option disabled selected>User tidak tersedia</option>
+                            @endif
+                        </select>
+                    </div>`;
+                    break;
+
+                case 'cost_center':
+                    html = `
+                    <div class="form-group">
+                        <label for="cost_center">Pilih Cost Center</label>
+                        <select class="form-control" name="cost_center_id" required>
+                            @if ($costCenters->count())
+                                @foreach ($costCenters as $cc)
+                                    <option value="{{ $cc->id }}">{{ $cc->name }}</option>
+                                @endforeach
+                            @else
+                                <option disabled selected>Cost center tidak tersedia</option>
+                            @endif
+                        </select>
+                    </div>`;
+                    break;
+
+                case 'division':
+                    html = `
+                    <div class="form-group">
+                        <label for="division">Pilih Divisi</label>
+                        <select class="form-control" name="division" required>
+                            <option value="Procurement">Procurement</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Construction">Construction</option>
+                        </select>
+                    </div>`;
+                    break;
+
+                case 'period':
+                    html = `
+                    <div class="form-group">
+                        <label>Periode Waktu</label>
+                        <div class="input-group">
+                            <input type="date" class="form-control" name="start_date" id="start_date" required>
+                            <input type="date" class="form-control" name="end_date" id="end_date" required>
+                        </div>
+                        <small class="text-danger d-none" id="date-error">Tanggal akhir tidak boleh kurang dari tanggal awal.</small>
+                    </div>`;
+                    break;
+
+                case 'project':
+                    html = `
+                    <div class="form-group">
+                        <label for="project">Pilih Project</label>
+                        <select class="form-control" name="project_id" required>
+                            @if ($projects->count())
+                                @foreach ($projects as $project)
+                                    <option value="{{ $project->id }}">{{ $project->name }}</option>
+                                @endforeach
+                            @else
+                                <option disabled selected>Project tidak tersedia</option>
+                            @endif
+                        </select>
+                    </div>`;
+                    break;
+
+                default:
+                    $('#export-submit').prop('disabled', true);
+            }
+
+
+            $('#filter-fields').html(html);
+        });
+
+        // Validasi periode waktu
+        $(document).on('change', '#start_date, #end_date', function() {
+            const start = new Date($('#start_date').val());
+            const end = new Date($('#end_date').val());
+
+            if (end < start) {
+                $('#export-submit').prop('disabled', true);
+                $('#date-error').removeClass('d-none');
+            } else {
+                $('#export-submit').prop('disabled', false);
+                $('#date-error').addClass('d-none');
+            }
         });
     </script>
 @endpush
