@@ -4,7 +4,6 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DocumentController;
-use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseRequestController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\FinanceController;
@@ -19,6 +18,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserExtensionController;
+use App\Http\Controllers\UserJobController;
 use App\Models\ExpenseItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB as FacadesDB;
@@ -28,32 +28,31 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-Route::get('/rekap', function () {
-    $items = ExpenseItem::select(
-        '*',
-        FacadesDB::raw('ABS(total_price - actual_amount) AS selisih')
-    )
-        ->whereNotNull('actual_amount')
-        ->whereColumn('total_price', '!=', 'actual_amount')
-        ->get();
-
-    return response()->json($items, 200, [], JSON_PRETTY_PRINT);
-});
-
-Route::get('/share/{id}', function ($id) {
-    $file = \App\Models\File::findOrFail($id);
-    $path = storage_path('app/public/' . $file->file_path);
-
-    if (!file_exists($path)) {
-        abort(404, 'File not found');
-    }
-
-    return response()->download($path);
-})->name('files.share');
-
 Auth::routes();
-
 Route::middleware('auth')->group(function () {
+    Route::get('/rekap', function () {
+        $items = ExpenseItem::select(
+            '*',
+            FacadesDB::raw('ABS(total_price - actual_amount) AS selisih')
+        )
+            ->whereNotNull('actual_amount')
+            ->whereColumn('total_price', '!=', 'actual_amount')
+            ->get();
+
+        return response()->json($items, 200, [], JSON_PRETTY_PRINT);
+    });
+
+    Route::get('/share/{id}', function ($id) {
+        $file = \App\Models\File::findOrFail($id);
+        $path = storage_path('app/public/' . $file->file_path);
+
+        if (!file_exists($path)) {
+            abort(404, 'File not found');
+        }
+
+        return response()->download($path);
+    })->name('files.share');
+
     // Check
     Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 
@@ -70,7 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password/{id}', [ProfileController::class, 'password'])->name('profile.password');
     Route::delete('/profile/delete/{id}', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // User | Employee  
+    // User | Employee
     Route::resource('employee', UserController::class);
     Route::resource('user-data', UserExtensionController::class);
 
@@ -143,6 +142,22 @@ Route::middleware('auth')->group(function () {
 
     // Partner
     Route::resource('partner', PartnerController::class);
+
+    /**
+     * Date: 21/05/2025
+     *
+     * UserJobs Menu
+     */
+    Route::controller(UserJobController::class)
+        ->prefix('/jobs')
+        ->group(function () {
+            Route::get('/', 'index')->name('jobs.index');
+            Route::post('/store', 'store')->name('jobs.store');
+            Route::get('/{id}', 'show')->name('jobs.show');
+            Route::put('/{id}', 'update')->name('jobs.update');
+            Route::post('/{id}/complete', 'markComplete')->name('jobs.complete');
+
+        });
 });
 
 Route::get('/debug-session', function () {
