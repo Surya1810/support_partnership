@@ -15,5 +15,14 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->renderable(function (\Exception $e) {
+            if (method_exists($e, 'getStatusCode')) {
+                if ($e->getStatusCode() == 419) {
+                    return redirect()->route('login')->with([
+                        'pesan' => 'Sesi keamanan browser Anda telah berakhir. Mohon login kembali.',
+                        'level-alert' => 'alert-warning'
+                    ]);
+                }
+            }
+        });
     })->create();
