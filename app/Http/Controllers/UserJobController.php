@@ -142,17 +142,17 @@ class UserJobController extends Controller
 
         try {
             $now = Carbon::today();
-            $start = Carbon::parse($job->start_date)->startOfDay();
-            $end = Carbon::parse($job->end_date)->startOfDay();
+            $start = Carbon::parse($request->start_date)->startOfDay();
+            $end = Carbon::parse($request->end_date)->startOfDay();
 
             if ($request->action === 'cancel') {
                 $status = 'cancelled';
-            } else if ($now->lt($start)) {
-                $status = 'planning';
             } else if ($now->gte($start) && $now->lte($end)) {
                 $status = 'in_progress';
             } else if ($now->gt($end)) {
-                $status = 'overdue';
+                return response()->json([
+                    'message' => 'Tanggal selesai tidak boleh kurang dari hari ini'
+                ], 400);
             }
 
             $job->update([
@@ -169,7 +169,7 @@ class UserJobController extends Controller
         } catch (\Exception $e) {
 
             DB::rollBack();
-            return response()->json(['message' => 'Gagal diperbarui'], 500);
+            return response()->json(['message' => $e], 500);
         }
     }
 

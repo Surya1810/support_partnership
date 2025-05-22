@@ -418,7 +418,8 @@
                         showToast('success', res.message);
                     },
                     error: function(xhr) {
-                        showToast('error', 'Gagal memperbarui penugasan');
+                        console.log(xhr);
+                        showToast('error', xhr.responseJSON.message);
                     }
                 });
             });
