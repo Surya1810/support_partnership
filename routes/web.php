@@ -146,6 +146,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('partner', PartnerController::class);
 
     /**
+<<<<<<< HEAD
      * Date: 15-05-2025
      */
     Route::controller(CostCenterController::class)
@@ -164,6 +165,8 @@ Route::middleware('auth')->group(function () {
         });
 
     /**
+=======
+>>>>>>> origin
      * Date: 21/05/2025
      *
      * UserJobs Menu
@@ -176,6 +179,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/{id}', 'show')->name('jobs.show');
             Route::put('/{id}', 'update')->name('jobs.update');
             Route::post('/{id}/complete', 'markComplete')->name('jobs.complete');
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin
         });
 });
 
