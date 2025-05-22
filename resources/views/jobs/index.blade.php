@@ -377,7 +377,7 @@
                     method: "POST",
                     data: formData,
                     success: function(res) {
-                        $('#addJobModal').modal('hide');
+                        $('#modalAddJob').modal('hide');
                         $('#jobTable').DataTable().ajax.reload(null, false);
                         showToast('success', res.message);
                     },

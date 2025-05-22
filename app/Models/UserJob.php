@@ -7,6 +7,7 @@ use Carbon\Carbon;
 
 class UserJob extends Model
 {
+    protected $table = 'user_jobs';
     protected $guarded = ['id'];
     protected $appends = ['status'];
 

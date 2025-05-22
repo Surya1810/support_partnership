@@ -92,7 +92,7 @@ class UserJobController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $assignee = User::where('assignee_id', $request)->fist();
+        $assignee = User::where('id', $request->assignee_id)->first();
 
         if (!$assignee->exists()) {
             return response()->json(['message' => 'Data tidak ditemukan'], 404);
