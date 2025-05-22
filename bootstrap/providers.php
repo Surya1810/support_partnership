@@ -5,4 +5,5 @@ return [
     Ladumor\LaravelPwa\PWAServiceProvider::class,
     Barryvdh\DomPDF\ServiceProvider::class,
     Maatwebsite\Excel\ExcelServiceProvider::class,
+    Yajra\DataTables\DataTablesServiceProvider::class,
 ];

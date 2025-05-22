@@ -230,6 +230,14 @@
 
                         <li class="nav-header mt-3">MANAGEMENT</li>
                         <li class="nav-item">
+                            <a href="{{ route('jobs.index') }}" class="nav-link">
+                                <i class="nav-icon fa-solid fa-square-check"></i>
+                                <p>
+                                    Penugasan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('project.index') }}" class="nav-link">
                                 <i class="nav-icon fa-solid fa-helmet-safety"></i>
                                 <p>

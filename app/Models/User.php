@@ -66,4 +66,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Asset::class);
     }
+
+    /**
+     * Date: 21/05/2025
+     *
+     * relation to UserJob for User Job Menu
+     */
+    public function givenJobs() {
+        return $this->hasMany(UserJob::class, 'assigner_id');
+    }
+
+    public function receivedJobs() {
+        return $this->hasMany(UserJob::class, 'assignee_id');
+    }
 }

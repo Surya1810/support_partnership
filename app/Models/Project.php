@@ -41,4 +41,11 @@ class Project extends Model
     {
         return $this->hasOne(Income::class, 'project_id');
     }
+
+    /**
+     * Date: 22/05/2025
+     */
+    public function financial() {
+        return $this->hasOne(ProjectFinancial::class);
+    }
 }

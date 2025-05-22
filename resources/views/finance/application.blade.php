@@ -89,7 +89,7 @@
                                                 <div>{{ $cc->name }}</div>
                                                 @endforeach
                                                 @endif
-                                            </td>                                                                                      
+                                            </td>
                                             <td>{{ $my_expense->use_date->format('d/m/y') }}</td>
                                             <td>{{ formatRupiah($my_expense->total_amount) }}</td>
                                             <td>
@@ -184,7 +184,7 @@
                                                     <i class="fa-regular fa-file-pdf"></i>
                                                 </a>
                                                 @endif
-                                            </td>                                            
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -238,7 +238,7 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                                 @enderror
-                            </div>                                                      
+                            </div>
 
                             <div class="col-12 col-md-6">
                                 <label for="use_date" class="mb-0 form-label col-form-label-sm">Tanggal Digunakan</label>
@@ -254,7 +254,13 @@
                             <div class="col-12 col-md-6">
                                 <label for="category" class="mb-0 form-label col-form-label-sm">Cost Center</label>
                                 <select class="form-control category select2" style="width: 100%;" id="category" name="category[]" multiple
-                                    required>
+                                required>
+                                    <option disabled>Pilih Project</option>
+                                    @foreach ($projects as $project)
+                                    <option value="{{ $project->id }}" {{ (collect(old('project'))->contains($project->id)) ? 'selected' : '' }}>
+                                        {{ $project->name }}
+                                    </option>
+                                    @endforeach
                                     <option disabled>Pilih Cost Center Pengeluaran</option>
                                     @foreach ($costCenters as $cc)
                                     <option value="{{ $cc->id }}" {{ (collect(old('category'))->contains($cc->id)) ? 'selected' : '' }}>
@@ -267,7 +273,7 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                                 @enderror
-                            </div>                            
+                            </div>
                         </div>
 
                         <label for="pencairan" class="mb-0 form-label col-form-label-sm">Metode Pembayaran</label>
@@ -450,7 +456,7 @@
                                                                         <input type="file" name="report_file" id="report_file_{{ $report->id }}" class="form-control form-control-sm"
                                                                             accept=".jpg,.jpeg,.png,.pdf">
                                                                         <small class="text-muted">Format yang diizinkan: JPG, PNG, atau PDF. Maks 2MB.</small>
-                                                                    </div>                                                                    
+                                                                    </div>
                                                                 </div>
                                                             </td>
                                                         </tr>

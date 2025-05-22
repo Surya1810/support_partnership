@@ -82,28 +82,20 @@ class ExpenseRequestController extends Controller
         //query direktur
         if (Auth::user()->id == 2) {
             $directorRequests = ExpenseRequest::where('status', 'pending')
-                ->where(function ($query) {
-                    $query->where('total_amount', '>', 150000)
-                        ->orWhere('department_id', 1)
-                        ->orWhereHas('user', function ($q) {
-                            $q->where('role_id', 3);
-                        });
-                })
-                ->orderBy('created_at', 'desc')
-                ->get();
+            ->where(function ($query) {
+                $query->where('total_amount', '>', 150000)
+                ->orWhere('department_id', 1)
+                ->orWhereHas('user', function ($q) {
+                    $q->where('role_id', 3);
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
         } else {
             $directorRequests = [];
         }
 
         return view('finance.approval', compact('managerRequests', 'directorRequests', 'all_expenses',));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -180,30 +172,6 @@ class ExpenseRequestController extends Controller
         $expenseRequest->save();
 
         return redirect()->route('application.index')->with(['pesan' => 'Pengajuan created successfully', 'level-alert' => 'alert-success']);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(ExpenseRequest $expenseRequest)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ExpenseRequest $expenseRequest)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ExpenseRequest $expenseRequest)
-    {
-        //
     }
 
     /**
@@ -372,7 +340,6 @@ class ExpenseRequestController extends Controller
             'level-alert' => 'alert-success'
         ]);
     }
-
 
     public function bulkAction(Request $request)
     {

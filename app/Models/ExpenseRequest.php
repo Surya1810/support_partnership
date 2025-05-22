@@ -7,15 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ExpenseRequest extends Model
 {
 
-    protected $fillable = [
-        'user_id',
-        'amount',
-        'status',
-        'approved_by_manager',
-        'approved_by_director',
-        'processed_by_finance'
-    ];
-
+    protected $guarded = ['id'];
     protected $casts = [
         'use_date' => 'datetime'
     ];

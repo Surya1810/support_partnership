@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CostCenter extends Model
 {
+    protected $table = 'cost_centers';
     protected $guarded = ['id'];
 
     public function department() {

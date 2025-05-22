@@ -14,7 +14,8 @@
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
         "maatwebsite/excel": "^3.1",
-        "pusher/pusher-php-server": "*"
+        "pusher/pusher-php-server": "*",
+        "yajra/laravel-datatables": "^11.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

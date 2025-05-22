@@ -70,3 +70,66 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <!-- Sweetalert2 -->
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            iconColor: 'white',
+            customClass: {
+                popup: 'colored-toast'
+            },
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true
+        })
+
+        @if (session('pesan'))
+            @switch(session('level-alert'))
+                @case('alert-success')
+                Toast.fire({
+                    icon: 'success',
+                    title: '{{ Session::get('pesan') }}'
+                })
+                @break
+
+                @case('alert-danger')
+                Toast.fire({
+                    icon: 'error',
+                    title: '{{ Session::get('pesan') }}'
+                })
+                @break
+
+                @case('alert-warning')
+                Toast.fire({
+                    icon: 'warning',
+                    title: '{{ Session::get('pesan') }}'
+                })
+                @break
+
+                @case('alert-question')
+                Toast.fire({
+                    icon: 'question',
+                    title: '{{ Session::get('pesan') }}'
+                })
+                @break
+
+                @default
+                Toast.fire({
+                    icon: 'info',
+                    title: '{{ Session::get('pesan') }}'
+                })
+            @endswitch
+        @endif
+        @if (count($errors) > 0)
+            @foreach ($errors->all() as $error)
+                Toast.fire({
+                    icon: 'error',
+                    title: '{{ $error }}'
+                })
+            @endforeach
+        @endif
+    </script>
+@endpush

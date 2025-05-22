@@ -14,55 +14,30 @@ class CostCenterSeeder extends Seeder
      */
     public function run(): void
     {
-        // Teknologi
-        CostCenter::create([
-            'department_id' => 5,
-            'name' => 'Project',
-            'code' => '03-25-1'
-        ]);
-        CostCenter::create([
-            'department_id' => 5,
-            'name' => 'Gaji',
-            'code' => '03-25-2'
-        ]);
-        CostCenter::create([
-            'department_id' => 5,
-            'name' => 'Rumah Tangga',
-            'code' => '03-25-3'
-        ]);
+        if (env('APP_ENV') === 'local') {
+            // Procurement
+            CostCenter::create([
+                'department_id' => 1,
+                'name' => 'Cost Center Procurement'
+            ]);
 
-        // Procurement
-        CostCenter::create([
-            'department_id' => 1,
-            'name' => 'Project',
-            'code' => '01-25-1'
-        ]);
-        CostCenter::create([
-            'department_id' => 1,
-            'name' => 'Gaji',
-            'code' => '01-25-2'
-        ]);
-        CostCenter::create([
-            'department_id' => 1,
-            'name' => 'Rumah Tangga',
-            'code' => '01-25-3'
-        ]);
+            // Construction
+            CostCenter::create([
+                'department_id' => 3,
+                'name' => 'Cost Center Konstruksi',
+            ]);
 
-        // Construction
-        CostCenter::create([
-            'department_id' => 3,
-            'name' => 'Project',
-            'code' => '02-25-1'
-        ]);
-        CostCenter::create([
-            'department_id' => 3,
-            'name' => 'Gaji',
-            'code' => '02-25-2'
-        ]);
-        CostCenter::create([
-            'department_id' => 3,
-            'name' => 'Rumah Tangga',
-            'code' => '02-25-3'
-        ]);
+            // Teknologi
+            CostCenter::create([
+                'department_id' => 5,
+                'name' => 'Cost Center Teknologi'
+            ]);
+
+            // Rumah Tangga
+            CostCenter::create([
+                'department_id' => 9,
+                'name' => 'Cost Center Rumah Tangga'
+            ]);
+        }
     }
 }

@@ -13,29 +13,34 @@ class DepartmentSeeder extends Seeder
      */
     public function run(): void
     {
-        $role = Department::create([
-            'name' => 'Partnership Procurement Solution'
-        ]);
-        $Department = Department::create([
-            'name' => 'Partnership Workshop'
-        ]);
-        $Department = Department::create([
-            'name' => 'Partnership Contractor'
-        ]);
-        $Department = Department::create([
-            'name' => 'Partnership Law Consultant'
-        ]);
-        $Department = Department::create([
-            'name' => 'Partnership Technology'
-        ]);
-        $Department = Department::create([
-            'name' => 'Partnership Information System & Website'
-        ]);
-        $Department = Department::create([
-            'name' => 'Partnership Event Organizer & Mice'
-        ]);
-        $Department = Department::create([
-            'name' => 'Finance'
-        ]);
+        if (env('APP_ENV') === 'local') {
+            // Department::create([
+            //     'name' => 'Partnership Procurement Solution'
+            // ]);
+            // Department::create([
+            //     'name' => 'Partnership Workshop'
+            // ]);
+            // Department::create([
+            //     'name' => 'Partnership Contractor'
+            // ]);
+            // Department::create([
+            //     'name' => 'Partnership Law Consultant'
+            // ]);
+            // Department::create([
+            //     'name' => 'Partnership Technology'
+            // ]);
+            // Department::create([
+            //     'name' => 'Partnership Information System & Website'
+            // ]);
+            // Department::create([
+            //     'name' => 'Partnership Event Organizer & Mice'
+            // ]);
+            // Department::create([
+            //     'name' => 'Finance'
+            // ]);
+            Department::create([
+                'name' => 'Rumah Tangga'
+            ]);
+        }
     }
 }
