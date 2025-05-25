@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\CostCenter;
 use App\Models\CostCenterCategories;
 use App\Models\CostCenterSub;
 use App\Models\Department;
@@ -10,6 +11,7 @@ use App\Models\Income;
 use App\Models\Project;
 use App\Models\ProjectFinancial;
 use App\Models\ProjectNetProfit;
+use App\Models\ProjectOtherCost;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -25,8 +27,7 @@ class ProjectController extends Controller
     public function index()
     {
         $today = Carbon::now()->toFormattedDateString('d/m/y');
-        // $projects = Project::where('deadline', '>=', today())->get();
-        $projects = Project::where('status', '!=', 'Finished')->get();
+        $projects = Project::with('pic')->where('status', '!=', 'Finished')->get();
 
         return view('project.index', compact('projects', 'today'));
     }
@@ -57,8 +58,6 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
-
         $request->validate([
             'name' => 'bail|required',
             'client' => 'bail|required',
@@ -70,10 +69,10 @@ class ProjectController extends Controller
             'assisten' => 'bail|required',
             'start' => 'bail|required',
             'deadline' => 'bail|required',
-            'profit_perusahaan' => 'bail|required',
-            'profit_penyusutan' => 'bail|required',
-            'profit_divisi' => 'bail|required',
-            'profit_bonus' => 'bail|required',
+            'profit_perusahaan' => 'bail|required|max:40',
+            'profit_penyusutan' => 'bail|required|max:20',
+            'profit_divisi' => 'bail|required|max:20',
+            'profit_bonus' => 'bail|required|max:30',
             'othercosts' => 'bail|array',
             'othercosts.*.item_name' => 'bail|required|string|max:255', // Nama Item Biaya Lain-lain
             'othercosts.*.unit_price' => 'bail|required|numeric|min:0', // Nominal Item Biaya Lain-lain
@@ -83,7 +82,11 @@ class ProjectController extends Controller
             'items.*.unit_price' => 'bail|required|numeric|min:0', // Nominal Item RAB
         ]);
 
-        $old = session()->getOldInput();
+        $calculateProfit = $request->profit_perusahaan + $request->profit_penyusutan + $request->profit_divisi + $request->profit_bonus;
+
+        if ($calculateProfit > 100) {
+            return redirect()->back()->with(['pesan' => 'Persentase keuntungan tidak boleh melebihi 100%', 'level-alert' => 'alert-warning']);
+        }
 
         DB::beginTransaction();
 
@@ -119,21 +122,23 @@ class ProjectController extends Controller
                 /**
                  * Masukkan item RAB ke cost_center_subs
                  */
-                $costCenterSubs = $request->items;
-                $costCenterId   = $request->cost_center_id;
-                $projectId      = $request->project_id;
                 $departmentId   = Auth::user()->department_id;
                 $department = Department::where('id', $departmentId)->first();
+                $costCenterSubs = $request->items;
+                $costCenter = CostCenter::where('department_id', $departmentId)->first();
+                $costCenterId   = $costCenter->id;
+                $projectId      = $addProject->id;
 
                 $preparedCostCenterSubsData = array_map(
                     function ($item, $index) use ($costCenterId, $projectId, $department) {
-                        $ref = $department->code . '.' . $item['item_type'] . '.' . now()->format('Y') . '/';
+                        $costCenterCategory = CostCenterCategories::where('id', $item['item_type'])->first();
+                        $ref = $department->code . '.' . $costCenterCategory->code . '.' . now()->format('Y') . '/';
                         return [
                             'cost_center_id' => $costCenterId,
                             'project_id'     => $projectId,
                             'department_id'  => $department->id,
                             'cost_center_category_ref' => $ref,
-                            'cost_center_category_code'      => $item['item_type'],
+                            'cost_center_category_code'      => $costCenterCategory->code,
                             'name'      => $item['item_name'],
                             'amount'     => $item['unit_price'],
                             'created_at'     => now(),
@@ -147,23 +152,47 @@ class ProjectController extends Controller
                 $addCostCenterSubs = CostCenterSub::insert($preparedCostCenterSubsData);
 
                 if ($addFinancials && $addCostCenterSubs) {
+                    /**
+                     * Masukkan biaya lain-lain
+                     */
+                    $preparedOtherCostsData = array_map(
+                        function ($item, $index) use ($addFinancials) {
+                            return [
+                                'project_financial_id' => $addFinancials->id,
+                                'name' => $item['item_name'],
+                                'amount' => $item['unit_price'],
+                                'created_at' => now(),
+                                'updated_at' => now()
+                            ];
+                        },
+                        $request->othercosts,
+                        array_keys($request->othercosts)
+                    );
+
+                    $addOtherCosts = ProjectOtherCost::insert($preparedOtherCostsData);
 
                     /**
                      * Masukkan net profit perusahaan
                      */
                     $addNetProfits = ProjectNetProfit::create([
-
+                        'project_financial_id' => $addFinancials->id,
+                        'company_percent' => $request->profit_perusahaan,
+                        'depreciation' => $request->profit_penyusutan,
+                        'cash_dept_percent' => $request->profit_divisi,
+                        'team_bonus' => $request->profit_bonus
                     ]);
 
-                    return redirect()->route('project.index')->with([
-                        'pesan' => 'Project berhasil ditambahkan',
-                        'level-alert' => 'alert-success'
-                    ]);
+                    if ($addOtherCosts && $addNetProfits) {
+                        DB::commit();
+                        return redirect()->route('project.index')->with([
+                            'pesan' => 'Project berhasil ditambahkan',
+                            'level-alert' => 'alert-success'
+                        ]);
+                    }
                 }
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e);
             return redirect()->back()->with([
                 'pesan' => 'Project gagal ditambahkan',
                 'leve-alert' => 'alert-danger'
@@ -179,7 +208,7 @@ class ProjectController extends Controller
         $project = Project::where('kode', $kode)->first();
         $users = User::where('id', '!=', '1')->get();
         $clients = Client::all();
-        $departments = Department::all()->except([2, 4, 6, 7, 8]);;
+        $departments = Department::all()->except([2, 4, 6, 7, 8]);
 
         return view('project.edit', compact('project', 'users', 'clients', 'departments'));
     }
@@ -217,21 +246,11 @@ class ProjectController extends Controller
         return redirect()->route('project.index')->with(['pesan' => 'Project updated successfully', 'level-alert' => 'alert-warning']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        $project = Project::find($id);
-
-        $project->delete();
-
-        return redirect()->route('project.index')->with(['pesan' => 'Project deleted successfully', 'level-alert' => 'alert-danger']);
-    }
-
     public function detail($kode)
     {
-        $project = Project::where('kode', $kode)->first();
+        $project = Project::where('kode', $kode)
+            ->with(['financial.otherCosts', 'financial.netProfits', 'costCenterSubs'])
+            ->first();
         $asisten = explode(',', $project->assisten_id);
         $team = User::whereIn('id', $asisten)->get();
 

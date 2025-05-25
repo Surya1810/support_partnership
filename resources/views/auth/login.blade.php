@@ -76,7 +76,7 @@
     <script>
         const Toast = Swal.mixin({
             toast: true,
-            position: 'top',
+            position: 'top-right',
             iconColor: 'white',
             customClass: {
                 popup: 'colored-toast'

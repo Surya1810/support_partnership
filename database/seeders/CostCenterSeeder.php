@@ -18,25 +18,41 @@ class CostCenterSeeder extends Seeder
             // Procurement
             CostCenter::create([
                 'department_id' => 1,
-                'name' => 'Cost Center Procurement'
+                'name' => 'Cost Center Procurement',
+                'debit_amount' => 0,
+                'credit_amount' => 0,
+                'balance_amount' => 0,
+                'current_year_revenue_amount' => 0
             ]);
 
             // Construction
             CostCenter::create([
                 'department_id' => 3,
                 'name' => 'Cost Center Konstruksi',
+                'debit_amount' => 0,
+                'credit_amount' => 0,
+                'balance_amount' => 0,
+                'current_year_revenue_amount' => 0
             ]);
 
             // Teknologi
             CostCenter::create([
                 'department_id' => 5,
-                'name' => 'Cost Center Teknologi'
+                'name' => 'Cost Center Teknologi',
+                'debit_amount' => 0,
+                'credit_amount' => 0,
+                'balance_amount' => 0,
+                'current_year_revenue_amount' => 0
             ]);
 
             // Rumah Tangga
             CostCenter::create([
                 'department_id' => 9,
-                'name' => 'Cost Center Rumah Tangga'
+                'name' => 'Cost Center Rumah Tangga',
+                'debit_amount' => 0,
+                'credit_amount' => 0,
+                'balance_amount' => 0,
+                'current_year_revenue_amount' => 0
             ]);
         }
     }

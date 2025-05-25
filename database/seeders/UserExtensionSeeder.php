@@ -16,7 +16,7 @@ class UserExtensionSeeder extends Seeder
         if (getenv('APP_ENV') === 'local') {
             for ($i = 1; $i <= 14; $i++) {
                 UserExtension::create([
-                    'user_id' => 1,
+                    'user_id' => $i,
                     'nik' => 0,
                     'npwp' => 0,
                     'phone' => 0,

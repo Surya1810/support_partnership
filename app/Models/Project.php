@@ -43,9 +43,23 @@ class Project extends Model
     }
 
     /**
-     * Date: 22/05/2025
+     * Job value, sp2d, ppn, pph, etc
      */
     public function financial() {
         return $this->hasOne(ProjectFinancial::class);
+    }
+
+    /**
+     * Biaya lain-lain
+     */
+    public function otherCosts() {
+        return $this->hasMany(ProjectOtherCost::class);
+    }
+
+    /**
+     * RAB
+     */
+    public function costCenterSubs() {
+        return $this->hasMany(CostCenterSub::class);
     }
 }

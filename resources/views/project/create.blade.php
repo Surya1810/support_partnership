@@ -26,7 +26,7 @@
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('project.index') }}">Project</a>
                         </li>
-                        <li class="breadcrumb-item active"><strong>Create</strong></li>
+                        <li class="breadcrumb-item active"><strong>Buat</strong></li>
                     </ol>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                         <h3 class="card-title">Project Create</h3>
                     </div>
                     <form action="{{ route('project.store') }}" method="POST" enctype="multipart/form-data"
-                        autocomplete="off">
+                        autocomplete="off" id="createProjectForm">
                         @csrf
                         <div class="card-body">
                             <div class="row">
@@ -227,7 +227,8 @@
                                 <div class="col-lg-4">
                                     <label for="margin" class="small">Margin</label>
                                     <input type="text" class="form-control muted @error('margin') is-invalid @enderror"
-                                        placeholder="Rp0" id="margin" value="{{ old('margin') }}" readonly>
+                                        placeholder="Rp0" name="margin" id="margin" value="{{ old('margin') }}" readonly>
+                                    <input type="hidden" name="margin" id="margin_numeric">
                                     @error('margin')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -427,8 +428,8 @@
                             </div>
                         </div>
                         <div class="card-footer rounded-partner">
-                            <button type="submit" class="btn btn-primary rounded-partner float-right">
-                                Create
+                            <button type="submit" class="btn btn-primary rounded-partner float-right" id=buttonSubmitProject>
+                                Buat
                             </button>
                         </div>
                     </form>
@@ -440,7 +441,7 @@
 
 @push('scripts')
     <script src="{{ asset('assets/adminLTE/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
-
+    <script src="{{ asset('js/loading-overlay.js') }}"></script>
     <script>
         $(function() {
             $('.pic').select2({
@@ -628,6 +629,11 @@
                 calculateProfitShares();
             });
 
+            // Show loading
+            $('#createProjectForm').on('submit', function() {
+                $.LoadingOverlay("show");
+                $('#buttonSubmitProject').prop('disabled', true);
+            });
         })
 
         function formatCurrency(num) {
@@ -670,6 +676,7 @@
             $('#sp2d').val(formatCurrency(sp2d));
             $('#sp2d_numeric').val(sp2d);
             $('#margin').val(formatCurrency(margin));
+            $('#margin_numeric').val(margin);
 
             // Lanjut hitung distribusi profit jika ada
             calculateProfitShares();
@@ -731,6 +738,7 @@
             const total = perusahaanPercent + penyusutanPercent + divisiPercent + bonusPercent;
 
             if (total > 100) {
+                $('#buttonSubmitProject').attr('disabled', true);
                 Swal.fire({
                     toast: true,
                     position: 'top-end',
@@ -740,6 +748,8 @@
                     timer: 3000,
                     timerProgressBar: true
                 });
+            } else {
+                $('#buttonSubmitProject').attr('disabled', false);
             }
 
             $('#value_perusahaan').text(formatCurrency(perusahaanValue));
