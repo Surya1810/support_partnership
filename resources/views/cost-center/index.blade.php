@@ -13,6 +13,7 @@
                     <ol class="breadcrumb text-black-50">
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item active"><strong>Cost Center</strong></li>
+                        <script src="https://cdn.tailwindcss.com"></script>
                     </ol>
                 </div>
             </div>
@@ -20,255 +21,104 @@
     </section>
 
     <section class="content">
-        <div class="container-fluid">
-            <div class="row text-sm">
-                {{-- Table Cost Center Per Divisi --}}
-                <div class="col-12 col-md-4">
-                    <div class="card card-outline rounded-partner card-primary p-3">
-                        <div class="row align-items-center">
-                            <div class="col-6">
-                                <h2 class="card-title"><b>Divisi Procurement</b></h2>
-                            </div>
-                            <div class="col-6">
-                                @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 3)
-                                    <button type="button" class="btn btn-sm btn-warning float-right"
-                                        data-id="{{ isset($costCentersProcurement[0]->department_id) ? $costCentersProcurement[0]->department_id : '' }}"
-                                        onclick="modalImport(this)">
-                                        <i class="fas fa-upload"></i>
-                                        Import
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-primary mr-2 float-right"
-                                        data-id="{{ isset($costCentersProcurement[0]->department_id) ? $costCentersProcurement[0]->department_id : '' }}"
-                                        onclick="modalAdd(this)">
-                                        <i class="fas fa-plus"></i>
-                                        Tambah Cost Center
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="card-body table-responsive">
-                            <table id="tableCostCenterProcurement" class="table table-bordered text-nowrap w-100">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>
-                                            No.
-                                        </th>
-                                        <th>
-                                            Nama
-                                        </th>
-                                        <th>
-                                            Kode
-                                        </th>
-                                        <th>
-                                            Amount
-                                        </th>
-                                        <th>
-                                            Aksi
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($costCentersProcurement as $item)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}.</td>
-                                            <td>{{ $item->name }}</td>
-                                            <td>{{ $item->code }}</td>
-                                            <td>{{ formatRupiah($item->amount) }}</td>
-                                            <td>
-                                                @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 3)
-                                                    <button type="button" class="badge badge-primary border-0 p-1"
-                                                        data-toggle="modal" onclick="modalEdit(this)"
-                                                        data-id="{{ $item->id }}">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="badge badge-danger border-0 p-1"
-                                                        data-toggle="modal" onclick="confirmDelete(this)"
-                                                        data-id="{{ $item->id }}">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                @endif
-
-                                                @if (strtolower($item->name) == 'project')
-                                                    <button onclick="modalDetail(this)"
-                                                        class="badge badge-info btn-sm p-1 border-0"
-                                                        data-id="{{ $item->id }}" data-toggle="modal">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+        <h2 class="text-xl font-bold mb-4 text-gray-700">Laporan General</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+           @php
+            $generalCards = [
+            [
+            'label' => 'Total Debit',
+            'value' => formatRupiah($totalDebitGeneral),
+            'bgFrom' => 'blue-400',
+            'bgTo' => 'blue-600',
+            'text' => 'white'
+            ],
+            [
+            'label' => 'Total Kredit',
+            'value' => formatRupiah($totalKreditGeneral),
+            'bgFrom' => 'green-400',
+            'bgTo' => 'green-600',
+            'text' => 'white'
+            ],
+            [
+            'label' => 'Total Saldo',
+            'value' => formatRupiah($totalSaldoGeneral),
+            'bgFrom' => 'purple-400',
+            'bgTo' => 'purple-600',
+            'text' => 'white'
+            ],
+            [
+            'label' => 'Total Pendapatan Tahun Berjalan',
+            'value' => formatRupiah($totalPendapatanGeneral),
+            'bgFrom' => 'orange-400',
+            'bgTo' => 'orange-600',
+            'text' => 'white'
+            ],
+            ];
+            @endphp                
+    
+            @foreach ($generalCards as $card)
+            <div
+                class="bg-gradient-to-br from-{{ $card['bgFrom'] }} to-{{ $card['bgTo'] }} rounded-lg shadow p-4 text-center">
+                <p class="text-sm font-semibold text-{{ $card['text'] }}">{{ $card['label'] }}</p>
+                <p class="text-2xl font-extrabold text-{{ $card['text'] }}">{{ $card['value'] }}</p>
+            </div>
+            @endforeach
+        </div>
+    </section>
+    <br><br>
+    <section>
+        <h2 class="text-xl font-bold mb-4 text-gray-700">Laporan Divisi</h2>
+        <div class="flex flex-wrap -mx-2">
+            @foreach ($divisions as $division)
+            @php
+            $color = $division['color'] ?? 'gray';
+            $departmentId = $division['department_id'] ?? null;
+            @endphp
+            <div class="w-full md:w-1/2 lg:w-1/4 px-2 mb-4">
+                <div class="bg-white border-l-4 border-{{ $color }}-500 rounded-lg shadow p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-bold text-{{ $color }}-700">Divisi {{ $division['name'] }}</h2>
+                        @if (in_array(auth()->user()->role_id, [1, 2, 3]) && $departmentId)
+                        <button type="button"
+                            class="bg-{{ $color }}-600 hover:bg-{{ $color }}-700 text-white px-2 py-1 rounded text-xs font-semibold flex items-center"
+                            data-id="{{ $departmentId }}" onclick="modalAdd(this)">
+                            <i class="fas fa-plus mr-1"></i> Tambah Cost Center
+                        </button>
+                        @endif
                     </div>
-                </div>
-
-                {{-- Divisi Construction --}}
-                <div class="col-12 col-md-4">
-                    <div class="card card-outline rounded-partner card-primary p-3">
-                        <div class="row align-items-center">
-                            <div class="col-6">
-                                <h2 class="card-title"><b>Divisi Konstruksi</b></h2>
-                            </div>
-                            <div class="col-6">
-                                @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 3)
-                                    <button type="button" class="btn btn-sm btn-warning float-right"
-                                        data-id="{{ isset($costCentersConstruction[0]->department_id) ? $costCentersConstruction[0]->department_id : '' }}"
-                                        onclick="modalImport(this)">
-                                        <i class="fas fa-upload"></i>
-                                        Import
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-primary mr-2 float-right"
-                                        data-id="{{ isset($costCentersConstruction[0]->department_id) ? $costCentersConstruction[0]->department_id : '' }}"
-                                        onclick="modalAdd(this)">
-                                        <i class="fas fa-plus"></i>
-                                        Tambah Cost Center
-                                    </button>
-                                @endif
-                            </div>
+    
+                    <div class="grid grid-cols-2 gap-3 text-sm text-gray-700">
+                        <div class="bg-blue-100 rounded p-3 text-center">
+                            <p class="font-semibold text-blue-800">Total Debit</p>
+                            <p class="text-lg font-bold text-blue-900">{{ formatRupiah($division['debit']) }}</p>
                         </div>
-                        <div class="card-body table-responsive">
-                            <table id="tableCostCenterConstruction" class="table table-bordered text-nowrap w-100">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>
-                                            No.
-                                        </th>
-                                        <th>
-                                            Nama
-                                        </th>
-                                        <th>
-                                            Kode
-                                        </th>
-                                        <th>
-                                            Amount
-                                        </th>
-                                        <th>
-                                            Aksi
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($costCentersConstruction as $item)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}.</td>
-                                            <td>{{ $item->name }}</td>
-                                            <td>{{ $item->code }}</td>
-                                            <td>{{ formatRupiah($item->amount) }}</td>
-                                            <td>
-                                                @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 3)
-                                                    <button type="button" class="badge badge-primary border-0 p-1"
-                                                        data-toggle="modal" onclick="modalEdit(this)"
-                                                        data-id="{{ $item->id }}">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="badge badge-danger border-0 p-1"
-                                                        data-toggle="modal" onclick="confirmDelete(this)"
-                                                        data-id="{{ $item->id }}">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                @endif
-
-                                                @if (strtolower($item->name) == 'project')
-                                                    <button onclick="modalDetail(this)" data-id="{{ $item->id }}"
-                                                        class="badge badge-info p-1 border-0" data-toggle="modal">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        <div class="bg-green-100 rounded p-3 text-center">
+                            <p class="font-semibold text-green-800">Total Kredit</p>
+                            <p class="text-lg font-bold text-green-900">{{ formatRupiah($division['kredit']) }}</p>
                         </div>
-                    </div>
-                </div>
-
-                {{-- Divisi Technology --}}
-                <div class="col-12 col-md-4">
-                    <div class="card card-outline rounded-partner card-primary p-3">
-                        <div class="row align-items-center">
-                            <div class="col-6">
-                                <h2 class="card-title"><b>Divisi Teknologi</b></h2>
-                            </div>
-                            <div class="col-6">
-                                @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 3)
-                                    <button type="button" class="btn btn-sm btn-warning float-right"
-                                        data-id="{{ isset($costCentersTechnology[0]->department_id) ? $costCentersTechnology[0]->department_id : '' }}"
-                                        onclick="modalImport(this)">
-                                        <i class="fas fa-upload"></i>
-                                        Import
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-primary mr-2 float-right"
-                                        data-id="{{ isset($costCentersTechnology[0]->department_id) ? $costCentersTechnology[0]->department_id : '' }}"
-                                        onclick="modalAdd(this)">
-                                        <i class="fas fa-plus"></i>
-                                        Tambah Cost Center
-                                    </button>
-                                @endif
-                            </div>
+                        <div class="bg-yellow-100 rounded p-3 text-center">
+                            <p class="font-semibold text-yellow-800">Total Saldo</p>
+                            <p class="text-lg font-bold text-yellow-900">{{ formatRupiah($division['saldo']) }}</p>
                         </div>
-                        <div class="card-body table-responsive">
-                            <table id="tableCostCenterTechnology" class="table table-bordered text-nowrap w-100">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>
-                                            No.
-                                        </th>
-                                        <th>
-                                            Nama
-                                        </th>
-                                        <th>
-                                            Kode
-                                        </th>
-                                        <th>
-                                            Amount
-                                        </th>
-                                        <th>
-                                            Aksi
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($costCentersTechnology as $item)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}.</td>
-                                            <td>{{ $item->name }}</td>
-                                            <td>{{ $item->code }}</td>
-                                            <td>{{ formatRupiah($item->amount) }}</td>
-                                            <td>
-                                                @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 3)
-                                                    <button type="button" class="badge badge-primary border-0 p-1"
-                                                        data-toggle="modal" onclick="modalEdit(this)"
-                                                        data-id="{{ $item->id }}">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button type="button" class="badge badge-danger border-0 p-1"
-                                                        data-toggle="modal" onclick="confirmDelete(this)"
-                                                        data-id="{{ $item->id }}">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                @endif
-
-                                                @if (strtolower($item->name) == 'project')
-                                                    <button onclick="modalDetail(this)"
-                                                        class="badge badge-info p-1 border-0" data-toggle="modal"
-                                                        data-id="{{ $item->id }}">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        <div class="bg-purple-100 rounded p-3 text-center">
+                            <p class="font-semibold text-purple-800">Total Pendapatan Tahun Berjalan</p>
+                            <p class="text-lg font-bold text-purple-900">{{ formatRupiah($division['pendapatan']) }}</p>
                         </div>
+    
+                        @if ($departmentId)
+                        <div class="col-span-2 mt-4 text-center">
+                            <a href="{{ route('cost-center.transaction', ['departmentId' => $departmentId]) }}"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-semibold inline-flex items-center justify-center">
+                                <i class="fas fa-receipt mr-1"></i> Lihat Transaksi
+                            </a>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
+            @endforeach
         </div>
-    </section>
+    </section>        
 
     {{-- Modal Add --}}
     <div class="modal fade" id="modalAddCostCenter" tabindex="-1" role="dialog" aria-labelledby="modalAddLabel"

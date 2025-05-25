@@ -1,3 +1,4 @@
+
 <?php
 
 use App\Http\Controllers\AssetController;
@@ -161,6 +162,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/show/{id}/json', 'show')->name('cost.center.show');
             Route::delete('{id}', 'delete')->name('cost.center.delete');
             Route::put('{id}', 'update')->name('cost.center.update');
+            Route::get('{departmentId}/transaction', 'showTransactions')->name('cost-center.transaction');
+            Route::get('/project-list', 'showProject')->name('cost-center.project');
+            Route::get('/rab', 'rab')->name('cost-center.rab');
+            Route::get('/saldo', 'saldo')->name('cost-center.saldo');
         });
 
     /**

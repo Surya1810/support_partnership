@@ -45,21 +45,29 @@ class Project extends Model
     /**
      * Job value, sp2d, ppn, pph, etc
      */
-    public function financial() {
+    public function financial()
+    {
         return $this->hasOne(ProjectFinancial::class);
     }
 
     /**
      * Biaya lain-lain
      */
-    public function otherCosts() {
+    public function otherCosts()
+    {
         return $this->hasMany(ProjectOtherCost::class);
     }
 
     /**
      * RAB
      */
-    public function costCenterSubs() {
+    public function costCenterSubs()
+    {
         return $this->hasMany(CostCenterSub::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
