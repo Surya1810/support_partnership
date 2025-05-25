@@ -3,14 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\CostCenterCategories;
+use App\Models\CostCenterSub;
 use App\Models\Department;
 use App\Models\Income;
 use App\Models\Project;
+use App\Models\ProjectFinancial;
+use App\Models\ProjectNetProfit;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ProjectController extends Controller
 {
@@ -42,7 +47,9 @@ class ProjectController extends Controller
         $users = User::where('id', '!=', '1')->get();
         $departments = Department::all()->except([2, 4, 6, 7, 8]);
         $clients = Client::all();
-        return view('project.create', compact('users', 'clients', 'departments'));
+        $costCenterCategories = CostCenterCategories::all();
+
+        return view('project.create', compact('users', 'clients', 'departments', 'costCenterCategories'));
     }
 
     /**
@@ -50,43 +57,118 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
+
         $request->validate([
             'name' => 'bail|required',
             'client' => 'bail|required',
             'creative_brief' => 'bail|required',
+            'nilai_pekerjaan' => 'bail|required',
+            'ppn' => 'bail|required',
+            'pph' => 'bail|required',
             'pic' => 'bail|required',
             'assisten' => 'bail|required',
-            'status' => 'bail|required',
-            'urgency' => 'bail|required',
-            'deadline' => 'bail|required',
             'start' => 'bail|required',
+            'deadline' => 'bail|required',
+            'profit_perusahaan' => 'bail|required',
+            'profit_penyusutan' => 'bail|required',
+            'profit_divisi' => 'bail|required',
+            'profit_bonus' => 'bail|required',
+            'othercosts' => 'bail|array',
+            'othercosts.*.item_name' => 'bail|required|string|max:255', // Nama Item Biaya Lain-lain
+            'othercosts.*.unit_price' => 'bail|required|numeric|min:0', // Nominal Item Biaya Lain-lain
+            'items' => 'bail|array', // RAB
+            'items.*.item_type' => 'bail|required|string|max:255', // ID Cost Center Category
+            'items.*.item_name' => 'bail|required|string|max:255', // Nama Item RAB
+            'items.*.unit_price' => 'bail|required|numeric|min:0', // Nominal Item RAB
         ]);
 
         $old = session()->getOldInput();
 
-        $project = new Project();
-        $project->name = $request->name;
-        $project->client_id = $request->client;
-        $project->department_id = $request->department_id;
-        $project->kode = (Str::random(5));
-        $project->creative_brief = $request->creative_brief;
-        $project->user_id = $request->pic;
-        $project->status = $request->status;
-        $project->urgency = $request->urgency;
-        $project->deadline = $request->deadline;
-        $project->start = $request->start;
-        $project->assisten_id = implode(',', $request->assisten);
-        $project->save();
+        DB::beginTransaction();
 
-        return redirect()->route('project.index')->with(['pesan' => 'Project created successfully', 'level-alert' => 'alert-success']);
-    }
+        try {
+            $addProject = Project::create([
+                'name' => $request->name,
+                'client_id' => $request->client,
+                'department_id' => $request->department_id,
+                'kode' => Str::random(5),
+                'creative_brief' => $request->creative_brief,
+                'user_id' => $request->pic,
+                'status' => 'On Going', // Status dihilangkan dari view, set ke default saja jadi On Going
+                'urgency' => 'High', // Urgency dihilangkan dari view, set default sebagai High
+                'start' => $request->start,
+                'deadline' => $request->deadline,
+                'assisten_id' => implode(',', $request->assisten)
+            ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Project $project)
-    {
-        // 
+            if ($addProject) {
+                /**
+                 * Masukkan nilai pekerjaan, ppn, pph,
+                 * sp2d, margin, dan biaya lain-lain ke project_financials
+                 */
+                $addFinancials = ProjectFinancial::create([
+                    'project_id' => $addProject->id,
+                    'job_value' => $request->nilai_pekerjaan,
+                    'vat_percent' => $request->ppn,
+                    'tax_percent' => $request->pph,
+                    'sp2d_amount' => $request->sp2d,
+                    'margin' => $request->margin
+                ]);
+
+                /**
+                 * Masukkan item RAB ke cost_center_subs
+                 */
+                $costCenterSubs = $request->items;
+                $costCenterId   = $request->cost_center_id;
+                $projectId      = $request->project_id;
+                $departmentId   = Auth::user()->department_id;
+                $department = Department::where('id', $departmentId)->first();
+
+                $preparedCostCenterSubsData = array_map(
+                    function ($item, $index) use ($costCenterId, $projectId, $department) {
+                        $ref = $department->code . '.' . $item['item_type'] . '.' . now()->format('Y') . '/';
+                        return [
+                            'cost_center_id' => $costCenterId,
+                            'project_id'     => $projectId,
+                            'department_id'  => $department->id,
+                            'cost_center_category_ref' => $ref,
+                            'cost_center_category_code'      => $item['item_type'],
+                            'name'      => $item['item_name'],
+                            'amount'     => $item['unit_price'],
+                            'created_at'     => now(),
+                            'updated_at'     => now(),
+                        ];
+                    },
+                    $costCenterSubs,
+                    array_keys($costCenterSubs)
+                );
+
+                $addCostCenterSubs = CostCenterSub::insert($preparedCostCenterSubsData);
+
+                if ($addFinancials && $addCostCenterSubs) {
+
+                    /**
+                     * Masukkan net profit perusahaan
+                     */
+                    $addNetProfits = ProjectNetProfit::create([
+
+                    ]);
+
+                    return redirect()->route('project.index')->with([
+                        'pesan' => 'Project berhasil ditambahkan',
+                        'level-alert' => 'alert-success'
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd($e);
+            return redirect()->back()->with([
+                'pesan' => 'Project gagal ditambahkan',
+                'leve-alert' => 'alert-danger'
+            ]);
+        }
     }
 
     /**

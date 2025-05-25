@@ -105,6 +105,16 @@ class UserSeeder extends Seeder
             'role_id' => '5',
             'position_id' => '1',
             'department_id' => '5',
+            'name' => 'Irfan',
+            'username' => 'Irfan',
+            'email' => 'irfan@partnership.co.id',
+            'password' => bcrypt('123'),
+            'avatar' => 'profile.jpg',
+        ]);
+        User::create([
+            'role_id' => '5',
+            'position_id' => '1',
+            'department_id' => '5',
             'name' => 'Maulida',
             'username' => 'Maulida',
             'email' => 'maulida@partnership.co.id',

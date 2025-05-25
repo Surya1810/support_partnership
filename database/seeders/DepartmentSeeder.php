@@ -14,30 +14,33 @@ class DepartmentSeeder extends Seeder
     public function run(): void
     {
         if (env('APP_ENV') === 'local') {
-            // Department::create([
-            //     'name' => 'Partnership Procurement Solution'
-            // ]);
-            // Department::create([
-            //     'name' => 'Partnership Workshop'
-            // ]);
-            // Department::create([
-            //     'name' => 'Partnership Contractor'
-            // ]);
-            // Department::create([
-            //     'name' => 'Partnership Law Consultant'
-            // ]);
-            // Department::create([
-            //     'name' => 'Partnership Technology'
-            // ]);
-            // Department::create([
-            //     'name' => 'Partnership Information System & Website'
-            // ]);
-            // Department::create([
-            //     'name' => 'Partnership Event Organizer & Mice'
-            // ]);
-            // Department::create([
-            //     'name' => 'Finance'
-            // ]);
+            Department::create([
+                'name' => 'Partnership Procurement Solution',
+                'code' => '01'
+            ]);
+            Department::create([
+                'name' => 'Partnership Workshop',
+            ]);
+            Department::create([
+                'name' => 'Partnership Contractor',
+                'code' => '03'
+            ]);
+            Department::create([
+                'name' => 'Partnership Law Consultant'
+            ]);
+            Department::create([
+                'name' => 'Partnership Technology',
+                'code' => '02'
+            ]);
+            Department::create([
+                'name' => 'Partnership Information System & Website'
+            ]);
+            Department::create([
+                'name' => 'Partnership Event Organizer & Mice'
+            ]);
+            Department::create([
+                'name' => 'Finance'
+            ]);
             Department::create([
                 'name' => 'Rumah Tangga'
             ]);

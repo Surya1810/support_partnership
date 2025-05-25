@@ -20,7 +20,7 @@ return new class extends Migration
 
             /**
              * cost_center_category_ref =
-             * department code . cost center category code . year . transaction number (start: 0001)
+             * department code . cost center category code . year . and (transaction number (start: 0001) in expense items)
              */
             $table->string('cost_center_category_ref');
             $table->string('cost_center_category_code');

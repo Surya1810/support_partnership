@@ -10,12 +10,12 @@ class Project extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $guarded = ['id'];
+    protected $dates = ['deleted_at'];
     protected $casts = [
         'deadline' => 'datetime',
         'start' => 'datetime'
     ];
-
-    protected $dates = ['deleted_at'];
 
     public function tasks()
     {
