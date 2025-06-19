@@ -54,8 +54,8 @@
             'text' => 'white'
             ],
             ];
-            @endphp                
-    
+            @endphp
+
             @foreach ($generalCards as $card)
             <div
                 class="bg-gradient-to-br from-{{ $card['bgFrom'] }} to-{{ $card['bgTo'] }} rounded-lg shadow p-4 text-center">
@@ -76,17 +76,6 @@
             @endphp
             <div class="w-full md:w-1/2 lg:w-1/4 px-2 mb-4">
                 <div class="bg-white border-l-4 border-{{ $color }}-500 rounded-lg shadow p-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg font-bold text-{{ $color }}-700">Divisi {{ $division['name'] }}</h2>
-                        @if (in_array(auth()->user()->role_id, [1, 2, 3]) && $departmentId)
-                        <button type="button"
-                            class="bg-{{ $color }}-600 hover:bg-{{ $color }}-700 text-white px-2 py-1 rounded text-xs font-semibold flex items-center"
-                            data-id="{{ $departmentId }}" onclick="modalAdd(this)">
-                            <i class="fas fa-plus mr-1"></i> Tambah Cost Center
-                        </button>
-                        @endif
-                    </div>
-    
                     <div class="grid grid-cols-2 gap-3 text-sm text-gray-700">
                         <div class="bg-blue-100 rounded p-3 text-center">
                             <p class="font-semibold text-blue-800">Total Debit</p>
@@ -104,7 +93,7 @@
                             <p class="font-semibold text-purple-800">Total Pendapatan Tahun Berjalan</p>
                             <p class="text-lg font-bold text-purple-900">{{ formatRupiah($division['pendapatan']) }}</p>
                         </div>
-    
+
                         @if ($departmentId)
                         <div class="col-span-2 mt-4 text-center">
                             <a href="{{ route('cost-center.transaction', ['departmentId' => $departmentId]) }}"
@@ -118,202 +107,7 @@
             </div>
             @endforeach
         </div>
-    </section>        
-
-    {{-- Modal Add --}}
-    <div class="modal fade" id="modalAddCostCenter" tabindex="-1" role="dialog" aria-labelledby="modalAddLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <form id="formAddCostCenter" method="POST" action="{{ route('cost.center.store') }}">
-                @csrf
-                <input type="hidden" name="department_id" id="department_id">
-
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalAddLabel">Tambah Cost Center</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="cost_center_name">Nama Cost Center</label>
-                            <input type="text" class="form-control" id="cost_center_name" name="name"
-                                placeholder="Masukkan nama cost center" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="cost_center_amount">Amount</label>
-                            <input type="text" class="form-control price @error('amount') is-invalid @enderror"
-                                id="amount" name="amount" value="{{ old('amount') }}"
-                                placeholder="Masukkan nilai anggaran" min="0" step="0.01" required>
-                            @error('amount')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {{-- Modal Edit --}}
-    <div class="modal fade" id="modalEditCostCenter" tabindex="-1" role="dialog" aria-labelledby="modalEditLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <form id="formEditCostCenter">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalEditLabel">Edit Cost Center</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="id" id="edit-id">
-                        <div class="form-group">
-                            <label for="edit-code">Kode</label>
-                            <input type="text" class="form-control" id="edit-code" name="code" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-name">Nama Cost Center</label>
-                            <input type="text" class="form-control" id="edit-name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-amount">Amount</label>
-                            <input type="text" class="form-control price @error('amount') is-invalid @enderror"
-                                id="edit-amount" name="amount" value="{{ old('amount') }}"
-                                placeholder="Masukkan nilai anggaran" min="0" step="0.01" required>
-                            @error('amount')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {{-- Modal Import Cost Center --}}
-    <div class="modal fade" id="modalImportCostCenter" tabindex="-1" role="dialog" aria-labelledby="modalImportLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <form id="formImportCostCenter" enctype="multipart/form-data" method="POST"
-                action="{{ route('cost.center.import') }}">
-                @csrf
-                <input type="hidden" name="department_id" id="import-department-id">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Import Cost Center dari Excel</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="import_file">Pilih File Excel</label>
-                            <input type="file" class="form-control-file" name="import_file" id="import_file" required
-                                accept=".xlsx, .xls">
-                        </div>
-                        <small class="form-text text-muted">
-                            Format kolom header: <strong>Nama</strong> dan <strong>Amount</strong>
-                        </small>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Import</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {{-- Modal Detail Cost Center --}}
-    <div class="modal fade" id="modal-detail-cost-center" tabindex="-1" role="dialog"
-        aria-labelledby="modalDetailTitle" aria-hidden="true">
-        <div class="modal-dialog modal-md" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Detail Cost Center</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span>&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="detail-cost-center-id">
-                    <p><strong>Kode:</strong> <span id="detail-cost-center-kode"></span></p>
-                    <p><strong>Nama:</strong> <span id="detail-cost-center-nama"></span></p>
-                    <p><strong>Amount:</strong> Rp<span id="detail-cost-center-amount"></span></p>
-                    <hr>
-                    <h6>Sub Cost Center</h6>
-                    <table class="table table-bordered table-sm">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>Amount</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sub-cost-center-table-body">
-                            <tr>
-                                <td colspan="4" class="text-center">Loading...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="form-group mt-3">
-                        <label>Tambah Sub Cost Center</label>
-                        <input type="text" class="form-control mb-2" placeholder="Nama Sub Cost Center"
-                            id="sub-cost-center-name" required>
-                        <input type="text" class="form-control price mb-2" placeholder="Amount"
-                            id="sub-cost-center-amount" min="0" step="0.01" required>
-                        <button type="button" class="btn btn-sm btn-success"
-                            onclick="addSubCostCenter()">Tambah</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Modal Edit Sub Cost Center --}}
-    <div class="modal fade" id="modal-edit-sub" tabindex="-1" role="dialog" aria-labelledby="modalEditSubTitle"
-        aria-hidden="true">
-        <div class="modal-dialog modal-sm" role="document">
-            <div class="modal-content">
-                <form id="form-edit-sub">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Sub Cost Center</h5>
-                        <button type="button" class="close" data-dismiss="modal">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="edit-sub-id">
-                        <div class="form-group">
-                            <label>Nama</label>
-                            <input type="text" class="form-control" id="edit-sub-name">
-                        </div>
-                        <div class="form-group">
-                            <label>Amount</label>
-                            <input type="text" class="form-control price" id="edit-sub-amount" min="0"
-                                step="0.01">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-sm btn-success">Simpan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    </section>
 @endsection
 
 @push('scripts')

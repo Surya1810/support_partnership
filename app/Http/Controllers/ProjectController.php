@@ -18,6 +18,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectController extends Controller
 {
@@ -310,5 +312,69 @@ class ProjectController extends Controller
         $sp2d->save();
 
         return redirect()->route('project.index')->with(['pesan' => 'Project Finished', 'level-alert' => 'alert-success']);
+    }
+
+    /**
+     * Saturday, 14 June 2025
+     */
+    public function importRAB(Request $request)
+    {
+        $validatedRequest = Validator::make($request->all(), [
+            'file' => 'required|mimes:xlsx',
+        ]);
+
+        if ($validatedRequest->fails()) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Pastikan format file RAB telah sesuai'
+            ], 400);
+        }
+
+        try {
+            $userDeparmentCode = Auth::user()->department->code;
+            $collection = Excel::toCollection(null, $request->file('file'));
+
+            // Get Sheet 1
+            $rows = $collection[0];
+
+            $data = [];
+            $currentDate = Carbon::now()->format('Y-m-d');
+            $totalDebetProject = 0;
+            $totalKreditProject = 0;
+
+            foreach ($rows as $index => $row) {
+                if ($index == 0) continue;
+
+                $data[] = [
+                    'no' => $index,
+                    'tanggal' => $currentDate,
+                    'nama_item' => $row[1],
+                    'debet' => $row[2],
+                    'kredit' => $row[3],
+                    'kode_ref' => ($userDeparmentCode . '.TEST.2025/0001')
+                        . ($index == 1 ? '' : '/' . str_pad(((string)$index++), 4, '0', STR_PAD_LEFT)),
+                ];
+
+                $totalDebetProject += $row[2] ? (int) trim($row[2]) : 0;
+                $totalKreditProject += $row[3] ? (int) trim($row[3]) : 0;
+            }
+
+            $sisaSaldoProject = $totalDebetProject - $totalKreditProject;
+            $response = [
+                'items' => $data,
+                'saldo' => [
+                    'total_debet' => formatRupiah($totalDebetProject),
+                    'total_kredit' => formatRupiah($totalKreditProject),
+                    'sisa_saldo' => formatRupiah($sisaSaldoProject)
+                ]
+            ];
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

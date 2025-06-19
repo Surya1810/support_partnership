@@ -39,16 +39,16 @@
             <div class="row">
                 <div class="card rounded-partner card-outline card-primary w-100">
                     <div class="card-header">
-                        <h3 class="card-title">Project Create</h3>
+                        <h3 class="card-title">Buat Project</h3>
                     </div>
                     <form action="{{ route('project.store') }}" method="POST" enctype="multipart/form-data"
                         autocomplete="off" id="createProjectForm">
                         @csrf
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     <div class="form-group">
-                                        <label for="name" class="small">Project name</label>
+                                        <label for="name" class="small">Nama Project</label>
                                         <input type="text" class="form-control @error('name') is-invalid @enderror"
                                             id="name" name="name" placeholder="Enter project name"
                                             value="{{ old('name') }}" required>
@@ -59,7 +59,7 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     <div class="form-group">
                                         <label for="client" class="small">Client</label>
                                         <select class="form-control client" style="width: 100%;" id="client"
@@ -79,23 +79,12 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label for="creative_brief" class="small">Creative Brief</label>
-                                        <textarea class="form-control @error('creative_brief') is-invalid @enderror" rows="4"
-                                            placeholder="Enter creative brief..." id="creative_brief" name="creative_brief">{{ old('creative_brief') }}</textarea>
-                                        @error('creative_brief')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <input type="hidden" value="{{ auth()->user()->department_id }}" name="department_id">
+                                        <input type="hidden" value="{{ auth()->user()->department_id }}"
+                                            name="department_id">
                                         <label for="department_select_id" class="mb-0 form-label col-form-label-sm"
-                                            class="small">Department</label>
+                                            class="small">Divisi</label>
                                         <select class="form-control department muted" style="width: 100%;"
                                             id="department_select_id" name="department_id" readonly required disabled>
                                             <option></option>
@@ -116,7 +105,8 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label for="pic" class="small">PIC</label>
-                                        <select class="form-control pic" style="width: 100%;" id="pic" name="pic" required>
+                                        <select class="form-control pic" style="width: 100%;" id="pic" name="pic"
+                                            required>
                                             <option></option>
                                             @foreach ($users as $user)
                                                 <option value="{{ $user->id }}"
@@ -133,9 +123,10 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="assisten" class="small">Team Members</label>
+                                        <label for="assisten" class="small">Anggota Team</label>
                                         <select class="form-control team select2 @error('assisten') is-invalid @enderror"
-                                            multiple="multiple" style="width: 100%;" id="assisten" name="assisten[]" required>
+                                            multiple="multiple" style="width: 100%;" id="assisten" name="assisten[]"
+                                            required>
                                             @foreach ($users as $user)
                                                 @if (old('assisten'))
                                                     <option value="{{ $user->id }}"
@@ -192,7 +183,8 @@
                                 </div>
                                 <div class="col-lg-2">
                                     <label for="pph" class="small">PPH</label>
-                                    <select class="form-control pph" style="width: 100%;" id="pph" name="pph" required>
+                                    <select class="form-control pph" style="width: 100%;" id="pph" name="pph"
+                                        required>
                                         <option value="0" disabled selected>Pilih PPH</option>
                                         <option value="1.5" {{ old('pph') == 1.5 ? 'selected' : '' }}>
                                             1.5%
@@ -216,7 +208,7 @@
                                         <input type="text"
                                             class="form-control muted @error('sp2d') is-invalid @enderror" id="sp2d"
                                             placeholder="Rp0" value="{{ old('sp2d') }}" readonly>
-                                            <input type="hidden" name="sp2d" id="sp2d_numeric">
+                                        <input type="hidden" name="sp2d" id="sp2d_numeric">
                                         @error('sp2d')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -227,7 +219,8 @@
                                 <div class="col-lg-4">
                                     <label for="margin" class="small">Margin</label>
                                     <input type="text" class="form-control muted @error('margin') is-invalid @enderror"
-                                        placeholder="Rp0" name="margin" id="margin" value="{{ old('margin') }}" readonly>
+                                        placeholder="Rp0" name="margin" id="margin" value="{{ old('margin') }}"
+                                        readonly>
                                     <input type="hidden" name="margin" id="margin_numeric">
                                     @error('margin')
                                         <span class="invalid-feedback" role="alert">
@@ -235,101 +228,6 @@
                                         </span>
                                     @enderror
                                 </div>
-                                <div class="col-12">
-                                    <hr>
-                                </div>
-                                {{-- ? Biaya Lain-lain --}}
-                                <label for="items" class="mb-0 mt-3 ml-2 border-0">Biaya Lain-lain</label>
-                                <div class="table-responsive border-0">
-                                    <table class="table table-sm border-0" id="items-table-other-cost">
-                                        <tbody>
-                                            <tr>
-                                                <td class="border-0">
-                                                    <div class="row g-2 align-items-end">
-                                                        <div class="col-md-4">
-                                                            <label class="mb-0 form-label form-label-sm small">Nama</label>
-                                                            <input type="text" name="othercosts[0][item_name]"
-                                                                class="form-control form-control-sm"
-                                                                placeholder="Masukkan nama item" required>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <label
-                                                                class="mb-0 form-label form-label-sm small">Nominal</label>
-                                                            <input type="text" name="othercosts[0][unit_price]"
-                                                                class="form-control form-control-sm price"
-                                                                placeholder="Rp0" min="0" step="0.01" required>
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <button type="button"
-                                                                class="btn btn-danger btn-sm remove-item-other-cost mt-4">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <button type="button" id="add-item-other-cost"
-                                    class="btn btn-primary btn-sm rounded-partner ml-3 mt-0">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <div class="col-12">
-                                    <hr>
-                                </div>
-                                {{-- ? Input RAB --}}
-                                <label for="items" class="mb-0 mt-3 ml-2 border-0">Rincian Item RAB</label>
-                                <div class="table-responsive border-0">
-                                    <table class="table table-sm border-0" id="items-table">
-                                        <tbody>
-                                            <tr>
-                                                <td class="border-0">
-                                                    <div class="row g-2 align-items-end">
-                                                        <div class="col-md-1">
-                                                            <label
-                                                                class="mb-0 form-label form-label-sm small">Jenis</label>
-                                                            <select name="items[0][item_type]"
-                                                                class="form-control form-control-sm" required>
-                                                                <option value="" disabled selected>Pilih Jenis
-                                                                </option>
-                                                                @foreach ($costCenterCategories as $category)
-                                                                    <option value="{{ $category->id }}">
-                                                                        {{ $category->code . ' - ' . $category->name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <label class="mb-0 form-label form-label-sm small">Nama</label>
-                                                            <input type="text" name="items[0][item_name]"
-                                                                class="form-control form-control-sm"
-                                                                placeholder="Masukkan nama item" required>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <label
-                                                                class="mb-0 form-label form-label-sm small">Nominal</label>
-                                                            <input type="text" name="items[0][unit_price]"
-                                                                class="form-control form-control-sm price"
-                                                                placeholder="Rp0" min="0" step="0.01" required>
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <button type="button"
-                                                                class="btn btn-danger btn-sm remove-item mt-4">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <button type="button" id="add-item"
-                                    class="btn btn-primary btn-sm rounded-partner ml-3 mt-0">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-
                                 {{-- ? Net Profit --}}
                                 <div class="col-12 mt-3">
                                     <hr>
@@ -393,12 +291,15 @@
                                         </span>
                                     @enderror
                                 </div>
-                                <div class="col-12">
+                                <div class="col-12 mt-3">
                                     <hr>
+                                    <label>
+                                        Waktu Pengerjaan
+                                    </label>
                                 </div>
-                                <div class="col-2">
+                                <div class="col-4 col-md-2">
                                     <div class="form-group">
-                                        <label for="start" class="small">Start Date</label>
+                                        <label for="start" class="small">Tanggal Mulai</label>
 
                                         <input type="date" class="form-control @error('start') is-invalid @enderror"
                                             id="start" name="start" value="{{ old('start') }}" required>
@@ -410,9 +311,9 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-2">
+                                <div class="col-4 col-md-2">
                                     <div class="form-group">
-                                        <label for="deadline" class="small">Due Date</label>
+                                        <label for="deadline" class="small">Tanggal Selesai</label>
 
                                         <input type="date"
                                             class="form-control @error('deadline') is-invalid @enderror" id="deadline"
@@ -425,10 +326,95 @@
                                         @enderror
                                     </div>
                                 </div>
+                                <div class="col-4 col-md-2">
+                                    <div class="form-group">
+                                        <label for="total_days" class="small">Total Hari</label>
+
+                                        <input type="numeric"
+                                            class="form-control @error('total_days') is-invalid @enderror"
+                                            id="total_days" name="total_days" value="{{ old('total_days') }}" readonly
+                                            required>
+
+                                        @error('total_days')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <hr>
+                                </div>
+                                <div class="col-6 col-md-2">
+                                    <input type="hidden" id="isRABReady" value="0">
+                                    <div class="form-group">
+                                        <label for="import_rab">RAB</label>
+                                        <button class="btn btn-sm btn-primary" id="buttonModalImportRAB" type="button">
+                                            <i class="fas fa-file-import"></i> Import dari Excel
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mt-3 mb-0 mx-2 overflow-auto" style="max-height: 150px; display: none"
+                                        id="cardSaldoRABWrapper">
+                                        <div class="card bg-primary text-center col-10 col-md-4 mx-1 h-100">
+                                            <div class="card-header">
+                                                <b>Total Debet</b>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="card-text" id="totalSaldoProjectText">
+                                                    {{ formatRupiah(0) }}
+                                                </p>
+                                                <input type="hidden" name="total_saldo_project"
+                                                    id="totalSaldoProjectInput">
+                                            </div>
+                                        </div>
+                                        <div class="card bg-warning text-center col-10 col-md-4 mx-1 h-100">
+                                            <div class="card-header">
+                                                <b>Total Kredit</b>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="card-text" id="totalKreditProjectText">
+                                                    {{ formatRupiah(0) }}
+                                                </p>
+                                                <input type="hidden" name="total_kredit_project"
+                                                    id="totalKreditProjectInput">
+                                            </div>
+                                        </div>
+                                        <div class="card bg-danger text-center col-10 col-md-4 mx-1 h-100">
+                                            <div class="card-header">
+                                                <b>Sisa Saldo</b>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="card-text" id="sisaSaldoProjectText">
+                                                    {{ formatRupiah(0) }}
+                                                </p>
+                                                <input type="hidden" name="sisa_saldo_project"
+                                                    id="sisaSaldoProjectInput">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 overflow-auto" id="tableRABWrapper">
+                                    <table class="table w-100 d-none" id="tablePreviewRAB">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Tanggal</th>
+                                                <th>Nama Item</th>
+                                                <th>Debet</th>
+                                                <th>Kredit</th>
+                                                <th>Kode Ref.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <div class="card-footer rounded-partner">
-                            <button type="submit" class="btn btn-primary rounded-partner float-right" id=buttonSubmitProject>
+                            <button type="submit" class="btn btn-primary rounded-partner float-right"
+                                id=buttonSubmitProject>
                                 Buat
                             </button>
                         </div>
@@ -437,6 +423,43 @@
             </div>
         </div>
     </section>
+
+    {{-- Modal Import RAB dari Excel --}}
+    <div class="modal fade" id="modalImportRAB" tabindex="-1" role="dialog" aria-labelledby="modalImportRABTitle"
+        aria-hidden="true" data-bs-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Modal Import RAB</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formImportRAB" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <button class="btn btn-sm btn-warning">
+                                <i class="fas fa-file-download"></i> Download Template
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label for="fileImportRAB">Pilih File Excel</label>
+                            <input type="file" class="form-control-file" id="file" name="file"
+                                accept=".xlsx">
+                        </div>
+                        <div class="form-group">
+                            <button class="btn float-right btn-sm btn-success" id="buttonImportRAB">
+                                <i class="fas fa-file-import"></i> Import
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -447,29 +470,21 @@
             $('.pic').select2({
                 placeholder: "Select PIC",
                 allowClear: true,
-            })
+            });
+
             $('.client').select2({
                 placeholder: "Select Client",
                 allowClear: true,
-            })
+            });
+
             $('.team').select2({
                 placeholder: "Select team member",
                 allowClear: true,
-            })
-            $('.status').select2({
-                placeholder: "Select status",
-                minimumResultsForSearch: -1,
-                allowClear: true,
-            })
-            $('.urgency').select2({
-                placeholder: "Select urgency",
-                minimumResultsForSearch: -1,
-                allowClear: true,
-            })
+            });
 
             $('.percent').inputmask('percentage', {
                 suffix: '%',
-                digits: 2,
+                digits: 3,
                 digitsOptional: true,
                 placeholder: '0',
                 autoUnmask: true,
@@ -486,130 +501,9 @@
                 rightAlign: false
             });
 
-            // Fungsi untuk tombol add item dan remove item rincian RAB
-            let itemIndexOtherCost = 1;
-
-            $('#add-item-other-cost').click(function() {
-                const newRow = `
-                    <tr>
-                        <td class="border-0">
-                            <div class="row g-2 align-items-end">
-                                <div class="col-md-4">
-                                    <label class="mb-0 form-label form-label-sm small">Nama</label>
-                                    <input type="text" name="othercosts[${itemIndexOtherCost}][item_name]"
-                                        class="form-control form-control-sm"
-                                        placeholder="Masukkan nama item" required>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="mb-0 form-label form-label-sm small">Nominal</label>
-                                    <input type="text" name="othercosts[${itemIndexOtherCost}][unit_price]"
-                                        class="form-control form-control-sm price"
-                                        placeholder="Rp0" min="0" step="0.01" required>
-                                </div>
-                                <div class="col-md-2">
-                                    <button type="button"
-                                        class="btn btn-danger btn-sm remove-item-other-cost mt-4">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-
-                $('#items-table-other-cost tbody').append(newRow);
-                $('#items-table-other-cost .price').last().inputmask({
-                    alias: 'numeric',
-                    prefix: 'Rp',
-                    digits: 0,
-                    groupSeparator: '.',
-                    autoGroup: true,
-                    removeMaskOnSubmit: true,
-                    rightAlign: false
-                });
-                calculateSP2DandMargin();
-                itemIndexOtherCost++;
-            });
-
-            // Fungsi untuk menghapus baris item
-            $('#items-table-other-cost').on('click', '.remove-item-other-cost', function() {
-                $(this).closest('tr').remove();
-                calculateSP2DandMargin();
-            });
-
-            // Fungsi untuk tombol add item dan remove item rincian RAB
-            let itemIndex = 1;
-            const costCenterCategories = @json($costCenterCategories);
-
-            $('#add-item').click(function() {
-                let optionsHtml = '<option value="">Pilih Jenis</option>';
-                costCenterCategories.forEach(category => {
-                    optionsHtml +=
-                        `<option value="${category.id}">${category.code} - ${category.name}</option>`;
-                });
-
-                const newRow = `
-                    <tr>
-                        <td class="border-0">
-                            <div class="row g-2 align-items-end">
-                                <div class="col-md-1">
-                                    <label class="mb-0 form-label form-label-sm small">Jenis</label>
-                                    <select name="items[${itemIndex}][item_type]" class="form-control form-control-sm" required>
-                                        ${optionsHtml}
-                                    </select>
-                                </div>
-                                <div class="col-md-3
-                                ">
-                                    <label class="mb-0 form-label form-label-sm small">Nama</label>
-                                    <input type="text" name="items[${itemIndex}][item_name] small"
-                                        class="form-control form-control-sm"
-                                        placeholder="Masukkan nama item" required>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="mb-0 form-label form-label-sm small">Nominal</label>
-                                    <input type="text" name="items[${itemIndex}][unit_price] small"
-                                        class="form-control form-control-sm price"
-                                        placeholder="Rp0" min="0" step="0.01" required>
-                                </div>
-                                <div class="col-md-2">
-                                    <button type="button"
-                                        class="btn btn-danger btn-sm remove-item mt-4">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-
-                $('#items-table tbody').append(newRow);
-                $('#items-table .price').last().inputmask({
-                    alias: 'numeric',
-                    prefix: 'Rp',
-                    digits: 0,
-                    groupSeparator: '.',
-                    autoGroup: true,
-                    removeMaskOnSubmit: true,
-                    rightAlign: false
-                });
-                calculateSP2DandMargin();
-                itemIndex++;
-            });
-
-            // Fungsi untuk menghapus baris item
-            $('#items-table').on('click', '.remove-item', function() {
-                $(this).closest('tr').remove();
-                calculateSP2DandMargin();
-            });
-
             // Trigger untuk hitung SP2D
             $('#nilai_pekerjaan').on('input', calculateSP2DandMargin);
             $('#ppn, #pph').on('change', calculateSP2DandMargin);
-
-            // Hitung ulang jika ada perubahan di biaya lain-lain
-            $(document).on('input', '#items-table-other-cost .price', calculateSP2DandMargin);
-            // Hitung ulang jika ada perubahan di RAB
-            $(document).on('input', '#items-table .price', calculateSP2DandMargin);
 
             // Trigger on input
             $('.percent').on('input', function() {
@@ -632,9 +526,162 @@
             // Show loading
             $('#createProjectForm').on('submit', function() {
                 $.LoadingOverlay("show");
-                $('#buttonSubmitProject').prop('disabled', true);
+                const statusInputRAB = $('#isRABReady').val();
+
+                if (statusInputRAB === '0') {
+                    $('#buttonSubmitProject').prop('disabled', true);
+
+                    return Swal.fire({
+                        icon: 'warning',
+                        text: 'Silahkan import RAB terlebih dahulu',
+                        toast: true,
+                        timer: 5000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    });
+                }
+
+                $('#buttonSubmitProject').prop('disabled', false);
             });
-        })
+
+            // Trigger Button to Open Modal Import RAB
+            $('#buttonModalImportRAB').click(function() {
+                $('#modalImportRAB').modal('show');
+            });
+
+            $('#start, #deadline').on('change', calculateDays);
+        });
+
+        $('#formImportRAB').on('submit', function(e) {
+            e.preventDefault();
+            $.LoadingOverlay('show');
+
+            let formData = new FormData();
+            formData.append('file', $('#formImportRAB #file')[0].files[0]);
+
+            $.ajax({
+                url: "{{ route('project.import.rab') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(data) {
+                    console.log(data);
+
+                    const saldo = data.saldo;
+
+                    $('#totalSaldoProjectText').text(saldo.total_debet);
+                    $('#totalKreditProjectText').text(saldo.total_kredit);
+                    $('#sisaSaldoProjectText').text(saldo.sisa_saldo);
+
+                    let tbody = $('#tablePreviewRAB tbody');
+                    tbody.empty();
+
+                    if (data.items.length === 0) {
+                        tbody.append(
+                            '<tr><td colspan="6" class="text-center">Tidak ada data</td></tr>');
+                        return Swal.fire({
+                            icon: 'warning',
+                            text: 'Data cost center untuk project tidak ada atau format excel tidak sesuai',
+                            toast: true,
+                            timer: 5000,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        $.each(data.items, function(i, row) {
+                            tbody.append(`
+                            <tr>
+                                <td>${row.no}.</td>
+                                <td>
+                                    ${row.tanggal}
+                                    <input type="hidden" value="${row.tanggal}" name="items[${i}][tanggal]"/>
+                                </td>
+                                <td>
+                                    ${row.nama_item}
+                                    <input type="hidden" value="${row.nama_item}" name="items[${i}][name]"/>
+                                </td>
+                                <td class="${row.debet ? 'bg-success' : ''}">
+                                    ${row.debet
+                                        ? formatCurrency(row.debet)
+                                            +  '<input type="hidden" value="'
+                                            + row.debet + '" name="items[' + i + '][debet] "/>'
+                                        : '-'
+                                            + '<input type="hidden" value="" name="items[' + i + '][debet]"/>'
+                                        }
+                                </td>
+                                <td class="${row.kredit ? 'bg-warning' : ''}">
+                                    ${row.kredit
+                                        ? formatCurrency(row.kredit)
+                                            +  '<input type="hidden" value="'
+                                            + row.kredit + '" name="items[' + i + '][kredit]] "/>'
+                                        : '-'
+                                            + '<input type="hidden" value="" name="items[' + i + '][kredit]"/>'
+                                        }
+                                </td>
+                                <td>
+                                    ${row.kode_ref}
+                                    <input type="hidden" value="${row.kode_ref}" name="items[${i}][kode_ref]"/>
+                                </td>
+                            </tr>
+                        `);
+                        });
+                    }
+                    $('#tablePreviewRAB').removeClass('d-none');
+                    $('#modalImportRAB').modal('hide');
+                    $('#isRABReady').val('1');
+                    $('#cardSaldoRABWrapper').addClass('d-flex').show();
+                    $.LoadingOverlay('hide');
+                },
+                error: function(xhr) {
+                    console.log(xhr);
+                    $('#isRABReady').val('0');
+                    $('#cardSaldoRABWrapper').removeClass('d-flex').hide();
+                    $.LoadingOverlay('hide');
+                    Swal.fire({
+                        'icon': 'error',
+                        'toast': true,
+                        'position': 'top-right',
+                        'showConfirmButton': false,
+                        'timer': 5000,
+                        'timerProgressBar': true,
+                        'text': 'Gagal memproses file Excel'
+                    });
+                }
+            });
+        });
+
+        function calculateDays() {
+            const startDate = $('#start').val();
+            const endDate = $('#deadline').val();
+
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+
+                // Periksa apakah end < start
+                if (end < start) {
+                    $('#total_days').val('');
+                    Swal.fire({
+                        'icon': 'error',
+                        'toast': true,
+                        'position': 'top-right',
+                        'showConfirmButton': false,
+                        'timer': 5000,
+                        'timerProgressBar': true,
+                        'text': 'Tanggal selesai tidak boleh lebih awal dari tanggal mulai'
+                    });
+                } else {
+                    // Hitung total hari (termasuk tanggal mulai dan selesai)
+                    const timeDiff = end - start;
+                    const totalDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+                    $('#total_days').val(totalDays);
+                }
+            }
+        }
 
         function formatCurrency(num) {
             return num.toLocaleString('id-ID', {
@@ -658,19 +705,7 @@
             const pph = pekerjaan * (pphPercent / 100);
             const sp2d = pekerjaan - ppn - pph;
 
-            // Hitung total biaya lain-lain
-            let totalOtherCosts = 0;
-            $('#items-table-other-cost .price').each(function() {
-                totalOtherCosts += getNumberFromCurrency($(this).val());
-            });
-
-            // Hitung total item RAB
-            let totalRAB = 0;
-            $('#items-table .price').each(function() {
-                totalRAB += getNumberFromCurrency($(this).val());
-            });
-
-            const margin = sp2d - totalOtherCosts - totalRAB;
+            const margin = sp2d;
 
             // Tampilkan hasil SP2D dan Margin
             $('#sp2d').val(formatCurrency(sp2d));
@@ -690,46 +725,6 @@
             const penyusutanPercent = parseFloat($('#profit_penyusutan').val()) || 0;
             const divisiPercent = parseFloat($('#profit_divisi').val()) || 0;
             const bonusPercent = parseFloat($('#profit_bonus').val()) || 0;
-
-            const ranges = {
-                profit_perusahaan: [10, 40],
-                profit_penyusutan: [10, 20],
-                profit_divisi: [10, 20],
-                profit_bonus: [10, 30]
-            };
-
-            let hasRangeError = false;
-
-            // Cek dan beri feedback jika ada yang keluar dari batas
-            Object.entries(ranges).forEach(([id, [min, max]]) => {
-                const raw = $(`#${id}`).val().trim();
-
-                if (raw === '') {
-                    $(`#${id}`).removeClass('is-invalid');
-                    return;
-                }
-
-                const value = parseFloat(raw);
-
-                if (value > max) {
-                    hasRangeError = true;
-                    $(`#${id}`).addClass('is-invalid');
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'warning',
-                        title: `Persentase ${label(id)} harus antara ${min}% - ${max}%`,
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true
-                    });
-                } else {
-                    $(`#${id}`).removeClass('is-invalid');
-                }
-            });
-
-            // Jika ada kesalahan range, jangan lanjut hitung
-            if (hasRangeError) return;
 
             const perusahaanValue = margin * (perusahaanPercent / 100);
             const penyusutanValue = margin * (penyusutanPercent / 100);

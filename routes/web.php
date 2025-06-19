@@ -182,6 +182,17 @@ Route::middleware('auth')->group(function () {
             Route::put('/{id}', 'update')->name('jobs.update');
             Route::post('/{id}/complete', 'markComplete')->name('jobs.complete');
         });
+
+    /**
+     * Saturday, 14 June 2025
+     *
+     * Project
+     */
+    Route::controller(ProjectController::class)
+        ->prefix('/projects')
+        ->group(function () {
+            Route::post('/import/rab', 'importRab')->name('project.import.rab');
+        });
 });
 
 Route::get('/debug-session', function () {
