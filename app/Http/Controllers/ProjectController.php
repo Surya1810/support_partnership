@@ -60,6 +60,8 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
+
         $request->validate([
             'name' => 'bail|required',
             'client' => 'bail|required',
@@ -319,6 +321,8 @@ class ProjectController extends Controller
      */
     public function importRAB(Request $request)
     {
+        $months = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
+
         $validatedRequest = Validator::make($request->all(), [
             'file' => 'required|mimes:xlsx',
         ]);
@@ -340,32 +344,45 @@ class ProjectController extends Controller
             $data = [];
             $currentDate = Carbon::now()->format('Y-m-d');
             $totalDebetProject = 0;
-            $totalKreditProject = 0;
+            $totalLimitProject = 0;
 
             foreach ($rows as $index => $row) {
                 if ($index == 0) continue;
+
+                $month = in_array(strtoupper(trim($row[2])), $months) ? strtoupper(trim($row[2])) : null;
+                $monthIndex = str_pad((array_search($month, $months) + 1), 2, '0', STR_PAD_LEFT);
+                $year = (int) trim($row[3]);
+
+                if (!$month) {
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Pastikan nama bulan pada file RAB telah sesuai dalam Bahasa Indonesia'
+                    ], 400);
+                }
 
                 $data[] = [
                     'no' => $index,
                     'tanggal' => $currentDate,
                     'nama_item' => $row[1],
-                    'debet' => $row[2],
-                    'kredit' => $row[3],
-                    'kode_ref' => ($userDeparmentCode . '.TEST.2025/0001')
+                    'bulan' => $month,
+                    'tahun' => $year,
+                    'debet' => $row[4],
+                    'limit' => $row[5],
+                    'kode_ref' => ($userDeparmentCode . '.TEST.'. $monthIndex . '-' . $year . '/0001')
                         . ($index == 1 ? '' : '/' . str_pad(((string)$index++), 4, '0', STR_PAD_LEFT)),
                 ];
 
-                $totalDebetProject += $row[2] ? (int) trim($row[2]) : 0;
-                $totalKreditProject += $row[3] ? (int) trim($row[3]) : 0;
+                $totalDebetProject += $row[4] ? (int) trim($row[4]) : 0;
+                $totalLimitProject += $row[5] ? (int) trim($row[5]) : 0;
             }
 
-            $sisaSaldoProject = $totalDebetProject - $totalKreditProject;
+            $sisaSaldoProject = $totalDebetProject - $totalLimitProject;
             $response = [
                 'items' => $data,
                 'saldo' => [
-                    'total_debet' => formatRupiah($totalDebetProject),
-                    'total_kredit' => formatRupiah($totalKreditProject),
-                    'sisa_saldo' => formatRupiah($sisaSaldoProject)
+                    'total_debet' => $totalDebetProject,
+                    'total_limit' => $totalLimitProject,
+                    'sisa_saldo' => $sisaSaldoProject
                 ]
             ];
 

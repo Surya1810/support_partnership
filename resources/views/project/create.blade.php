@@ -374,11 +374,11 @@
                                                 <b>Total Kredit</b>
                                             </div>
                                             <div class="card-body">
-                                                <p class="card-text" id="totalKreditProjectText">
+                                                <p class="card-text" id="totalLimitProjectText">
                                                     {{ formatRupiah(0) }}
                                                 </p>
-                                                <input type="hidden" name="total_kredit_project"
-                                                    id="totalKreditProjectInput">
+                                                <input type="hidden" name="total_limit_project"
+                                                    id="totalLimitProjectInput">
                                             </div>
                                         </div>
                                         <div class="card bg-danger text-center col-10 col-md-4 mx-1 h-100">
@@ -400,10 +400,12 @@
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th>No.</th>
-                                                <th>Tanggal</th>
+                                                <th>Tanggal Dibuat</th>
                                                 <th>Nama Item</th>
+                                                <th>Bulan</th>
+                                                <th>Tahun</th>
                                                 <th>Debet</th>
-                                                <th>Kredit</th>
+                                                <th>Limit</th>
                                                 <th>Kode Ref.</th>
                                             </tr>
                                         </thead>
@@ -573,9 +575,12 @@
 
                     const saldo = data.saldo;
 
-                    $('#totalSaldoProjectText').text(saldo.total_debet);
-                    $('#totalKreditProjectText').text(saldo.total_kredit);
-                    $('#sisaSaldoProjectText').text(saldo.sisa_saldo);
+                    $('#totalSaldoProjectText').text(formatCurrency(saldo.total_debet));
+                    $('#totalSaldoProjectInput').val(saldo.total_debet);
+                    $('#totalLimitProjectText').text(formatCurrency(saldo.total_limit));
+                    $('#totalLimitProjectInput').val(saldo.total_limit);
+                    $('#sisaSaldoProjectText').text(formatCurrency(saldo.sisa_saldo));
+                    $('#sisaSaldoProjectInput').val(saldo.sisa_saldo);
 
                     let tbody = $('#tablePreviewRAB tbody');
                     tbody.empty();
@@ -604,6 +609,14 @@
                                     ${row.nama_item}
                                     <input type="hidden" value="${row.nama_item}" name="items[${i}][name]"/>
                                 </td>
+                                <td>
+                                    ${row.bulan}
+                                    <input type="hidden" value="${row.bulan}" name="items[${i}][bulan]"/>
+                                </td>
+                                <td>
+                                    ${row.tahun}
+                                    <input type="hidden" value="${row.tahun}" name="items[${i}][tahun]"/>
+                                </td>
                                 <td class="${row.debet ? 'bg-success' : ''}">
                                     ${row.debet
                                         ? formatCurrency(row.debet)
@@ -613,11 +626,11 @@
                                             + '<input type="hidden" value="" name="items[' + i + '][debet]"/>'
                                         }
                                 </td>
-                                <td class="${row.kredit ? 'bg-warning' : ''}">
-                                    ${row.kredit
-                                        ? formatCurrency(row.kredit)
+                                <td class="${row.limit ? 'bg-warning' : ''}">
+                                    ${row.limit
+                                        ? formatCurrency(row.limit)
                                             +  '<input type="hidden" value="'
-                                            + row.kredit + '" name="items[' + i + '][kredit]] "/>'
+                                            + row.limit + '" name="items[' + i + '][limit] "/>'
                                         : '-'
                                             + '<input type="hidden" value="" name="items[' + i + '][kredit]"/>'
                                         }
@@ -642,13 +655,13 @@
                     $('#cardSaldoRABWrapper').removeClass('d-flex').hide();
                     $.LoadingOverlay('hide');
                     Swal.fire({
-                        'icon': 'error',
+                        'icon': xhr.status === 400 ? 'warning' : 'error',
                         'toast': true,
                         'position': 'top-right',
                         'showConfirmButton': false,
                         'timer': 5000,
                         'timerProgressBar': true,
-                        'text': 'Gagal memproses file Excel'
+                        'text': xhr.responseJSON.message
                     });
                 }
             });

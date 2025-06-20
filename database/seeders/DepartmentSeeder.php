@@ -20,13 +20,13 @@ class DepartmentSeeder extends Seeder
              */
             Department::create([
                 'name' => 'Partnership Procurement Solution',
-                'code' => '01'
+                'code' => '02'
             ]);
             Department::create([
                 'name' => 'Partnership Workshop',
             ]);
             Department::create([
-                'name' => 'Partnership Contractor',
+                'name' => 'Partnership Contruction',
                 'code' => '03'
             ]);
             Department::create([
@@ -34,7 +34,7 @@ class DepartmentSeeder extends Seeder
             ]);
             Department::create([
                 'name' => 'Partnership Technology',
-                'code' => '02'
+                'code' => '04'
             ]);
             Department::create([
                 'name' => 'Partnership Information System & Website'
@@ -47,7 +47,7 @@ class DepartmentSeeder extends Seeder
             ]);
             Department::create([
                 'name' => 'Rumah Tangga',
-                'code' => '00'
+                'code' => '01'
             ]);
         }
     }
