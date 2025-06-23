@@ -177,6 +177,7 @@ Route::middleware('auth')->group(function () {
         ->prefix('/jobs')
         ->group(function () {
             Route::get('/', 'index')->name('jobs.index');
+            Route::get('/my-tasks', 'myTasks')->name('jobs.my_tasks');
             Route::post('/store', 'store')->name('jobs.store');
             Route::get('/{id}', 'show')->name('jobs.show');
             Route::put('/{id}', 'update')->name('jobs.update');

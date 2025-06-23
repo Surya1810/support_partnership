@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title')
-    Dashboard
+    Penugasan
 @endsection
 
 @push('css')
@@ -42,13 +42,19 @@
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item active"><strong>Penugasan</strong></li>
                     </ol>
+                    <a href="{{ route('jobs.index') }}" class="btn btn-sm btn-outline-secondary active mt-3" type="button" id="buttonJobsPage">
+                        Penugasan
+                    </a>
+                    <a href="{{ route('jobs.my_tasks') }}" class="btn btn-sm btn-outline-primary mt-3" type="button" id="buttonMyTasksPage">
+                        Tugas Saya
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
     {{-- Main Content --}}
-    <section class="content mt-3">
+    <section class="content">
         <div class="container-fluid">
             <div class="row gap-2 mb-3">
                 <div id="filterWrapper" class="col-4 col-md-2">
@@ -66,23 +72,30 @@
                     <i class="fas fa-plus"></i>
                     Tambah
                 </button>
+                @include('jobs.buttons')
             </div>
             <div class="table-responsive w-100">
                 <table class="table table-bordered table-striped" id="jobTable" style="width:100%">
                     <thead class="thead-dark">
                         <tr>
-                            <th>No.</th>
+                            <th rowspan="2" style="vertical-align: middle">No.</th>
+                            <th colspan="2" style="text-align: center">Penugasan</th>
+                            <th rowspan="2" style="vertical-align: middle">Divisi</th>
+                            <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
+                            <th colspan="2" style="text-align: center">Tanggal</th>
+                            <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br/>/Hari</th>
+                            <th rowspan="2" style="vertical-align: middle">Report<br/>Pekerjaan</th>
+                            <th rowspan="2" style="vertical-align: middle">Adendum<br/>/Catatan</th>
+                            <th rowspan="2" style="vertical-align: middle">Point</th>
+                            <th rowspan="2" style="vertical-align: middle">Status</th>
+                            <th rowspan="2" style="vertical-align: middle">Revisi</th>
+                            <th rowspan="2" style="vertical-align: middle">Aksi</th>
+                        </tr>
+                        <tr>
                             <th>Pemberi</th>
                             <th>Penerima</th>
-                            <th>Divisi</th>
-                            <th>Judul</th>
-                            <th>Tanggal Mulai</th>
-                            <th>Tanggal Selesai</th>
-                            <th>Detail</th>
-                            <th>Keterangan</th>
-                            <th>Masukan</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+                            <th>Mulai</th>
+                            <th>Selesai</th>
                         </tr>
                     </thead>
                 </table>
@@ -231,8 +244,8 @@
                     [5, 'asc']
                 ],
                 lengthMenu: [
-                    [10, 25, 50, 100, -1],
-                    [10, 25, 50, 100, "Semua"]
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
                 ],
                 processing: true,
                 serverSide: true,
@@ -286,11 +299,7 @@
                         data: 'title',
                         name: 'title',
                         class: 'text-center',
-                        orderable: false,
-                        render: function(data, type, row, meta) {
-                            if (!data) return '';
-                            return `<span class="text-ellipsis" data-toggle="tooltip" title="${data}">${data}</span>`;
-                        }
+                        orderable: false
                     },
                     {
                         data: 'start_date',
@@ -303,18 +312,8 @@
                         class: 'text-center'
                     },
                     {
-                        data: 'detail',
-                        name: 'detail',
-                        class: 'text-center',
-                        orderable: false,
-                        render: function(data, type, row, meta) {
-                            if (!data) return '';
-                            return `<span class="text-ellipsis" data-toggle="tooltip" title="${data}">${data}</span>`;
-                        }
-                    },
-                    {
-                        data: 'notes',
-                        name: 'notes',
+                        data: 'time_remaining',
+                        name: 'time_remaining',
                         class: 'text-center',
                         orderable: false
                     },
@@ -322,15 +321,29 @@
                         data: 'feedback',
                         name: 'feedback',
                         class: 'text-center',
-                        orderable: false,
-                        render: function(data, type, row, meta) {
-                            if (!data) return '';
-                            return `<span class="text-ellipsis" data-toggle="tooltip" title="${data}">${data}</span>`;
-                        }
+                        orderable: false
+                    },
+                    {
+                        data: 'feedback',
+                        name: 'feedback',
+                        class: 'text-center',
+                        orderable: false
+                    },
+                    {
+                        data: 'completion_efficiency',
+                        name: 'completion_efficiency',
+                        class: 'text-center',
+                        orderable: false
                     },
                     {
                         data: 'status',
                         name: 'status',
+                        class: 'text-center',
+                        orderable: false
+                    },
+                    {
+                        data: 'feedback',
+                        name: 'feedback',
                         class: 'text-center',
                         orderable: false
                     },
