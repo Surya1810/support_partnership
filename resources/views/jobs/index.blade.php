@@ -42,10 +42,12 @@
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item active"><strong>Penugasan</strong></li>
                     </ol>
-                    <a href="{{ route('jobs.index') }}" class="btn btn-sm btn-outline-secondary active mt-3" type="button" id="buttonJobsPage">
+                    <a href="{{ route('jobs.index') }}" class="btn btn-sm btn-outline-secondary active mt-3" type="button"
+                        id="buttonJobsPage">
                         Penugasan
                     </a>
-                    <a href="{{ route('jobs.my_tasks') }}" class="btn btn-sm btn-outline-primary mt-3" type="button" id="buttonMyTasksPage">
+                    <a href="{{ route('jobs.my_tasks') }}" class="btn btn-sm btn-outline-primary mt-3" type="button"
+                        id="buttonMyTasksPage">
                         Tugas Saya
                     </a>
                 </div>
@@ -53,52 +55,58 @@
         </div>
     </section>
 
-    {{-- Main Content --}}
+    <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
-            <div class="row gap-2 mb-3">
-                <div id="filterWrapper" class="col-4 col-md-2">
-                    <select class="form-control" id="statusFilter">
-                        <option value="all" disabled selected>Pilih Status</option>
-                        <option value="all">Semua</option>
-                        <option value="planning">Planning</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="overdue">Overdue</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card card-outline rounded-partner card-primary">
+                        <div class="card-body table-responsive w-100">
+                            <div class="row gap-2 mb-3">
+                                <div id="filterWrapper" class="col-4 col-md-2">
+                                    <select class="form-control" id="statusFilter">
+                                        <option value="all" disabled selected>Pilih Status</option>
+                                        <option value="all">Semua</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="overdue">Overdue</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-sm btn-primary rounded-partner" type="button"
+                                    id="buttonAddJobModal">
+                                    <i class="fas fa-plus"></i>
+                                    Tambah
+                                </button>
+                                @include('jobs.buttons')
+                            </div>
+                            <table class="table table-bordered table-striped text-sm" id="jobTable" style="width:100%">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th rowspan="2" style="vertical-align: middle">No.</th>
+                                        <th colspan="2" style="text-align: center">Penugasan</th>
+                                        <th rowspan="2" style="vertical-align: middle">Divisi</th>
+                                        <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
+                                        <th colspan="2" style="text-align: center">Tanggal</th>
+                                        <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari</th>
+                                        <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan</th>
+                                        <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan</th>
+                                        <th rowspan="2" style="vertical-align: middle">Point</th>
+                                        <th rowspan="2" style="vertical-align: middle">Status</th>
+                                        <th rowspan="2" style="vertical-align: middle">Revisi</th>
+                                        <th rowspan="2" style="vertical-align: middle">Aksi</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Pemberi</th>
+                                        <th>Penerima</th>
+                                        <th>Mulai</th>
+                                        <th>Selesai</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <button class="btn btn-sm btn-primary" type="button" id="buttonAddJobModal">
-                    <i class="fas fa-plus"></i>
-                    Tambah
-                </button>
-                @include('jobs.buttons')
-            </div>
-            <div class="table-responsive w-100">
-                <table class="table table-bordered table-striped" id="jobTable" style="width:100%">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th rowspan="2" style="vertical-align: middle">No.</th>
-                            <th colspan="2" style="text-align: center">Penugasan</th>
-                            <th rowspan="2" style="vertical-align: middle">Divisi</th>
-                            <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
-                            <th colspan="2" style="text-align: center">Tanggal</th>
-                            <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br/>/Hari</th>
-                            <th rowspan="2" style="vertical-align: middle">Report<br/>Pekerjaan</th>
-                            <th rowspan="2" style="vertical-align: middle">Adendum<br/>/Catatan</th>
-                            <th rowspan="2" style="vertical-align: middle">Point</th>
-                            <th rowspan="2" style="vertical-align: middle">Status</th>
-                            <th rowspan="2" style="vertical-align: middle">Revisi</th>
-                            <th rowspan="2" style="vertical-align: middle">Aksi</th>
-                        </tr>
-                        <tr>
-                            <th>Pemberi</th>
-                            <th>Penerima</th>
-                            <th>Mulai</th>
-                            <th>Selesai</th>
-                        </tr>
-                    </thead>
-                </table>
             </div>
         </div>
     </section>
@@ -106,7 +114,7 @@
     {{-- Modal Tambah Penugasan --}}
     <div class="modal fade" id="modalAddJob" tabindex="-1" role="dialog" aria-labelledby="modalLabelJob"
         aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog" role="document">
             <form id="formAddJob">
                 @csrf
                 <div class="modal-content">
@@ -118,56 +126,52 @@
                         <div class="form-group">
                             <label for="assignee_id">Penerima Tugas</label>
                             <select name="assignee_id" class="form-control select2" required>
-                                <option value="">Pilih Karyawan</option>
+                                <option value="">Pilih Penerima</option>
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="title">Judul</label>
-                            <input type="text" name="title" class="form-control" required>
-                        </div>
-                        <div class="form-group">
                             <label for="detail">Detail Pekerjaan</label>
                             <textarea name="detail" class="form-control" rows="3" required></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="start_date">Tanggal Mulai</label>
-                            <input type="date" name="start_date" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="end_date">Tanggal Selesai</label>
-                            <input type="date" name="end_date" class="form-control" required>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="start_date">Tanggal Mulai</label>
+                                    <input type="date" name="start_date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="end_date">Tanggal Selesai</label>
+                                    <input type="date" name="end_date" class="form-control" required>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary rounded-partner">Simpan</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
-    {{-- Modal Edit Penugasa --}}
+    {{-- Modal Edit Penugasan --}}
     <div class="modal fade" id="editJobModal" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <form id="formEditJob">
-                    <div class="modal-header bg-warning text-white">
-                        <h5 class="modal-title">Edit Pekerjaan</h5>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ubah Pekerjaan</h5>
                         <button type="button" class="close" data-dismiss="modal">
                             <span>&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <input type="hidden" id="edit_job_id">
-
-                        <div class="form-group">
-                            <label>Judul</label>
-                            <input type="text" id="edit_title" class="form-control" required>
-                        </div>
 
                         <div class="form-group">
                             <label>Detail Pekerjaan</label>
@@ -188,14 +192,19 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Tanggal Mulai</label>
-                            <input type="date" id="edit_start_date" class="form-control" disabled>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Tanggal Selesai</label>
-                            <input type="date" id="edit_end_date" class="form-control">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Tanggal Mulai</label>
+                                    <input type="date" id="edit_start_date" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Tanggal Selesai</label>
+                                    <input type="date" id="edit_end_date" class="form-control">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -210,8 +219,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-warning">Update</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-warning rounded-partner">Update</button>
                     </div>
                 </form>
             </div>
@@ -296,8 +304,8 @@
                         orderable: false
                     },
                     {
-                        data: 'title',
-                        name: 'title',
+                        data: 'job_detail',
+                        name: 'job_detail',
                         class: 'text-center',
                         orderable: false
                     },
@@ -324,8 +332,8 @@
                         orderable: false
                     },
                     {
-                        data: 'feedback',
-                        name: 'feedback',
+                        data: 'notes',
+                        name: 'notes',
                         class: 'text-center',
                         orderable: false
                     },
@@ -342,8 +350,8 @@
                         orderable: false
                     },
                     {
-                        data: 'feedback',
-                        name: 'feedback',
+                        data: 'revisions',
+                        name: 'revisions',
                         class: 'text-center',
                         orderable: false
                     },
@@ -394,7 +402,8 @@
                         $('#jobTable').DataTable().ajax.reload(null, false);
                         showToast('success', res.message);
                     },
-                    error: function() {
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
                         showToast('error', 'Gagal menambahkan penugasan');
                     }
                 });
@@ -418,7 +427,6 @@
                     method: 'PUT',
                     data: {
                         _token: '{{ csrf_token() }}',
-                        title: $('#edit_title').val(),
                         job_detail: $('#edit_detail').val(),
                         end_date: $('#edit_end_date').val(),
                         feedback: $('#edit_feedback').val(),
@@ -443,7 +451,6 @@
 
             $.get(`/jobs/${jobId}`, function(data) {
                 $('#edit_job_id').val(data.id);
-                $('#edit_title').val(data.title);
                 $('#edit_detail').val(data.job_detail);
                 $('#edit_start_date').val(data.start_date);
                 $('#edit_end_date').val(data.end_date);

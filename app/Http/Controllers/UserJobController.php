@@ -163,11 +163,12 @@ class UserJobController extends Controller
 
                     return $rowClass;
                 })
+                ->addColumn('revisions', fn($job) => $job->feedback ?? '-')
                 ->rawColumns(['actions', 'status'])
                 ->make(true);
         }
 
-        $users = User::where('id', '!=', Auth::id())->with('department')->get();
+        $users = User::whereNotIn('id', [Auth::id(), 1])->with('department')->get();
         return view('jobs.index', compact('users'));
     }
 
@@ -314,7 +315,6 @@ class UserJobController extends Controller
     {
         $request->validate([
             'assignee_id' => 'required|exists:users,id',
-            'title' => 'required|string|max:255',
             'detail' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
@@ -322,7 +322,7 @@ class UserJobController extends Controller
 
         $assignee = User::where('id', $request->assignee_id)->first();
 
-        if (!$assignee->exists()) {
+        if (!$assignee) {
             return response()->json(['message' => 'Data tidak ditemukan'], 404);
         }
 
@@ -333,7 +333,6 @@ class UserJobController extends Controller
                 'assigner_id' => Auth::id(),
                 'assignee_id' => $request->assignee_id,
                 'department_id' => $assignee->department_id,
-                'title' => $request->title,
                 'job_detail' => $request->detail,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
@@ -344,9 +343,13 @@ class UserJobController extends Controller
             return response()->json(['message' => 'Berhasil disimpan']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Gagal disimpan'], 500);
+            return response()->json([
+                'message' => 'Gagal disimpan',
+                'error' => $e->getMessage(), // tampilkan error
+            ], 500);
         }
     }
+
 
     public function show($id)
     {
