@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title')
-    Dashboard
+    Penugasan
 @endsection
 
 @push('css')
@@ -42,50 +42,116 @@
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item active"><strong>Penugasan</strong></li>
                     </ol>
+                    <a href="{{ route('jobs.index') }}" class="btn btn-sm btn-outline-secondary active mt-3" type="button"
+                        id="buttonJobsPage">
+                        Penugasan
+                    </a>
+                    <a href="{{ route('jobs.my_tasks') }}" class="btn btn-sm btn-outline-primary mt-3" type="button"
+                        id="buttonMyTasksPage">
+                        Tugas Saya
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    {{-- Main Content --}}
-    <section class="content mt-3">
+    <!-- Main content -->
+    <section class="content">
         <div class="container-fluid">
-            <div class="row gap-2 mb-3">
-                <div id="filterWrapper" class="col-4 col-md-2">
-                    <select class="form-control" id="statusFilter">
-                        <option value="all" disabled selected>Pilih Status</option>
-                        <option value="all">Semua</option>
-                        <option value="planning">Planning</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="overdue">Overdue</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card card-outline rounded-partner card-primary">
+                        <div class="card-body table-responsive w-100">
+                            <div class="row mb-3 align-items-end">
+                                <div class="col-md-2">
+                                    <select class="form-control" id="statusFilter">
+                                        <option value="all" disabled selected>Pilih Status</option>
+                                        <option value="all">Semua</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="overdue">Overdue</option>
+                                        <option value="cancelled">Cancelled</option>
+                                        <option value="checking">Checking</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="revision">Revision</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-primary rounded-partner" type="button"
+                                            id="buttonAddJobModal">
+                                            <i class="fas fa-plus"></i> Tambah
+                                        </button>
+                                        <button class="btn btn-warning rounded-partner" type="button"
+                                            id="buttonOpenModalImportJobs">
+                                            <i class="fas fa-upload"></i> Import
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-7 text-right">
+                                    <form method="GET" action="{{ route('jobs.export') }}"
+                                        class="form-inline justify-content-end">
+                                        <input type="date" name="start_date" class="form-control mr-2" required>
+                                        <input type="date" name="end_date" class="form-control mr-2" required>
+                                        <button type="submit" class="btn btn-success rounded-partner">
+                                            <i class="fas fa-file-excel"></i> Export Excel
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            {{-- Total Point Wrapper --}}
+                            <div class="row mb-4">
+                                <div class="col-2">
+                                    <div id="timeWrapper">
+                                        <input type="text" id="time" class="form-control" value="Tue, 10 Jan 2022"
+                                            disabled>
+                                    </div>
+                                </div>
+                                <div id="totalEfficiencyWrapper" class="col-6" style="display: none">
+                                    <form>
+                                        <div class="form-group row">
+                                            <label for="totalEfficiencyOutput" class="col-form-label">
+                                                Total Point
+                                            </label>
+                                            <div class="col-md-1">
+                                                <input type="text" class="form-control" id="totalEfficiencyOutput"
+                                                    disabled>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <table class="table table-bordered table-striped text-sm" id="jobTable" style="width:100%">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th rowspan="2" style="vertical-align: middle">No.</th>
+                                        <th colspan="2" style="text-align: center">Penugasan</th>
+                                        <th rowspan="2" style="vertical-align: middle">Divisi</th>
+                                        <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
+                                        <th colspan="3" style="text-align: center">Tanggal</th>
+                                        <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari</th>
+                                        <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan</th>
+                                        <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan</th>
+                                        <th rowspan="2" style="vertical-align: middle">Point</th>
+                                        <th rowspan="2" style="vertical-align: middle">Status</th>
+                                        <th rowspan="2" style="vertical-align: middle">Revisi</th>
+                                        <th rowspan="2" style="vertical-align: middle">Aksi</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Pemberi</th>
+                                        <th>Penerima</th>
+                                        <th>Mulai</th>
+                                        <th>Akhir</th>
+                                        <th>Selesai</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <button class="btn btn-sm btn-primary" type="button" id="buttonAddJobModal">
-                    <i class="fas fa-plus"></i>
-                    Tambah
-                </button>
-            </div>
-            <div class="table-responsive w-100">
-                <table class="table table-bordered table-striped" id="jobTable" style="width:100%">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No.</th>
-                            <th>Pemberi</th>
-                            <th>Penerima</th>
-                            <th>Divisi</th>
-                            <th>Judul</th>
-                            <th>Tanggal Mulai</th>
-                            <th>Tanggal Selesai</th>
-                            <th>Detail</th>
-                            <th>Keterangan</th>
-                            <th>Masukan</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                </table>
             </div>
         </div>
     </section>
@@ -93,7 +159,7 @@
     {{-- Modal Tambah Penugasan --}}
     <div class="modal fade" id="modalAddJob" tabindex="-1" role="dialog" aria-labelledby="modalLabelJob"
         aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog" role="document">
             <form id="formAddJob">
                 @csrf
                 <div class="modal-content">
@@ -105,56 +171,52 @@
                         <div class="form-group">
                             <label for="assignee_id">Penerima Tugas</label>
                             <select name="assignee_id" class="form-control select2" required>
-                                <option value="">Pilih Karyawan</option>
+                                <option value="">Pilih Penerima</option>
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="title">Judul</label>
-                            <input type="text" name="title" class="form-control" required>
-                        </div>
-                        <div class="form-group">
                             <label for="detail">Detail Pekerjaan</label>
                             <textarea name="detail" class="form-control" rows="3" required></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="start_date">Tanggal Mulai</label>
-                            <input type="date" name="start_date" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="end_date">Tanggal Selesai</label>
-                            <input type="date" name="end_date" class="form-control" required>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="start_date">Tanggal Mulai</label>
+                                    <input type="date" name="start_date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="end_date">Tanggal Selesai</label>
+                                    <input type="date" name="end_date" class="form-control" required>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary rounded-partner">Simpan</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
-    {{-- Modal Edit Penugasa --}}
+    {{-- Modal Edit Penugasan --}}
     <div class="modal fade" id="editJobModal" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <form id="formEditJob">
-                    <div class="modal-header bg-warning text-white">
-                        <h5 class="modal-title">Edit Pekerjaan</h5>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ubah Pekerjaan</h5>
                         <button type="button" class="close" data-dismiss="modal">
                             <span>&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <input type="hidden" id="edit_job_id">
-
-                        <div class="form-group">
-                            <label>Judul</label>
-                            <input type="text" id="edit_title" class="form-control" required>
-                        </div>
 
                         <div class="form-group">
                             <label>Detail Pekerjaan</label>
@@ -175,33 +237,110 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Tanggal Mulai</label>
-                            <input type="date" id="edit_start_date" class="form-control" disabled>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Tanggal Mulai</label>
+                                    <input type="date" id="edit_start_date" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Tanggal Selesai</label>
+                                    <input type="date" id="edit_end_date" class="form-control">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Tanggal Selesai</label>
-                            <input type="date" id="edit_end_date" class="form-control">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Masukan</label>
-                            <textarea id="edit_feedback" class="form-control"></textarea>
+                            <label>Adendum/Catatan</label>
+                            <textarea id="edit_notes" class="form-control"></textarea>
                         </div>
 
                         <div class="form-group">
                             <label>Keterangan</label>
-                            <input type="text" id="edit_notes" class="form-control muted" readonly>
+                            <input type="text" id="edit_feedback" class="form-control muted" readonly>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-warning">Update</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-warning rounded-partner">Update</button>
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+
+    {{-- Modal Import File --}}
+    <div class="modal fade" id="modalImportFile" tabindex="-1" role="dialog" aria-labelledby="modalLabelImportFile"
+        aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <form id="formImportFile" method="POST" enctype="multipart/form-data" action="{{ route('jobs.import') }}">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Import File Penugasan</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <button class="btn btn-secondary rounded-partner" id="buttonDownloadTemplate" type="button">
+                            <i class="fas fa-download"></i> Download Template
+                        </button>
+                        <div class="form-group mt-3 mx-2">
+                            <input type="hidden" name="job_id">
+                            <label for="jobsFile">Import File Penugasan</label>
+                            <input type="file" class="form-control-file" id="jobsFile" name="jobs_file">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary rounded-partner">
+                            <i class="fas fa-upload"></i> Upload
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Modal Pengecekan --}}
+    <div class="modal fade" id="modalPengecekanJob" tabindex="-1" role="dialog"
+        aria-labelledby="modalLabelPengecekan" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <form id="formPengecekan">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Pengecekan</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="hidden" name="job_id" id="job_id_hidden">
+                            <label>Hasil Pengecekan</label><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="action" id="approveRadio"
+                                    value="approve" required>
+                                <label class="form-check-label" for="approveRadio">Approve</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="action" id="revisiRadio"
+                                    value="revisi">
+                                <label class="form-check-label" for="revisiRadio">Revisi</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group d-none" id="notesGroup">
+                            <label for="notes">Catatan Revisi</label>
+                            <textarea name="notes" id="notes" class="form-control" rows="3" placeholder="Tulis revisi..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary rounded-partner">Submit</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 @endsection
@@ -227,12 +366,10 @@
                 scrollX: true,
                 autoWidth: true,
                 pageLength: 10,
-                order: [
-                    [5, 'asc']
-                ],
+                ordering: false,
                 lengthMenu: [
-                    [10, 25, 50, 100, -1],
-                    [10, 25, 50, 100, "Semua"]
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
                 ],
                 processing: true,
                 serverSide: true,
@@ -262,13 +399,14 @@
                         name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false,
-                        class: 'text-center'
+                        class: 'text-center',
                     },
                     {
                         data: 'assigner',
                         name: 'assigner',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'assignee',
@@ -283,56 +421,73 @@
                         orderable: false
                     },
                     {
-                        data: 'title',
-                        name: 'title',
+                        data: 'job_detail',
+                        name: 'job_detail',
                         class: 'text-center',
-                        orderable: false,
-                        render: function(data, type, row, meta) {
-                            if (!data) return '';
-                            return `<span class="text-ellipsis" data-toggle="tooltip" title="${data}">${data}</span>`;
-                        }
+                        orderable: false
                     },
                     {
                         data: 'start_date',
                         name: 'start_date',
-                        class: 'text-center'
+                        class: 'text-center',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'end_date',
                         name: 'end_date',
-                        class: 'text-center'
-                    },
-                    {
-                        data: 'detail',
-                        name: 'detail',
                         class: 'text-center',
                         orderable: false,
-                        render: function(data, type, row, meta) {
-                            if (!data) return '';
-                            return `<span class="text-ellipsis" data-toggle="tooltip" title="${data}">${data}</span>`;
-                        }
+                        searchable: false
                     },
                     {
-                        data: 'notes',
-                        name: 'notes',
+                        data: 'completed_at',
+                        name: 'completed_at',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'time_remaining',
+                        name: 'time_remaining',
+                        class: 'text-center',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'report_file',
+                        name: 'report_file',
+                        class: 'text-center',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'feedback',
                         name: 'feedback',
                         class: 'text-center',
                         orderable: false,
-                        render: function(data, type, row, meta) {
-                            if (!data) return '';
-                            return `<span class="text-ellipsis" data-toggle="tooltip" title="${data}">${data}</span>`;
-                        }
+                        searchable: false
+                    },
+                    {
+                        data: 'completion_efficiency',
+                        name: 'completion_efficiency',
+                        class: 'text-center',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'status',
                         name: 'status',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'revisions',
+                        name: 'revisions',
+                        class: 'text-center',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'actions',
@@ -341,13 +496,7 @@
                         searchable: false,
                         class: 'text-center'
                     },
-                ],
-                drawCallback: function() {
-                    $('[data-toggle="tooltip"]').tooltip({
-                        container: 'body',
-                        trigger: 'hover'
-                    });
-                }
+                ]
             });
 
             $("#statusFilter").on('change', function() {
@@ -381,7 +530,8 @@
                         $('#jobTable').DataTable().ajax.reload(null, false);
                         showToast('success', res.message);
                     },
-                    error: function() {
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
                         showToast('error', 'Gagal menambahkan penugasan');
                     }
                 });
@@ -390,7 +540,7 @@
             $('#edit_end_date').on('change', function() {
                 const newDate = $(this).val();
                 if (!endDateChanged && newDate !== originalEndDate) {
-                    $('#edit_notes').val('Pengerjaan ke-' + editCount);
+                    $('#edit_feedback').val('Pengerjaan ke-' + editCount);
                     endDateChanged = true;
                 }
             });
@@ -405,7 +555,6 @@
                     method: 'PUT',
                     data: {
                         _token: '{{ csrf_token() }}',
-                        title: $('#edit_title').val(),
                         job_detail: $('#edit_detail').val(),
                         end_date: $('#edit_end_date').val(),
                         feedback: $('#edit_feedback').val(),
@@ -423,6 +572,76 @@
                     }
                 });
             });
+
+            /**
+             * 24 June 2025
+             * Get total completion efficiency/point
+             **/
+            let searchBox = $('div.dataTables_filter input');
+
+            searchBox.on('keyup', function() {
+                table.on('xhr.dt', function(e, settings, json, xhr) {
+                    let searchValue = table.search().trim();
+
+                    if (searchValue.length > 0) {
+                        $('#totalEfficiencyOutput').val(json.total_efficiency + '%');
+                        $('#totalEfficiencyWrapper').show();
+                    } else {
+                        $('#totalEfficiencyWrapper').hide();
+                    }
+                });
+            });
+
+            $('#buttonDownloadTemplate').on('click', function() {
+                window.open('{{ route('jobs.download_template') }}', '_blank');
+            });
+
+            $(document).ready(function() {
+                $('#buttonOpenModalImportJobs').click(function() {
+                    $('#modalImportFile').modal('show');
+                });
+            });
+
+            $('input[name="action"]').on('change', function() {
+                if ($(this).val() === 'revisi') {
+                    $('#notesGroup').removeClass('d-none');
+                    $('#notes').attr('required', true);
+                } else {
+                    $('#notesGroup').addClass('d-none');
+                    $('#notes').removeAttr('required');
+                }
+            });
+
+            $('#formPengecekan').on('submit', function(e) {
+                e.preventDefault();
+
+                const jobId = $('#job_id_hidden').val();
+                const formData = $(this).serialize();
+
+                console.log('Form Data:', formData);
+
+                $.ajax({
+                    url: `/jobs/${jobId}/mark-complete`,
+                    method: "POST",
+                    data: formData,
+                    success: function(res) {
+                        $('#modalPengecekanJob').modal('hide');
+                        $('#jobTable').DataTable().ajax.reload(null, false);
+                        showToast('success', res.message);
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        let msg = 'Gagal menyelesaikan tugas';
+                        if (xhr.responseJSON?.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        showToast('error', msg);
+                    }
+                });
+            });
+
+            updateTime(); // sekali saat awal
+            setInterval(updateTime, 1000); // update tiap 1 detik
         });
 
         function modalEdit(button) {
@@ -430,22 +649,32 @@
 
             $.get(`/jobs/${jobId}`, function(data) {
                 $('#edit_job_id').val(data.id);
-                $('#edit_title').val(data.title);
                 $('#edit_detail').val(data.job_detail);
                 $('#edit_start_date').val(data.start_date);
                 $('#edit_end_date').val(data.end_date);
-                $('#edit_feedback').val(data.feedback ?? '');
-                $('#edit_notes').val(data.notes ?? '');
+
+                const feedback = data.feedback;
+                const splittedFeedback = feedback.split('tgl');
+
+                $('#edit_feedback').val(splittedFeedback[0]);
 
                 originalEndDate = data.end_date;
-                editCount = countNotesEdit(data.notes);
+                editCount = countFeedback(data.feedback);
                 endDateChanged = false;
 
                 $('#editJobModal').modal('show');
             });
         }
 
-        function countNotesEdit(notes) {
+        function modalApprove(el) {
+            const id = $(el).data('id');
+            $('#job_id_hidden').val(id);
+            $('#formPengecekan')[0].reset();
+            $('#notesGroup').addClass('d-none');
+            $('#modalPengecekanJob').modal('show');
+        }
+
+        function countFeedback(notes) {
             if (!notes) return 1;
             const matches = notes.match(/Pengerjaan ke-(\d+)/);
             return matches ? parseInt(matches[1]) + 1 : 2;
@@ -491,6 +720,28 @@
                     });
                 }
             });
+        }
+
+        function updateTime() {
+            const now = new Date();
+
+            const options = {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+                timeZone: 'Asia/Jakarta' // waktu WIB
+            };
+
+            const formatted = now.toLocaleString('id-ID', options).replace(',', '');
+            const parts = formatted.split(' ');
+            const final = `${parts[0]}, ${parts.slice(1).join(' ')}`;
+
+            $('#time').val(final);
         }
     </script>
 @endpush
