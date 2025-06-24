@@ -170,7 +170,6 @@ Route::middleware('auth')->group(function () {
 
     /**
      * Date: 21/05/2025
-     *
      * UserJobs Menu
      */
     Route::controller(UserJobController::class)
@@ -179,6 +178,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/', 'index')->name('jobs.index');
             Route::get('/my-tasks', 'myTasks')->name('jobs.my_tasks');
             Route::post('/store', 'store')->name('jobs.store');
+            Route::get('/upload/export', 'export')->name('jobs.export');
+            Route::post('/upload/import', 'import')->name('jobs.import');
+            Route::get('/upload/report/download-template', 'downloadTemplateImport')->name('jobs.download_template');
+            Route::post('/upload/report/{id}', 'uploadFile')->name('jobs.upload_report');
             Route::get('/{id}', 'show')->name('jobs.show');
             Route::put('/{id}', 'update')->name('jobs.update');
             Route::post('/{id}/complete', 'markComplete')->name('jobs.complete');

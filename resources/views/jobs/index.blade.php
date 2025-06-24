@@ -62,24 +62,57 @@
                 <div class="col-12">
                     <div class="card card-outline rounded-partner card-primary">
                         <div class="card-body table-responsive w-100">
-                            <div class="row gap-2 mb-3">
-                                <div id="filterWrapper" class="col-4 col-md-2">
+                            <div class="row mb-3 align-items-end">
+                                <div class="col-md-2">
                                     <select class="form-control" id="statusFilter">
                                         <option value="all" disabled selected>Pilih Status</option>
                                         <option value="all">Semua</option>
                                         <option value="in_progress">In Progress</option>
                                         <option value="overdue">Overdue</option>
-                                        <option value="completed">Completed</option>
                                         <option value="cancelled">Cancelled</option>
+                                        <option value="checking">Checking</option>
+                                        <option value="completed">Completed</option>
                                     </select>
                                 </div>
-                                <button class="btn btn-sm btn-primary rounded-partner" type="button"
-                                    id="buttonAddJobModal">
-                                    <i class="fas fa-plus"></i>
-                                    Tambah
-                                </button>
-                                @include('jobs.buttons')
+
+                                <div class="col-md-3">
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-primary rounded-partner" type="button" id="buttonAddJobModal">
+                                            <i class="fas fa-plus"></i> Tambah
+                                        </button>
+                                        <button class="btn btn-warning rounded-partner" type="button"
+                                            id="buttonOpenModalImportJobs">
+                                            <i class="fas fa-upload"></i> Import
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-7 text-right">
+                                    <form method="GET" action="{{ route('jobs.export') }}"
+                                        class="form-inline justify-content-end">
+                                        <input type="date" name="start_date" class="form-control mr-2" required>
+                                        <input type="date" name="end_date" class="form-control mr-2" required>
+                                        <button type="submit" class="btn btn-success rounded-partner">
+                                            <i class="fas fa-file-excel"></i> Export Excel
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
+
+                            {{-- Total Point Wrapper --}}
+                            <div id="totalEfficiencyWrapper" class="mb-4 mx-3" style="display: none">
+                                <form>
+                                    <div class="form-group row">
+                                        <label for="totalEfficiencyOutput" class="col-form-label">
+                                            Total Point
+                                        </label>
+                                        <div class="col-md-1">
+                                            <input type="text" class="form-control" id="totalEfficiencyOutput" disabled>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
                             <table class="table table-bordered table-striped text-sm" id="jobTable" style="width:100%">
                                 <thead class="thead-dark">
                                     <tr>
@@ -225,6 +258,37 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal Import File --}}
+    <div class="modal fade" id="modalImportFile" tabindex="-1" role="dialog" aria-labelledby="modalLabelImportFile"
+        aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <form id="formImportFile" method="POST" enctype="multipart/form-data" action="{{ route('jobs.import') }}">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Import File Penugasan</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <button class="btn btn-secondary rounded-partner" id="buttonDownloadTemplate" type="button">
+                            <i class="fas fa-download"></i> Download Template
+                        </button>
+                        <div class="form-group mt-3 mx-2">
+                            <input type="hidden" name="job_id">
+                            <label for="jobsFile">Import File Penugasan</label>
+                            <input type="file" class="form-control-file" id="jobsFile" name="jobs_file">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary rounded-partner">
+                            <i class="fas fa-upload"></i> Upload
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -248,9 +312,7 @@
                 scrollX: true,
                 autoWidth: true,
                 pageLength: 10,
-                order: [
-                    [5, 'asc']
-                ],
+                ordering: false,
                 lengthMenu: [
                     [10, 25, 50, 100],
                     [10, 25, 50, 100]
@@ -283,13 +345,14 @@
                         name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false,
-                        class: 'text-center'
+                        class: 'text-center',
                     },
                     {
                         data: 'assigner',
                         name: 'assigner',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'assignee',
@@ -307,53 +370,64 @@
                         data: 'job_detail',
                         name: 'job_detail',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'start_date',
                         name: 'start_date',
-                        class: 'text-center'
+                        class: 'text-center',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'end_date',
                         name: 'end_date',
-                        class: 'text-center'
+                        class: 'text-center',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'time_remaining',
                         name: 'time_remaining',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
                     },
                     {
-                        data: 'feedback',
-                        name: 'feedback',
+                        data: 'report_file',
+                        name: 'report_file',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'notes',
                         name: 'notes',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'completion_efficiency',
                         name: 'completion_efficiency',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'status',
                         name: 'status',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'revisions',
                         name: 'revisions',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'actions',
@@ -362,13 +436,7 @@
                         searchable: false,
                         class: 'text-center'
                     },
-                ],
-                drawCallback: function() {
-                    $('[data-toggle="tooltip"]').tooltip({
-                        container: 'body',
-                        trigger: 'hover'
-                    });
-                }
+                ]
             });
 
             $("#statusFilter").on('change', function() {
@@ -442,6 +510,35 @@
                         console.log(xhr);
                         showToast('error', xhr.responseJSON.message);
                     }
+                });
+            });
+
+            /**
+             * 24 June 2025
+             * Get total completion efficiency/point
+             **/
+            let searchBox = $('div.dataTables_filter input');
+
+            searchBox.on('keyup', function() {
+                table.on('xhr.dt', function(e, settings, json, xhr) {
+                    let searchValue = table.search().trim();
+
+                    if (searchValue.length > 0) {
+                        $('#totalEfficiencyOutput').val(json.total_efficiency + '%');
+                        $('#totalEfficiencyWrapper').show();
+                    } else {
+                        $('#totalEfficiencyWrapper').hide();
+                    }
+                });
+            });
+
+            $('#buttonDownloadTemplate').on('click', function() {
+                window.open('{{ route('jobs.download_template') }}', '_blank');
+            });
+
+            $(document).ready(function() {
+                $('#buttonOpenModalImportJobs').click(function() {
+                    $('#modalImportFile').modal('show');
                 });
             });
         });

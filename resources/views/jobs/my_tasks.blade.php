@@ -58,48 +58,103 @@
     {{-- Main Content --}}
     <section class="content">
         <div class="container-fluid">
-            <div class="row gap-2 mb-3">
-                <div id="filterWrapper" class="col-4 col-md-2">
-                    <select class="form-control" id="statusFilter">
-                        <option value="all" disabled selected>Pilih Status</option>
-                        <option value="all">Semua</option>
-                        <option value="planning">Planning</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="overdue">Overdue</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
+            <div class="col-12">
+                <div class="card card-outline rounded-partner card-primary">
+                    <div class="card-body table-responsive w-100">
+                        <div class="row mb-3 align-items-end">
+                            <div class="col-md-2">
+                                <select class="form-control" id="statusFilter">
+                                    <option value="all" disabled selected>Pilih Status</option>
+                                    <option value="all">Semua</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="overdue">Overdue</option>
+                                    <option value="cancelled">Cancelled</option>
+                                    <option value="checking">Checking</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-10 text-right">
+                                <form method="GET" action="#" class="form-inline justify-content-end">
+                                    <input type="date" name="start_date" class="form-control mr-2" required>
+                                    <input type="date" name="end_date" class="form-control mr-2" required>
+                                    <button type="submit" class="btn btn-success rounded-partner">
+                                        <i class="fas fa-file-excel"></i> Export Excel
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="table-responsive w-100">
+                            {{-- Total Point Wrapper --}}
+                            <div id="totalEfficiencyWrapper" class="mb-4 mx-3">
+                                <form>
+                                    <div class="form-group row">
+                                        <label for="totalEfficiencyOutput" class="col-form-label">
+                                            Total Point
+                                        </label>
+                                        <div class="col-md-1">
+                                            <input type="text" class="form-control" id="totalEfficiencyOutput" disabled>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <table class="table table-bordered table-striped" id="jobTable" style="width:100%">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th rowspan="2" style="vertical-align: middle">No.</th>
+                                        <th colspan="2" style="text-align: center">Penugasan</th>
+                                        <th rowspan="2" style="vertical-align: middle">Divisi</th>
+                                        <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
+                                        <th colspan="2" style="text-align: center">Tanggal</th>
+                                        <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari</th>
+                                        <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan</th>
+                                        <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan</th>
+                                        <th rowspan="2" style="vertical-align: middle">Point</th>
+                                        <th rowspan="2" style="vertical-align: middle">Status</th>
+                                        <th rowspan="2" style="vertical-align: middle">Revisi</th>
+                                        <th rowspan="2" style="vertical-align: middle">Aksi</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Pemberi</th>
+                                        <th>Penerima</th>
+                                        <th>Mulai</th>
+                                        <th>Selesai</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                @include('jobs.buttons')
-            </div>
-            <div class="table-responsive w-100">
-                <table class="table table-bordered table-striped" id="jobTable" style="width:100%">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th rowspan="2" style="vertical-align: middle">No.</th>
-                            <th colspan="2" style="text-align: center">Penugasan</th>
-                            <th rowspan="2" style="vertical-align: middle">Divisi</th>
-                            <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
-                            <th colspan="2" style="text-align: center">Tanggal</th>
-                            <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br/>/Hari</th>
-                            <th rowspan="2" style="vertical-align: middle">Report<br/>Pekerjaan</th>
-                            <th rowspan="2" style="vertical-align: middle">Adendum<br/>/Catatan</th>
-                            <th rowspan="2" style="vertical-align: middle">Point</th>
-                            <th rowspan="2" style="vertical-align: middle">Status</th>
-                            <th rowspan="2" style="vertical-align: middle">Revisi</th>
-                            <th rowspan="2" style="vertical-align: middle">Aksi</th>
-                        </tr>
-                        <tr>
-                            <th>Pemberi</th>
-                            <th>Penerima</th>
-                            <th>Mulai</th>
-                            <th>Selesai</th>
-                        </tr>
-                    </thead>
-                </table>
             </div>
         </div>
     </section>
+
+    {{-- Modal Upload File --}}
+    <div class="modal fade" id="modalUploadFile" tabindex="-1" role="dialog" aria-labelledby="modalLabelUploadFile"
+        aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <form id="formUploadFile" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Upload File Laporan Pekerjaan</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="hidden" name="job_id">
+                            <label for="reportFile">Upload File Laporan Pekerjaan</label>
+                            <input type="file" class="form-control-file" id="reportFile" name="report_file">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary rounded-partner">Upload</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -118,9 +173,7 @@
                 scrollX: true,
                 autoWidth: true,
                 pageLength: 10,
-                order: [
-                    [5, 'asc']
-                ],
+                ordering: false,
                 lengthMenu: [
                     [10, 25, 50, 100],
                     [10, 25, 50, 100]
@@ -146,7 +199,7 @@
                     type: "GET",
                     data: function(data) {
                         data.status = $('#statusFilter').find(':selected').val();
-                    },
+                    }
                 },
                 columns: [{
                         data: 'DT_RowIndex',
@@ -159,51 +212,58 @@
                         data: 'assigner',
                         name: 'assigner',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false,
                     },
                     {
                         data: 'assignee',
                         name: 'assignee',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false,
                     },
                     {
                         data: 'department',
                         name: 'department',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false,
                     },
                     {
-                        data: 'title',
-                        name: 'title',
+                        data: 'detail',
+                        name: 'detail',
                         class: 'text-center',
                         orderable: false
                     },
                     {
                         data: 'start_date',
                         name: 'start_date',
-                        class: 'text-center'
+                        class: 'text-center',
+                        orderable: false
                     },
                     {
                         data: 'end_date',
                         name: 'end_date',
-                        class: 'text-center'
+                        class: 'text-center',
+                        orderable: false
                     },
                     {
                         data: 'time_remaining',
                         name: 'time_remaining',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false,
                     },
                     {
-                        data: 'feedback',
-                        name: 'feedback',
+                        data: 'report_file',
+                        name: 'report_file',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false,
                     },
                     {
-                        data: 'feedback',
-                        name: 'feedback',
+                        data: 'notes',
+                        name: 'notes',
                         class: 'text-center',
                         orderable: false
                     },
@@ -211,19 +271,22 @@
                         data: 'completion_efficiency',
                         name: 'completion_efficiency',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false,
                     },
                     {
                         data: 'status',
                         name: 'status',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false,
                     },
                     {
-                        data: 'feedback',
-                        name: 'feedback',
+                        data: 'revisions',
+                        name: 'revisions',
                         class: 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searchable: false,
                     },
                     {
                         data: 'actions',
@@ -232,18 +295,28 @@
                         searchable: false,
                         class: 'text-center'
                     },
-                ],
-                drawCallback: function() {
-                    $('[data-toggle="tooltip"]').tooltip({
-                        container: 'body',
-                        trigger: 'hover'
-                    });
-                }
+                ]
             });
 
             $("#statusFilter").on('change', function() {
                 table.ajax.reload();
             });
+
+            /**
+             * 24 June 2025
+             **/
+            $('#jobTable').on('xhr.dt', function(e, settings, json, xhr) {
+                if (json.total_efficiency !== null) {
+                    $('#totalEfficiencyOutput').val(json.total_efficiency + '%');
+                } else {
+                    $('#totalEfficiencyOutput').val('0%');
+                }
+            });
         });
+
+        function modalUploadReportFile(id) {
+            $('#formUploadFile').attr('action', "{{ route('jobs.upload_report', ':id') }}".replace(':id', id));
+            $('#modalUploadFile').modal('show');
+        }
     </script>
 @endpush
