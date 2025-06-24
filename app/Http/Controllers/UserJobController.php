@@ -543,9 +543,7 @@ class UserJobController extends Controller
             }
 
             $explodedFeedback = explode('-', $request->feedback);
-            $feedback = $explodedFeedback[1] == '1'
-                ? $explodedFeedback[1]
-                : 'Pengerjaan ke-' . $explodedFeedback[1]
+            $feedback = 'Pengerjaan ke-' . $explodedFeedback[1]
                 . "\n" . "tgl. $today s.d. " . $request->end_date . "\n" . $request->notes;
 
             $job->update([
@@ -581,12 +579,12 @@ class UserJobController extends Controller
         DB::beginTransaction();
 
         try {
-            if ($request->action === 'approve') {
+            if ($request->action == 'approve') {
                 $job->update([
                     'status' => 'completed',
                     'updated_at' => now(),
                 ]);
-            } elseif ($request->action === 'revisi') {
+            } elseif ($request->action == 'revisi') {
                 $job->update([
                     'status' => 'revision',
                     'notes' => $request->notes,
