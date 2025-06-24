@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class UserJobExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents, WithStyles
+class MyTaskExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents, WithStyles
 {
     protected $startDate;
     protected $endDate;
@@ -27,18 +27,11 @@ class UserJobExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
     public function collection()
     {
         $jobs = UserJob::with(['assigner', 'assignee', 'assignee.department'])
+            ->where('assignee_id', Auth::user()->id)
             ->when($this->startDate && $this->endDate, function ($query) {
                 $query->whereBetween('start_date', [$this->startDate, $this->endDate]);
             })
             ->orderBy('created_at', 'desc');
-
-        $roleId = Auth::user()->role_id;
-
-        if ($roleId == 3) {
-            $jobs->where('department_id', Auth::user()->department_id);
-        } else if ($roleId == 5) {
-            $jobs->where('assigner_id', Auth::id());
-        }
 
         $no = 1;
 

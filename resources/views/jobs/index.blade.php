@@ -72,6 +72,7 @@
                                         <option value="cancelled">Cancelled</option>
                                         <option value="checking">Checking</option>
                                         <option value="completed">Completed</option>
+                                        <option value="revision">Revision</option>
                                     </select>
                                 </div>
 
@@ -101,17 +102,26 @@
                             </div>
 
                             {{-- Total Point Wrapper --}}
-                            <div id="totalEfficiencyWrapper" class="mb-4 mx-3" style="display: none">
-                                <form>
-                                    <div class="form-group row">
-                                        <label for="totalEfficiencyOutput" class="col-form-label">
-                                            Total Point
-                                        </label>
-                                        <div class="col-md-1">
-                                            <input type="text" class="form-control" id="totalEfficiencyOutput" disabled>
-                                        </div>
+                            <div class="row mb-4">
+                                <div class="col-2">
+                                    <div id="timeWrapper">
+                                        <input type="text" id="time" class="form-control" value="Tue, 10 Jan 2022"
+                                            disabled>
                                     </div>
-                                </form>
+                                </div>
+                                <div id="totalEfficiencyWrapper" class="col-6" style="display: none">
+                                    <form>
+                                        <div class="form-group row">
+                                            <label for="totalEfficiencyOutput" class="col-form-label">
+                                                Total Point
+                                            </label>
+                                            <div class="col-md-1">
+                                                <input type="text" class="form-control" id="totalEfficiencyOutput"
+                                                    disabled>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
 
                             <table class="table table-bordered table-striped text-sm" id="jobTable" style="width:100%">
@@ -121,7 +131,7 @@
                                         <th colspan="2" style="text-align: center">Penugasan</th>
                                         <th rowspan="2" style="vertical-align: middle">Divisi</th>
                                         <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
-                                        <th colspan="2" style="text-align: center">Tanggal</th>
+                                        <th colspan="3" style="text-align: center">Tanggal</th>
                                         <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari</th>
                                         <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan</th>
                                         <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan</th>
@@ -134,6 +144,7 @@
                                         <th>Pemberi</th>
                                         <th>Penerima</th>
                                         <th>Mulai</th>
+                                        <th>Akhir</th>
                                         <th>Selesai</th>
                                     </tr>
                                 </thead>
@@ -242,13 +253,13 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Masukan</label>
-                            <textarea id="edit_feedback" class="form-control"></textarea>
+                            <label>Adendum/Catatan</label>
+                            <textarea id="edit_notes" class="form-control"></textarea>
                         </div>
 
                         <div class="form-group">
                             <label>Keterangan</label>
-                            <input type="text" id="edit_notes" class="form-control muted" readonly>
+                            <input type="text" id="edit_feedback" class="form-control muted" readonly>
                         </div>
                     </div>
 
@@ -413,8 +424,7 @@
                         data: 'job_detail',
                         name: 'job_detail',
                         class: 'text-center',
-                        orderable: false,
-                        searchable: false
+                        orderable: false
                     },
                     {
                         data: 'start_date',
@@ -426,6 +436,13 @@
                     {
                         data: 'end_date',
                         name: 'end_date',
+                        class: 'text-center',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'completed_at',
+                        name: 'completed_at',
                         class: 'text-center',
                         orderable: false,
                         searchable: false
@@ -445,8 +462,8 @@
                         searchable: false
                     },
                     {
-                        data: 'notes',
-                        name: 'notes',
+                        data: 'feedback',
+                        name: 'feedback',
                         class: 'text-center',
                         orderable: false,
                         searchable: false
@@ -523,7 +540,7 @@
             $('#edit_end_date').on('change', function() {
                 const newDate = $(this).val();
                 if (!endDateChanged && newDate !== originalEndDate) {
-                    $('#edit_notes').val('Pengerjaan ke-' + editCount);
+                    $('#edit_feedback').val('Pengerjaan ke-' + editCount);
                     endDateChanged = true;
                 }
             });
@@ -623,6 +640,8 @@
                 });
             });
 
+            updateTime(); // sekali saat awal
+            setInterval(updateTime, 1000); // update tiap 1 detik
         });
 
         function modalEdit(button) {
@@ -633,11 +652,14 @@
                 $('#edit_detail').val(data.job_detail);
                 $('#edit_start_date').val(data.start_date);
                 $('#edit_end_date').val(data.end_date);
-                $('#edit_feedback').val(data.feedback ?? '');
-                $('#edit_notes').val(data.notes ?? '');
+
+                const feedback = data.feedback;
+                const splittedFeedback = feedback.split('tgl');
+
+                $('#edit_feedback').val(splittedFeedback[0]);
 
                 originalEndDate = data.end_date;
-                editCount = countNotesEdit(data.notes);
+                editCount = countFeedback(data.feedback);
                 endDateChanged = false;
 
                 $('#editJobModal').modal('show');
@@ -652,7 +674,7 @@
             $('#modalPengecekanJob').modal('show');
         }
 
-        function countNotesEdit(notes) {
+        function countFeedback(notes) {
             if (!notes) return 1;
             const matches = notes.match(/Pengerjaan ke-(\d+)/);
             return matches ? parseInt(matches[1]) + 1 : 2;
@@ -698,6 +720,28 @@
                     });
                 }
             });
+        }
+
+        function updateTime() {
+            const now = new Date();
+
+            const options = {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+                timeZone: 'Asia/Jakarta' // waktu WIB
+            };
+
+            const formatted = now.toLocaleString('id-ID', options).replace(',', '');
+            const parts = formatted.split(' ');
+            const final = `${parts[0]}, ${parts.slice(1).join(' ')}`;
+
+            $('#time').val(final);
         }
     </script>
 @endpush

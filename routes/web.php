@@ -179,6 +179,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/my-tasks', 'myTasks')->name('jobs.my_tasks');
             Route::post('/store', 'store')->name('jobs.store');
             Route::get('/upload/export', 'export')->name('jobs.export');
+            Route::get('/upload/export/my-tasks', 'exportMyTasks')->name('jobs.export.my_tasks');
             Route::post('/upload/import', 'import')->name('jobs.import');
             Route::get('/upload/report/download-template', 'downloadTemplateImport')->name('jobs.download_template');
             Route::post('/upload/report/{id}', 'uploadFile')->name('jobs.upload_report');

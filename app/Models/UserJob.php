@@ -13,7 +13,7 @@ class UserJob extends Model
 
     public function getStatusAttribute(): string
     {
-        if (in_array($this->attributes['status'], ['completed', 'cancelled', 'checking'])) {
+        if (in_array($this->attributes['status'], ['completed', 'cancelled', 'checking', 'revision'])) {
             return $this->attributes['status'];
         }
 

@@ -17,6 +17,7 @@ use App\Models\User;
 
 use App\Imports\UserJobImport;
 use App\Exports\UserJobExport;
+use App\Exports\MyTaskExport;
 
 class UserJobController extends Controller
 {
@@ -56,13 +57,19 @@ class UserJobController extends Controller
 
             $searchKeyword = $request->input('search')['value'] ?? null;
             if (!empty($searchKeyword)) {
-                $hasAssigneeSearch = User::where('name', 'like', "%{$searchKeyword}%")->exists();
+                $hasAssigneeSearch = User::where('name', 'like', "%{$searchKeyword}%")
+                    ->orWhereHas('department', function ($query) use ($searchKeyword) {
+                        $query->where('name', 'like', "%{$searchKeyword}%");
+                    })->exists();
             }
 
             if ($hasAssigneeSearch) {
                 $clonedJobs = clone $jobs;
                 $filteredJobs = $clonedJobs->whereHas('assignee', function ($query) use ($searchKeyword) {
-                    $query->where('name', 'like', "%{$searchKeyword}%");
+                    $query->where('name', 'like', "%{$searchKeyword}%")
+                        ->orWhereHas('department', function ($query) use ($searchKeyword) {
+                            $query->where('name', 'like', "%{$searchKeyword}%");
+                        });
                 })->get();
 
                 foreach ($filteredJobs as $job) {
@@ -96,7 +103,6 @@ class UserJobController extends Controller
                 ->addColumn('assigner', fn($job) => $job->assigner->name ?? '-')
                 ->addColumn('assignee', fn($job) => $job->assignee->name ?? '-')
                 ->addColumn('department', fn($job) => $job->assignee->department->name ?? '-')
-                ->addColumn('detail', fn($job) => $job->job_detail ?? '-')
                 ->addColumn('time_remaining', function ($job) {
                     if (!$job->end_date || !$job->start_date) return '-';
 
@@ -132,6 +138,10 @@ class UserJobController extends Controller
                     return $job->report_file ? '<a href="' . asset('storage/' . $job->report_file) . '" target="_blank" class="btn btn-sm btn-danger mr-1" title="Lihat Laporan" type="button">
                         <i class="fas fa-file-pdf"></i>
                     </a>' : '-';
+                })
+                ->addColumn('completed_at', fn($job) => $job->completed_at ? Carbon::parse($job->completed_at)->format('Y-m-d') : '-')
+                ->addColumn('feedback', function ($job) {
+                    return $job->feedback ? nl2br($job->feedback) : '-';
                 })
                 ->addColumn('completion_efficiency', function ($job) {
                     if (!$job->start_date || !$job->end_date) return '-';
@@ -226,7 +236,7 @@ class UserJobController extends Controller
                      </button>';
                     }
 
-                    if ($job->status == 'checking') {
+                    if ($job->status == 'checking' && $job->assigner_id == $userId) {
                         $buttons .= '<button class="btn btn-sm btn-success m-1 rounded-partner" title="Approve" type="button" onclick="modalApprove(this)" data-id="' . $job->id . '">
                         <i class="fas fa-clipboard-check"></i>
                      </button>';
@@ -246,12 +256,15 @@ class UserJobController extends Controller
                         });
                     });
                 })
+                ->filterColumn('job_detail', function ($query, $keyword) {
+                    $query->where('job_detail', 'like', "%{$keyword}%");
+                })
                 ->with([
                     'total_efficiency' => (!empty($searchKeyword) && $efficiencyCount > 0)
                         ? round($efficiencySum)
                         : 0
                 ])
-                ->rawColumns(['actions', 'report_file'])
+                ->rawColumns(['actions', 'report_file', 'feedback'])
                 ->make(true);
         }
 
@@ -316,6 +329,10 @@ class UserJobController extends Controller
                 ->addColumn('assignee', fn($job) => $job->assignee->name ?? '-')
                 ->addColumn('department', fn($job) => $job->assignee->department->name ?? '-')
                 ->addColumn('detail', fn($job) => $job->job_detail ?? '-')
+                ->addColumn('completed_at', fn($job) => $job->completed_at ? Carbon::parse($job->completed_at)->format('Y-m-d') : '-')
+                ->addColumn('feedback', function ($job) {
+                    return $job->feedback ? nl2br($job->feedback) : '-';
+                })
                 ->addColumn('time_remaining', function ($job) {
                     if (!$job->end_date || !$job->start_date) return '-';
 
@@ -440,11 +457,11 @@ class UserJobController extends Controller
                         : 0
                 ])
                 ->addColumn('actions', function ($job) {
-                    return '<button class="btn btn-sm btn-warning mr-1" title="Upload Bukti Pekerjaan Selesai" type="button" onclick="modalUploadReportFile(' . $job->id . ')">
+                    return $job->status != 'cancelled' ? '<button class="btn btn-sm btn-warning mr-1" title="Upload Bukti Pekerjaan Selesai" type="button" onclick="modalUploadReportFile(' . $job->id . ')">
                         <i class="fas fa-upload"></i>
-                    </button>';
+                    </button>' : '';
                 })
-                ->rawColumns(['actions', 'report_file'])
+                ->rawColumns(['actions', 'report_file', 'feedback'])
                 ->make(true);
         }
         return view('jobs.my_tasks');
@@ -475,7 +492,7 @@ class UserJobController extends Controller
                 'job_detail' => $request->detail,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
-                'notes' => 'Pengerjaan ke-1',
+                'feedback' => 'Pengerjaan ke-1',
             ]);
 
             DB::commit();
@@ -513,6 +530,7 @@ class UserJobController extends Controller
             $now = Carbon::today();
             $start = Carbon::parse($request->start_date)->startOfDay();
             $end = Carbon::parse($request->end_date)->startOfDay();
+            $today = Carbon::today()->format('Y-m-d');
 
             if ($request->action == 'cancel') {
                 $status = 'cancelled';
@@ -524,12 +542,17 @@ class UserJobController extends Controller
                 ], 400);
             }
 
+            $explodedFeedback = explode('-', $request->feedback);
+            $feedback = $explodedFeedback[1] == '1'
+                ? $explodedFeedback[1]
+                : 'Pengerjaan ke-' . $explodedFeedback[1]
+                . "\n" . "tgl. $today s.d. " . $request->end_date . "\n" . $request->notes;
+
             $job->update([
                 'title'       => $request->title,
                 'job_detail'  => $request->job_detail,
                 'end_date'    => $request->end_date,
-                'feedback'    => $request->feedback,
-                'notes'       => $request->notes,
+                'feedback'    => $feedback,
                 'status'      => $status,
             ]);
 
@@ -661,6 +684,17 @@ class UserJobController extends Controller
         return Excel::download(
             new UserJobExport($startDate, $endDate),
             'LAPORAN PENUGASAN - ' . $startDate . ' - ' . $endDate . '.xlsx'
+        );
+    }
+
+    public function exportMyTasks(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        return Excel::download(
+            new MyTaskExport($startDate, $endDate),
+            'REKAP TUGAS SAYA - ' . $startDate . ' - ' . $endDate . '.xlsx'
         );
     }
 

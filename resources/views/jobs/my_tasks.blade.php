@@ -71,11 +71,13 @@
                                     <option value="cancelled">Cancelled</option>
                                     <option value="checking">Checking</option>
                                     <option value="completed">Completed</option>
+                                    <option value="revision">Revision</option>
                                 </select>
                             </div>
 
                             <div class="col-md-10 text-right">
-                                <form method="GET" action="#" class="form-inline justify-content-end">
+                                <form method="GET" action="{{ route('jobs.export.my_tasks') }}"
+                                    class="form-inline justify-content-end">
                                     <input type="date" name="start_date" class="form-control mr-2" required>
                                     <input type="date" name="end_date" class="form-control mr-2" required>
                                     <button type="submit" class="btn btn-success rounded-partner">
@@ -85,18 +87,27 @@
                             </div>
                         </div>
                         <div class="table-responsive w-100">
-                            {{-- Total Point Wrapper --}}
-                            <div id="totalEfficiencyWrapper" class="mb-4 mx-3">
-                                <form>
-                                    <div class="form-group row">
-                                        <label for="totalEfficiencyOutput" class="col-form-label">
-                                            Total Point
-                                        </label>
-                                        <div class="col-md-1">
-                                            <input type="text" class="form-control" id="totalEfficiencyOutput" disabled>
-                                        </div>
+                            <div class="row mb-4">
+                                {{-- Total Point Wrapper --}}
+                                <div class="col-2">
+                                    <div id="timeWrapper">
+                                        <input type="text" id="time" class="form-control"
+                                            value="Tue, 10 Jan 2022 00:00:00" disabled>
                                     </div>
-                                </form>
+                                </div>
+                                <div id="totalEfficiencyWrapper" class="col-6">
+                                    <form>
+                                        <div class="form-group row">
+                                            <label for="totalEfficiencyOutput" class="col-form-label ml-3">
+                                                Total Point
+                                            </label>
+                                            <div class="col-md-1">
+                                                <input type="text" class="form-control" id="totalEfficiencyOutput"
+                                                    disabled>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
 
                             <table class="table table-bordered table-striped" id="jobTable" style="width:100%">
@@ -106,7 +117,7 @@
                                         <th colspan="2" style="text-align: center">Penugasan</th>
                                         <th rowspan="2" style="vertical-align: middle">Divisi</th>
                                         <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
-                                        <th colspan="2" style="text-align: center">Tanggal</th>
+                                        <th colspan="3" style="text-align: center">Tanggal</th>
                                         <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari</th>
                                         <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan</th>
                                         <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan</th>
@@ -119,6 +130,7 @@
                                         <th>Pemberi</th>
                                         <th>Penerima</th>
                                         <th>Mulai</th>
+                                        <th>Akhir</th>
                                         <th>Selesai</th>
                                     </tr>
                                 </thead>
@@ -248,6 +260,12 @@
                         orderable: false
                     },
                     {
+                        data: 'completed_at',
+                        name: 'completed_at',
+                        class: 'text-center',
+                        orderable: false
+                    },
+                    {
                         data: 'time_remaining',
                         name: 'time_remaining',
                         class: 'text-center',
@@ -262,8 +280,8 @@
                         searchable: false,
                     },
                     {
-                        data: 'notes',
-                        name: 'notes',
+                        data: 'feedback',
+                        name: 'feedback',
                         class: 'text-center',
                         orderable: false
                     },
@@ -306,17 +324,42 @@
              * 24 June 2025
              **/
             $('#jobTable').on('xhr.dt', function(e, settings, json, xhr) {
-                if (json.total_efficiency !== null) {
+                if (json.total_efficiency != null) {
                     $('#totalEfficiencyOutput').val(json.total_efficiency + '%');
                 } else {
                     $('#totalEfficiencyOutput').val('0%');
                 }
             });
+
+            updateTime(); // sekali saat awal
+            setInterval(updateTime, 1000); // update tiap 1 detik
         });
 
         function modalUploadReportFile(id) {
             $('#formUploadFile').attr('action', "{{ route('jobs.upload_report', ':id') }}".replace(':id', id));
             $('#modalUploadFile').modal('show');
+        }
+
+        function updateTime() {
+            const now = new Date();
+
+            const options = {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+                timeZone: 'Asia/Jakarta' // waktu WIB
+            };
+
+            const formatted = now.toLocaleString('id-ID', options).replace(',', '');
+            const parts = formatted.split(' ');
+            const final = `${parts[0]}, ${parts.slice(1).join(' ')}`;
+
+            $('#time').val(final);
         }
     </script>
 @endpush

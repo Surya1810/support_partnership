@@ -37,7 +37,7 @@ class UserJobImport implements ToCollection
                 'job_detail' => $detail,
                 'start_date' => $start,
                 'end_date' => $end,
-                'notes' => 'Pengerjaan ke-1',
+                'feedback' => 'Pengerjaan ke-1',
             ]);
         });
     }
