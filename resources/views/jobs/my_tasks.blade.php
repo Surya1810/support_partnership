@@ -101,7 +101,7 @@
                                             <label for="totalEfficiencyOutput" class="col-form-label ml-3">
                                                 Total Point
                                             </label>
-                                            <div class="col-md-1">
+                                            <div class="col-md-2">
                                                 <input type="text" class="form-control" id="totalEfficiencyOutput"
                                                     disabled>
                                             </div>

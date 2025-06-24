@@ -109,13 +109,13 @@
                                             disabled>
                                     </div>
                                 </div>
-                                <div id="totalEfficiencyWrapper" class="col-6" style="display: none">
+                                <div id="totalEfficiencyWrapper" class="col-6 ml-3" style="display: none">
                                     <form>
                                         <div class="form-group row">
                                             <label for="totalEfficiencyOutput" class="col-form-label">
                                                 Total Point
                                             </label>
-                                            <div class="col-md-1">
+                                            <div class="col-md-2">
                                                 <input type="text" class="form-control" id="totalEfficiencyOutput"
                                                     disabled>
                                             </div>
@@ -565,6 +565,9 @@
                         $('#editJobModal').modal('hide');
                         $('#jobTable').DataTable().ajax.reload(null, false);
                         showToast('success', res.message);
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 2000);
                     },
                     error: function(xhr) {
                         console.log(xhr);
@@ -628,6 +631,9 @@
                         $('#modalPengecekanJob').modal('hide');
                         $('#jobTable').DataTable().ajax.reload(null, false);
                         showToast('success', res.message);
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 2000);
                     },
                     error: function(xhr) {
                         console.error(xhr.responseText);
@@ -654,8 +660,9 @@
                 $('#edit_end_date').val(data.end_date);
 
                 const feedback = data.feedback;
-                const splittedFeedback = feedback.split('tgl');
+                const splittedFeedback = feedback.split('\n');
 
+                $('#edit_notes').val(splittedFeedback[2]);
                 $('#edit_feedback').val(splittedFeedback[0]);
 
                 originalEndDate = data.end_date;
@@ -689,36 +696,6 @@
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
-            });
-        }
-
-        function markJobDone(button) {
-            const jobId = $(button).data('id');
-
-            Swal.fire({
-                title: 'Yakin ingin menandai pekerjaan ini selesai?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, tandai selesai',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/jobs/${jobId}/complete`,
-                        type: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function(res) {
-                            $('#jobTable').DataTable().ajax.reload();
-                            showToast('success', res.message);
-                        },
-                        error: function(err) {
-                            showToast('error', 'Gagal menandai pekerjaan ini selesai');
-                        }
-                    });
-                }
             });
         }
 
