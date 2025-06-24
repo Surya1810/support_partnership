@@ -77,7 +77,8 @@
 
                                 <div class="col-md-3">
                                     <div class="btn-group" role="group">
-                                        <button class="btn btn-primary rounded-partner" type="button" id="buttonAddJobModal">
+                                        <button class="btn btn-primary rounded-partner" type="button"
+                                            id="buttonAddJobModal">
                                             <i class="fas fa-plus"></i> Tambah
                                         </button>
                                         <button class="btn btn-warning rounded-partner" type="button"
@@ -284,6 +285,48 @@
                         <button type="submit" class="btn btn-primary rounded-partner">
                             <i class="fas fa-upload"></i> Upload
                         </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Modal Pengecekan --}}
+    <div class="modal fade" id="modalPengecekanJob" tabindex="-1" role="dialog"
+        aria-labelledby="modalLabelPengecekan" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <form id="formPengecekan">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Pengecekan</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="hidden" name="job_id" id="job_id_hidden">
+                            <label>Hasil Pengecekan</label><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="action" id="approveRadio"
+                                    value="approve" required>
+                                <label class="form-check-label" for="approveRadio">Approve</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="action" id="revisiRadio"
+                                    value="revisi">
+                                <label class="form-check-label" for="revisiRadio">Revisi</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group d-none" id="notesGroup">
+                            <label for="notes">Catatan Revisi</label>
+                            <textarea name="notes" id="notes" class="form-control" rows="3" placeholder="Tulis revisi..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary rounded-partner">Submit</button>
                     </div>
                 </div>
             </form>
@@ -541,6 +584,45 @@
                     $('#modalImportFile').modal('show');
                 });
             });
+
+            $('input[name="action"]').on('change', function() {
+                if ($(this).val() === 'revisi') {
+                    $('#notesGroup').removeClass('d-none');
+                    $('#notes').attr('required', true);
+                } else {
+                    $('#notesGroup').addClass('d-none');
+                    $('#notes').removeAttr('required');
+                }
+            });
+
+            $('#formPengecekan').on('submit', function(e) {
+                e.preventDefault();
+
+                const jobId = $('#job_id_hidden').val();
+                const formData = $(this).serialize();
+
+                console.log('Form Data:', formData);
+
+                $.ajax({
+                    url: `/jobs/${jobId}/mark-complete`,
+                    method: "POST",
+                    data: formData,
+                    success: function(res) {
+                        $('#modalPengecekanJob').modal('hide');
+                        $('#jobTable').DataTable().ajax.reload(null, false);
+                        showToast('success', res.message);
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        let msg = 'Gagal menyelesaikan tugas';
+                        if (xhr.responseJSON?.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        showToast('error', msg);
+                    }
+                });
+            });
+
         });
 
         function modalEdit(button) {
@@ -560,6 +642,14 @@
 
                 $('#editJobModal').modal('show');
             });
+        }
+
+        function modalApprove(el) {
+            const id = $(el).data('id');
+            $('#job_id_hidden').val(id);
+            $('#formPengecekan')[0].reset();
+            $('#notesGroup').addClass('d-none');
+            $('#modalPengecekanJob').modal('show');
         }
 
         function countNotesEdit(notes) {

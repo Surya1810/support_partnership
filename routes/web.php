@@ -184,7 +184,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/upload/report/{id}', 'uploadFile')->name('jobs.upload_report');
             Route::get('/{id}', 'show')->name('jobs.show');
             Route::put('/{id}', 'update')->name('jobs.update');
-            Route::post('/{id}/complete', 'markComplete')->name('jobs.complete');
+            Route::post('/{id}/mark-complete', 'markComplete')->name('jobs.complete');
         });
 
     /**

@@ -215,24 +215,24 @@ class UserJobController extends Controller
 
                     return $rowClass;
                 })
-                ->addColumn('revisions', fn($job) => $job->feedback ?? '-')
+                ->addColumn('revisions', fn($job) => $job->notes ?? '-')
                 ->addColumn('actions', function ($job) {
                     $buttons = '';
                     $userId = Auth::id();
 
                     if ($job->assigner_id == $userId) {
-                        $buttons .= '<button class="btn btn-sm btn-warning mr-1" title="Edit" type="button" onclick="modalEdit(this)" data-id="' . $job->id . '">
+                        $buttons .= '<button class="btn btn-sm btn-warning mr-1 rounded-partner" title="Edit" type="button" onclick="modalEdit(this)" data-id="' . $job->id . '">
                         <i class="fas fa-pencil-alt"></i>
                      </button>';
                     }
 
                     if ($job->status == 'checking') {
-                        $buttons .= '<button class="btn btn-sm btn-info m-1" title="Approve" type="button" onclick="modalApprove(this)" data-id="' . $job->id . '">
-                        <i class="fas fa-check"></i>
+                        $buttons .= '<button class="btn btn-sm btn-success m-1 rounded-partner" title="Approve" type="button" onclick="modalApprove(this)" data-id="' . $job->id . '">
+                        <i class="fas fa-clipboard-check"></i>
                      </button>';
                     }
 
-                    return $buttons;
+                    return '<div class="text-nowrap">' . $buttons . '</div>';
                 })
                 ->filterColumn('assignee', function ($query, $keyword) {
                     $query->whereHas('assignee', function ($query) use ($keyword) {
@@ -433,7 +433,7 @@ class UserJobController extends Controller
 
                     return $rowClass;
                 })
-                ->addColumn('revisions', fn($job) => $job->feedback ?? '-')
+                ->addColumn('revisions', fn($job) => $job->notes ?? '-')
                 ->with([
                     'total_efficiency' => ($efficiencyCount > 0)
                         ? round($efficiencySum)
@@ -542,27 +542,40 @@ class UserJobController extends Controller
         }
     }
 
-    public function markComplete($id)
+    public function markComplete(Request $request, $id)
     {
         $job = UserJob::findOrFail($id);
 
-        if (Auth::user()->id != $job->assignee_id) {
+        if (Auth::user()->id != $job->assigner_id) {
             return response()->json(['message' => 'Anda tidak berhak menyelesaikan pekerjaan ini.'], 403);
         }
+
+        $request->validate([
+            'action' => 'required|in:approve,revisi',
+            'notes' => 'nullable|string|max:1000'
+        ]);
 
         DB::beginTransaction();
 
         try {
-            $job->update([
-                'status' => 'completed',
-                'updated_at' => now(),
-            ]);
+            if ($request->action === 'approve') {
+                $job->update([
+                    'status' => 'completed',
+                    'updated_at' => now(),
+                ]);
+            } elseif ($request->action === 'revisi') {
+                $job->update([
+                    'status' => 'revision',
+                    'notes' => $request->notes,
+                    'updated_at' => now(),
+                ]);
+            }
 
             DB::commit();
-            return response()->json(['message' => 'Pekerjaan berhasil ditandai selesai.']);
+            return response()->json(['message' => 'Pekerjaan berhasil diperbarui.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Gagal menyelesaikan pekerjaan.'], 500);
+            return response()->json(['message' => $e->getMessage()], 500); // sementara
         }
     }
 
