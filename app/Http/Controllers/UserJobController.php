@@ -588,6 +588,7 @@ class UserJobController extends Controller
                 $job->update([
                     'status' => 'revision',
                     'notes' => $request->notes,
+                    'completed_at' => null,
                     'updated_at' => now(),
                 ]);
             }
