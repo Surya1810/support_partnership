@@ -45,8 +45,8 @@ class UserJobController extends Controller
 
             if ($roleId == 3) {
                 $jobs = $jobs->where('department_id', Auth::user()->department_id);
-            } else if ($roleId == 5) {
-                $jobs = $jobs->where('assigner_id', Auth::id());
+            } else if ($roleId == 5 || $roleId == 4) {
+                $jobs = $jobs->where('assigner_id', Auth::user()->id);
             }
 
             $clonedJobs = clone $jobs;

@@ -36,8 +36,8 @@ class UserJobExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
 
         if ($roleId == 3) {
             $jobs->where('department_id', Auth::user()->department_id);
-        } else if ($roleId == 5) {
-            $jobs->where('assigner_id', Auth::id());
+        } else if ($roleId == 5 || $roleId == 4) {
+            $jobs->where('assigner_id', Auth::user()->id);
         }
 
         $no = 1;
