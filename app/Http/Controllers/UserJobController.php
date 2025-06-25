@@ -343,7 +343,7 @@ class UserJobController extends Controller
                         $completedAt = Carbon::parse($job->completed_at);
 
                         if ($completedAt->equalTo($endDate)) {
-                            return "0 days";
+                            return "0";
                         } elseif ($completedAt->lessThan($endDate)) {
                             $diff = $endDate->diffInDays($completedAt);
                             return "+" . $diff * -1; // plus
@@ -627,7 +627,7 @@ class UserJobController extends Controller
             }
 
             $request->validate([
-                'report_file' => 'required|mimes:zip,rar,xlsx,xls,csv,pdf,jpg,jpeg,png|max:20480'
+                'report_file' => 'required|mimes:zip,rar,xlsx,xls,csv,pdf,jpg,jpeg,png|max:122880'
             ]);
 
             $file = $request->file('report_file');
