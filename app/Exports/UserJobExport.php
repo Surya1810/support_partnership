@@ -123,7 +123,7 @@ class UserJobExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
         $start = Carbon::parse($job->start_date);
         $end = Carbon::parse($job->end_date);
 
-        if ($start->equalTo($end)) return '-';
+        if ($start->equalTo($end)) return '0%';
 
         $totalDuration = $start->diffInSeconds($end);
 

@@ -24,6 +24,32 @@
             vertical-align: bottom;
             cursor: pointer;
         }
+
+        <style>@media (max-width: 576px) {
+
+            .dataTables_length,
+            .dataTables_filter,
+            .dataTables_info,
+            .dataTables_paginate {
+                text-align: center !important;
+                float: none !important;
+                width: 100%;
+            }
+
+            .dataTables_filter input {
+                width: 100% !important;
+            }
+
+            .paginate_button {
+                margin: 2px;
+            }
+
+            #jobTable_wrapper .row {
+                display: block;
+            }
+        }
+    </style>
+
     </style>
     <link rel="stylesheet" href="{{ asset('assets/adminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet"
@@ -63,7 +89,7 @@
                     <div class="card card-outline rounded-partner card-primary">
                         <div class="card-body table-responsive w-100">
                             <div class="row mb-3 align-items-end">
-                                <div class="col-md-2">
+                                <div class="col-12 col-md-2 mt-0">
                                     <select class="form-control" id="statusFilter">
                                         <option value="all" disabled selected>Pilih Status</option>
                                         <option value="all">Semua</option>
@@ -76,8 +102,8 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-3">
-                                    <div class="btn-group" role="group">
+                                <div class="col-12 col-md-3 my-3 my-md-0">
+                                    <div class="btn-group col-12 col-md-0" role="group">
                                         <button class="btn btn-primary rounded-partner" type="button"
                                             id="buttonAddJobModal">
                                             <i class="fas fa-plus"></i> Tambah
@@ -89,12 +115,14 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-7 text-right">
+                                <div class="col-12 col-md-7 mt-2 mt-0 text-right">
                                     <form method="GET" action="{{ route('jobs.export') }}"
                                         class="form-inline justify-content-end">
                                         <input type="date" name="start_date" class="form-control mr-2" required>
-                                        <input type="date" name="end_date" class="form-control mr-2" required>
-                                        <button type="submit" class="btn btn-success rounded-partner">
+                                        <input type="date" name="end_date" class="form-control mr-2 mt-2 mt-md-0"
+                                            required>
+                                        <button type="submit"
+                                            class="btn btn-success rounded-partner col-12 col-md-2 mt-2 mt-md-0">
                                             <i class="fas fa-file-excel"></i> Export Excel
                                         </button>
                                     </form>
@@ -102,17 +130,18 @@
                             </div>
 
                             {{-- Total Point Wrapper --}}
-                            <div class="row mb-4">
-                                <div class="col-2">
-                                    <div id="timeWrapper">
+                            <div class="row mb-4 mt-3 mt-md-0">
+                                <div class="col-12 col-md-2">
+                                    <div id="timeWrapper" class="mt-3 mt-md-0">
                                         <input type="text" id="time" class="form-control" value="Tue, 10 Jan 2022"
                                             disabled>
                                     </div>
                                 </div>
-                                <div id="totalEfficiencyWrapper" class="col-6 ml-3" style="display: none">
+                                <div id="totalEfficiencyWrapper" class="col-12 col-md-6 ml-0 ml-md-3" style="display: none">
                                     <form>
                                         <div class="form-group row">
-                                            <label for="totalEfficiencyOutput" class="col-form-label">
+                                            <label for="totalEfficiencyOutput"
+                                                class="col-form-label ml-2 ml-md-0 mt-2 mt-md-0">
                                                 Total Point
                                             </label>
                                             <div class="col-md-2">
@@ -124,31 +153,33 @@
                                 </div>
                             </div>
 
-                            <table class="table table-bordered table-striped text-sm" id="jobTable" style="width:100%">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th rowspan="2" style="vertical-align: middle">No.</th>
-                                        <th colspan="2" style="text-align: center">Penugasan</th>
-                                        <th rowspan="2" style="vertical-align: middle">Divisi</th>
-                                        <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
-                                        <th colspan="3" style="text-align: center">Tanggal</th>
-                                        <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari</th>
-                                        <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan</th>
-                                        <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan</th>
-                                        <th rowspan="2" style="vertical-align: middle">Point</th>
-                                        <th rowspan="2" style="vertical-align: middle">Status</th>
-                                        <th rowspan="2" style="vertical-align: middle">Revisi</th>
-                                        <th rowspan="2" style="vertical-align: middle">Aksi</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Pemberi</th>
-                                        <th>Penerima</th>
-                                        <th>Mulai</th>
-                                        <th>Akhir</th>
-                                        <th>Selesai</th>
-                                    </tr>
-                                </thead>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped text-sm" id="jobTable" style="width:100%">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th rowspan="2" style="vertical-align: middle">No.</th>
+                                            <th colspan="2" style="text-align: center">Penugasan</th>
+                                            <th rowspan="2" style="vertical-align: middle">Divisi</th>
+                                            <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
+                                            <th colspan="3" style="text-align: center">Tanggal</th>
+                                            <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari</th>
+                                            <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan</th>
+                                            <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan</th>
+                                            <th rowspan="2" style="vertical-align: middle">Point</th>
+                                            <th rowspan="2" style="vertical-align: middle">Status</th>
+                                            <th rowspan="2" style="vertical-align: middle">Revisi</th>
+                                            <th rowspan="2" style="vertical-align: middle">Aksi</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Pemberi</th>
+                                            <th>Penerima</th>
+                                            <th>Mulai</th>
+                                            <th>Akhir</th>
+                                            <th>Selesai</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -360,6 +391,7 @@
         let originalEndDate = null;
         let editCount = 1;
         let endDateChanged = false;
+        let isMobile = window.innerWidth <= 768;
 
         $(document).ready(function() {
             let table = $('#jobTable').DataTable({
@@ -367,6 +399,7 @@
                 autoWidth: true,
                 pageLength: 10,
                 ordering: false,
+                responsive: isMobile,
                 lengthMenu: [
                     [10, 25, 50, 100],
                     [10, 25, 50, 100]

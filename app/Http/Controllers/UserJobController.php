@@ -151,7 +151,7 @@ class UserJobController extends Controller
                     $end = Carbon::parse($job->end_date);
 
                     // Jika tidak ada rentang waktu
-                    if ($start->equalTo($end)) return '-';
+                    if ($start->equalTo($end)) return '0%';
 
                     $totalDuration = $start->diffInSeconds($end);
 
@@ -377,7 +377,7 @@ class UserJobController extends Controller
                     $end = Carbon::parse($job->end_date);
 
                     // Jika tidak ada rentang waktu
-                    if ($start->equalTo($end)) return '-';
+                    if ($start->equalTo($end)) return '0%';
 
                     $totalDuration = $start->diffInSeconds($end);
 
@@ -627,7 +627,7 @@ class UserJobController extends Controller
             }
 
             $request->validate([
-                'report_file' => 'required|mimes:pdf,jpg,jpeg,png|max:10240'
+                'report_file' => 'required|mimes:zip,rar,xlsx,xls,csv,pdf,jpg,jpeg,png|max:20480'
             ]);
 
             $file = $request->file('report_file');

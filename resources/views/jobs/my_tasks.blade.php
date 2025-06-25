@@ -62,7 +62,7 @@
                 <div class="card card-outline rounded-partner card-primary">
                     <div class="card-body table-responsive w-100">
                         <div class="row mb-3 align-items-end">
-                            <div class="col-md-2">
+                            <div class="col-12 col-md-2 mb-3 mb-md-0">
                                 <select class="form-control" id="statusFilter">
                                     <option value="all" disabled selected>Pilih Status</option>
                                     <option value="all">Semua</option>
@@ -75,12 +75,12 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-10 text-right">
+                            <div class="col-12 col-md-10 text-right">
                                 <form method="GET" action="{{ route('jobs.export.my_tasks') }}"
                                     class="form-inline justify-content-end">
-                                    <input type="date" name="start_date" class="form-control mr-2" required>
-                                    <input type="date" name="end_date" class="form-control mr-2" required>
-                                    <button type="submit" class="btn btn-success rounded-partner">
+                                    <input type="date" name="start_date" class="form-control mr-0 mr-md-2" required>
+                                    <input type="date" name="end_date" class="form-control mr-0 mr-md-2 mt-2 mt-md-0" required>
+                                    <button type="submit" class="btn btn-success rounded-partner col-12 col-md-2 mt-2 mt-md-0">
                                         <i class="fas fa-file-excel"></i> Export Excel
                                     </button>
                                 </form>
@@ -89,13 +89,13 @@
                         <div class="table-responsive w-100">
                             <div class="row mb-4">
                                 {{-- Total Point Wrapper --}}
-                                <div class="col-2">
+                                <div class="col-12 col-md-2 mt-3 mt-md-0">
                                     <div id="timeWrapper">
                                         <input type="text" id="time" class="form-control"
                                             value="Tue, 10 Jan 2022 00:00:00" disabled>
                                     </div>
                                 </div>
-                                <div id="totalEfficiencyWrapper" class="col-6">
+                                <div id="totalEfficiencyWrapper" class="col-12 col-md-6 mt-3 mt-md-0">
                                     <form>
                                         <div class="form-group row">
                                             <label for="totalEfficiencyOutput" class="col-form-label ml-3">
@@ -181,8 +181,11 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
+            let isMobile = window.innerWidth <= 768;
+
             let table = $('#jobTable').DataTable({
                 scrollX: true,
+                responsive: isMobile,
                 autoWidth: true,
                 pageLength: 10,
                 ordering: false,
