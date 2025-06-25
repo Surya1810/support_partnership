@@ -56,11 +56,6 @@ Route::middleware('auth')->group(function () {
     // Check
     Route::get('/check-user-extension/{userId}', [UserController::class, 'checkUserExtension']);
 
-    // Coming Soon
-    Route::get('/coming-soon', function () {
-        return view('coming_soon');
-    })->name('coming_soon');
-
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
     // Profile Section
@@ -162,13 +157,4 @@ Route::middleware('auth')->group(function () {
             Route::put('/{id}', 'update')->name('jobs.update');
             Route::post('/{id}/mark-complete', 'markComplete')->name('jobs.complete');
         });
-});
-
-Route::get('/debug-session', function () {
-    session(['check' => 'testing']);
-    return redirect('/check-session');
-});
-
-Route::get('/check-session', function () {
-    return session('check', 'no session found');
 });

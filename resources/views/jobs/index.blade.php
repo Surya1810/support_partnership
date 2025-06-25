@@ -5,52 +5,6 @@
 @endsection
 
 @push('css')
-    <style>
-        #jobTable_filter,
-        #jobTable_paginate {
-            float: right !important;
-        }
-
-        .gap-2 {
-            gap: 0.5rem;
-        }
-
-        .text-ellipsis {
-            display: inline-block;
-            max-width: 150px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            vertical-align: bottom;
-            cursor: pointer;
-        }
-
-        <style>@media (max-width: 576px) {
-
-            .dataTables_length,
-            .dataTables_filter,
-            .dataTables_info,
-            .dataTables_paginate {
-                text-align: center !important;
-                float: none !important;
-                width: 100%;
-            }
-
-            .dataTables_filter input {
-                width: 100% !important;
-            }
-
-            .paginate_button {
-                margin: 2px;
-            }
-
-            #jobTable_wrapper .row {
-                display: block;
-            }
-        }
-    </style>
-
-    </style>
     <link rel="stylesheet" href="{{ asset('assets/adminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet"
         href="{{ asset('assets/adminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
@@ -118,8 +72,8 @@
                                 <div class="col-12 col-md-7 mt-2 mt-0 text-right">
                                     <form method="GET" action="{{ route('jobs.export') }}"
                                         class="form-inline justify-content-end">
-                                        <input type="date" name="start_date" class="form-control mr-2" required>
-                                        <input type="date" name="end_date" class="form-control mr-2 mt-2 mt-md-0"
+                                        <input type="date" name="start_date" class="form-control mr-2" placeholder="Tanggal Mulai" required>
+                                        <input type="date" name="end_date" class="form-control mr-2 mt-2 mt-md-0" placeholder="Tanggal Akhir"
                                             required>
                                         <button type="submit"
                                             class="btn btn-success rounded-partner col-12 col-md-2 mt-2 mt-md-0">
@@ -161,7 +115,7 @@
                                             <th colspan="2" style="text-align: center">Penugasan</th>
                                             <th rowspan="2" style="vertical-align: middle">Divisi</th>
                                             <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
-                                            <th colspan="3" style="text-align: center">Tanggal</th>
+                                            <th colspan="3" style="text-align: center" id="dateHeaderColumn">Tanggal</th>
                                             <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari</th>
                                             <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan</th>
                                             <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan</th>
@@ -221,7 +175,7 @@
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label for="end_date">Tanggal Selesai</label>
+                                    <label for="end_date">Tanggal Akhir</label>
                                     <input type="date" name="end_date" class="form-control" required>
                                 </div>
                             </div>
@@ -277,7 +231,7 @@
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label>Tanggal Selesai</label>
+                                    <label>Tanggal Akhir</label>
                                     <input type="date" id="edit_end_date" class="form-control">
                                 </div>
                             </div>
@@ -393,13 +347,17 @@
         let endDateChanged = false;
         let isMobile = window.innerWidth <= 768;
 
+        if (isMobile) {
+            $('#dateHeaderColumn').hide();
+        }
+
         $(document).ready(function() {
             let table = $('#jobTable').DataTable({
-                scrollX: true,
+                scrollX: !isMobile,
+                responsive: isMobile,
                 autoWidth: true,
                 pageLength: 10,
                 ordering: false,
-                responsive: isMobile,
                 lengthMenu: [
                     [10, 25, 50, 100],
                     [10, 25, 50, 100]
@@ -437,88 +395,88 @@
                     {
                         data: 'assigner',
                         name: 'assigner',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false,
                         searchable: false
                     },
                     {
                         data: 'assignee',
                         name: 'assignee',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false
                     },
                     {
                         data: 'department',
                         name: 'department',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false
                     },
                     {
                         data: 'job_detail',
                         name: 'job_detail',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false
                     },
                     {
                         data: 'start_date',
                         name: 'start_date',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
                     },
                     {
                         data: 'end_date',
                         name: 'end_date',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false,
                         searchable: false
                     },
                     {
                         data: 'completed_at',
                         name: 'completed_at',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false,
                         searchable: false
                     },
                     {
                         data: 'time_remaining',
                         name: 'time_remaining',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false,
                         searchable: false
                     },
                     {
                         data: 'report_file',
                         name: 'report_file',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false,
                         searchable: false
                     },
                     {
                         data: 'feedback',
                         name: 'feedback',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false,
                         searchable: false
                     },
                     {
                         data: 'completion_efficiency',
                         name: 'completion_efficiency',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false,
                         searchable: false
                     },
                     {
                         data: 'status',
                         name: 'status',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false,
                         searchable: false
                     },
                     {
                         data: 'revisions',
                         name: 'revisions',
-                        class: 'text-center',
+                        class: isMobile ? 'text-start' : 'text-center',
                         orderable: false,
                         searchable: false
                     },
@@ -527,7 +485,7 @@
                         name: 'actions',
                         orderable: false,
                         searchable: false,
-                        class: 'text-center'
+                        class: isMobile ? 'text-start' : 'text-center'
                     },
                 ]
             });
