@@ -42,10 +42,11 @@ class UserJobController extends Controller
                 })
                 ->orderBy('created_at', 'desc');
             $roleId = Auth::user()->role_id;
+            $departmentId = Auth::user()->department_id;
 
             if ($roleId == 3) {
                 $jobs = $jobs->where('department_id', Auth::user()->department_id);
-            } else if ($roleId == 5 || $roleId == 4) {
+            } else if ($roleId == 5 || $roleId == 4 && $departmentId != 8) {
                 $jobs = $jobs->where('assigner_id', Auth::user()->id);
             }
 
@@ -162,7 +163,7 @@ class UserJobController extends Controller
                             // Telat
                             $actualDuration = $start->diffInSeconds($today);
                             $diffPercentage = (($actualDuration - $totalDuration) / $totalDuration) * 100;
-                            return "-" . round($diffPercentage) . "%";
+                            return  round($diffPercentage) . "%";
                         } else {
                             // Belum selesai tapi masih dalam waktu
                             $actualDuration = $start->diffInSeconds($today);
@@ -388,7 +389,7 @@ class UserJobController extends Controller
                             // Telat
                             $actualDuration = $start->diffInSeconds($today);
                             $diffPercentage = (($actualDuration - $totalDuration) / $totalDuration) * 100;
-                            return "-" . round($diffPercentage) . "%";
+                            return round($diffPercentage) . "%";
                         } else {
                             // Belum selesai tapi masih dalam waktu
                             $actualDuration = $start->diffInSeconds($today);
