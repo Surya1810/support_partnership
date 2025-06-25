@@ -457,9 +457,15 @@ class UserJobController extends Controller
                         : 0
                 ])
                 ->addColumn('actions', function ($job) {
-                    return $job->status != 'cancelled' ? '<button class="btn btn-sm btn-warning mr-1" title="Upload Bukti Pekerjaan Selesai" type="button" onclick="modalUploadReportFile(' . $job->id . ')">
-                        <i class="fas fa-upload"></i>
-                    </button>' : '';
+                    $button = '';
+
+                    if ($job->status != 'completed' && $job->status != 'cancelled') {
+                        $button .= '<button class="btn btn-sm btn-warning mr-1" title="Upload Bukti Pekerjaan Selesai" type="button" onclick="modalUploadReportFile(' . $job->id . ')">
+                            <i class="fas fa-upload"></i>
+                        </button>';
+                    }
+
+                    return $button;
                 })
                 ->rawColumns(['actions', 'report_file', 'feedback'])
                 ->make(true);
@@ -582,6 +588,7 @@ class UserJobController extends Controller
             if ($request->action == 'approve') {
                 $job->update([
                     'status' => 'completed',
+                    'notes' => null,
                     'updated_at' => now(),
                 ]);
             } elseif ($request->action == 'revisi') {
