@@ -627,7 +627,7 @@ class UserJobController extends Controller
             }
 
             $request->validate([
-                'report_file' => 'required|mimes:zip,rar,xlsx,xls,csv,pdf,jpg,jpeg,png|max:122880'
+                'report_file' => 'required|mimes:zip,rar,xlsx,xls,csv,pdf,jpg,jpeg,png,7z|max:122880'
             ]);
 
             $file = $request->file('report_file');
