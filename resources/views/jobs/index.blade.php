@@ -622,9 +622,6 @@
                         $('#modalPengecekanJob').modal('hide');
                         $('#jobTable').DataTable().ajax.reload(null, false);
                         showToast('success', res.message);
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 2000);
                     },
                     error: function(xhr) {
                         console.error(xhr.responseText);
