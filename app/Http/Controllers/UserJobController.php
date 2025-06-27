@@ -14,10 +14,12 @@ use Maatwebsite\Excel\Facades\Excel;
 // Models
 use App\Models\UserJob;
 use App\Models\User;
+use App\Models\Department;
 
 use App\Imports\UserJobImport;
 use App\Exports\UserJobExport;
 use App\Exports\MyTaskExport;
+use Illuminate\Support\Facades\Log;
 
 class UserJobController extends Controller
 {
@@ -27,250 +29,194 @@ class UserJobController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $jobs = UserJob::with(['assigner', 'assignee'])
-                ->when($request->has('status') && $request->status != 'all', function ($query) use ($request) {
-                    if ($request->status == 'in_progress') {
-                        $query->where('status', 'in_progress')
-                            ->orWhere('status', 'planning');
-                    } else if ($request->status == 'overdue') {
-                        $today = Carbon::today();
-                        $query->where('end_date', '<', $today)
-                            ->where('completed_at', null);
-                    } else {
-                        $query->where('status', $request->status);
-                    }
-                })
-                ->orderBy('created_at', 'desc');
-            $roleId = Auth::user()->role_id;
-            $departmentId = Auth::user()->department_id;
+            $jobs = UserJob::with(['assigner', 'assignee.department']);
 
-            if ($roleId == 3) {
-                $jobs = $jobs->where('department_id', Auth::user()->department_id);
-            } else if ($roleId == 5 || $roleId == 4 && $departmentId != 8) {
-                $jobs = $jobs->where('assigner_id', Auth::user()->id);
-            }
-
-            $clonedJobs = clone $jobs;
-
-            $efficiencySum = 0;
-            $efficiencyCount = 0;
-            $hasAssigneeSearch = false;
-
-            $searchKeyword = $request->input('search')['value'] ?? null;
-            if (!empty($searchKeyword)) {
-                $hasAssigneeSearch = User::where('name', 'like', "%{$searchKeyword}%")
-                    ->orWhereHas('department', function ($query) use ($searchKeyword) {
-                        $query->where('name', 'like', "%{$searchKeyword}%");
-                    })->exists();
-            }
-
-            if ($hasAssigneeSearch) {
-                $clonedJobs = clone $jobs;
-                $filteredJobs = $clonedJobs->whereHas('assignee', function ($query) use ($searchKeyword) {
-                    $query->where('name', 'like', "%{$searchKeyword}%")
-                        ->orWhereHas('department', function ($query) use ($searchKeyword) {
-                            $query->where('name', 'like', "%{$searchKeyword}%");
-                        });
-                })->get();
-
-                foreach ($filteredJobs as $job) {
-                    if (!$job->start_date || !$job->end_date) continue;
-
-                    $start = Carbon::parse($job->start_date);
-                    $end = Carbon::parse($job->end_date);
-                    if ($start->equalTo($end)) continue;
-
-                    $totalDuration = $start->diffInSeconds($end);
-
-                    if (!$job->completed_at) {
-                        $today = Carbon::today();
-                        $actualDuration = $start->diffInSeconds($today);
-                        $diffPercentage = ($today->gt($end))
-                            ? (($actualDuration - $totalDuration) / $totalDuration) * -100
-                            : (($totalDuration - $actualDuration) / $totalDuration) * 100;
-                    } else {
-                        $completed = Carbon::parse($job->completed_at);
-                        $actualDuration = $start->diffInSeconds($completed);
-                        $diffPercentage = (($totalDuration - $actualDuration) / $totalDuration) * 100;
-                    }
-
-                    $efficiencySum += $diffPercentage;
-                    $efficiencyCount++;
+            // Filter berdasarkan status
+            if ($request->status && $request->status != 'all') {
+                if ($request->status == 'in_progress') {
+                    $jobs->where(function ($q) {
+                        $q->where('status', 'in_progress')->orWhere('status', 'planning');
+                    });
+                } elseif ($request->status == 'overdue') {
+                    $jobs->whereDate('end_date', '<', Carbon::today())
+                        ->whereNull('completed_at');
+                } else {
+                    $jobs->where('status', $request->status);
                 }
             }
+
+            // Filter berdasarkan staff
+            if ($request->staff && $request->staff != 'all') {
+                $jobs->where(function ($q) use ($request) {
+                    $q->where('assignee_id', $request->staff)
+                        ->orWhere('assigner_id', $request->staff);
+                });
+            }
+
+            // Filter berdasarkan department
+            if ($request->department && $request->department != 'all') {
+                $jobs->where('department_id', $request->department);
+            }
+
+            // Filter berdasarkan role & department user login
+            $roleId = Auth::user()->role_id;
+            $departmentId = Auth::user()->department_id;
+            if ($roleId == 3) {
+                $jobs->where('department_id', $departmentId);
+            } elseif (($roleId == 5 || $roleId == 4) && $departmentId != 8) {
+                $jobs->where('assigner_id', Auth::id());
+            }
+
+            // Global search dari datatables
+            $searchKeyword = $request->input('search.value');
+            if (!empty($searchKeyword)) {
+                $jobs->where(function ($q) use ($searchKeyword) {
+                    $q->whereHas('assignee', function ($q2) use ($searchKeyword) {
+                            $q2->where('name', 'like', "%{$searchKeyword}%");
+                        })
+                        ->orWhereHas('assignee.department', function ($q3) use ($searchKeyword) {
+                            $q3->where('name', 'like', "%{$searchKeyword}%");
+                        })
+                        ->orWhereHas('assigner', function ($q4) use ($searchKeyword) {
+                            $q4->where('name', 'like', "%{$searchKeyword}%");
+                        });
+                });
+            }
+
+            $jobs->orderByDesc('created_at');
+
+            // Hitung efisiensi jika ada filter
+            $efficiencyJobs = (clone $jobs)->get();
+            $efficiencySum = 0;
+            $efficiencyCount = 0;
+
+            foreach ($efficiencyJobs as $job) {
+                if (!$job->start_date || !$job->end_date) continue;
+
+                $start = Carbon::parse($job->start_date);
+                $end = Carbon::parse($job->end_date);
+
+                if ($start->equalTo($end)) continue;
+
+                $totalDuration = $start->diffInSeconds($end);
+                $actualDuration = !$job->completed_at
+                    ? $start->diffInSeconds(Carbon::today())
+                    : $start->diffInSeconds(Carbon::parse($job->completed_at));
+
+                if ($actualDuration == $totalDuration) {
+                    $diffPercentage = 0;
+                } elseif ($actualDuration < $totalDuration) {
+                    $diffPercentage = abs((($totalDuration - $actualDuration) / $totalDuration) * 100);
+                } else {
+                    $diffPercentage = -1 * abs((($actualDuration - $totalDuration) / $totalDuration) * 100);
+                }
+
+                $debugLogs[] = [
+                    'job_id' => $job->id,
+                    'start' => $start->toDateString(),
+                    'end' => $end->toDateString(),
+                    'completed_at' => $job->completed_at,
+                    'total_duration' => $totalDuration,
+                    'actual_duration' => $actualDuration,
+                    'diff_percentage' => round($diffPercentage, 2)
+                ];
+
+                $efficiencySum += $diffPercentage;
+                $efficiencyCount++;
+            }
+
+            $totalEfficiency = round($efficiencySum);
 
             return DataTables::of($jobs)
                 ->addIndexColumn()
                 ->addColumn('assigner', fn($job) => $job->assigner->name ?? '-')
                 ->addColumn('assignee', fn($job) => $job->assignee->name ?? '-')
                 ->addColumn('department', fn($job) => $job->assignee->department->name ?? '-')
+                ->addColumn('job_detail', fn($job) => $job->job_detail)
+                ->addColumn('start_date', fn($job) => $job->start_date)
+                ->addColumn('end_date', fn($job) => $job->end_date)
+                ->addColumn('completed_at', fn($job) => $job->completed_at ? Carbon::parse($job->completed_at)->format('Y-m-d') : '-')
                 ->addColumn('time_remaining', function ($job) {
                     if (!$job->end_date || !$job->start_date) return '-';
-
-                    $endDate = Carbon::parse($job->end_date);
-
-                    if ($job->completed_at) {
-                        $completedAt = Carbon::parse($job->completed_at);
-
-                        if ($completedAt->equalTo($endDate)) {
-                            return "0";
-                        } elseif ($completedAt->lessThan($endDate)) {
-                            $diff = $endDate->diffInDays($completedAt);
-                            return "+" . $diff * -1; // plus
-                        } else {
-                            $diff = $completedAt->diffInDays($endDate);
-                            return "{$diff}";
-                        }
-                    } else {
-                        $today = Carbon::today();
-
-                        if ($today->gt($endDate)) {
-                            $diff = $today->diffInDays($endDate);
-                            return "$diff";
-                        } elseif ($today->eq($endDate)) {
-                            return "0";
-                        } else {
-                            $diff = $endDate->diffInDays($today);
-                            return $diff * -1;
-                        }
-                    }
-                })
-                ->addColumn('report_file', function ($job) {
-                    return $job->report_file ? '<a href="' . asset('storage/' . $job->report_file) . '" target="_blank" class="btn btn-sm btn-danger mr-1" title="Lihat Laporan" type="button">
-                        <i class="fas fa-file-pdf"></i>
-                    </a>' : '-';
-                })
-                ->addColumn('completed_at', fn($job) => $job->completed_at ? Carbon::parse($job->completed_at)->format('Y-m-d') : '-')
-                ->addColumn('feedback', function ($job) {
-                    return $job->feedback ? nl2br($job->feedback) : '-';
-                })
-                ->addColumn('completion_efficiency', function ($job) {
-                    if (!$job->start_date || !$job->end_date) return '-';
-
-                    $start = Carbon::parse($job->start_date);
                     $end = Carbon::parse($job->end_date);
 
-                    // Jika tidak ada rentang waktu
+                    if ($job->completed_at) {
+                        $completed = Carbon::parse($job->completed_at);
+                        if ($completed->equalTo($end)) return "0";
+                        $diff = $end->diffInDays($completed);
+                        return $completed->lt($end) ? "+" . ($diff * -1) : $diff;
+                    }
+
+                    $today = Carbon::today();
+                    if ($today->gt($end)) return $today->diffInDays($end);
+                    if ($today->eq($end)) return "0";
+                    return ($end->diffInDays($today)) * -1;
+                })
+                ->addColumn('report_file', fn($job) =>
+                $job->report_file
+                    ? '<a href="' . asset('storage/' . $job->report_file) . '" target="_blank" class="btn btn-sm btn-danger"><i class="fas fa-file-pdf"></i></a>'
+                    : '-')
+                ->addColumn('feedback', fn($job) => $job->feedback ? nl2br($job->feedback) : '-')
+                ->addColumn('completion_efficiency', function ($job) {
+                    if (!$job->start_date || !$job->end_date) return '-';
+                    $start = Carbon::parse($job->start_date);
+                    $end = Carbon::parse($job->end_date);
                     if ($start->equalTo($end)) return '0%';
 
                     $totalDuration = $start->diffInSeconds($end);
+                    $actualDuration = !$job->completed_at
+                        ? $start->diffInSeconds(Carbon::today())
+                        : $start->diffInSeconds(Carbon::parse($job->completed_at));
 
-                    // Jika belum selesai
-                    if (!$job->completed_at) {
-                        $today = Carbon::today();
-
-                        if ($today->gt($end)) {
-                            // Telat
-                            $actualDuration = $start->diffInSeconds($today);
-                            $diffPercentage = (($actualDuration - $totalDuration) / $totalDuration) * 100;
-                            return  round($diffPercentage) . "%";
-                        } else {
-                            // Belum selesai tapi masih dalam waktu
-                            $actualDuration = $start->diffInSeconds($today);
-                            $diffPercentage = (($totalDuration - $actualDuration) / $totalDuration) * 100;
-                            $roundedPercentage = round($diffPercentage);
-                            return $roundedPercentage == 0 ? "0%" : "+" . $roundedPercentage . "%";
-                        }
-                    }
-
-                    // Jika sudah selesai
-                    $completed = Carbon::parse($job->completed_at);
-                    $actualDuration = $start->diffInSeconds($completed);
                     $diffPercentage = (($totalDuration - $actualDuration) / $totalDuration) * 100;
 
-                    if ($actualDuration < $totalDuration) {
-                        return "+" . round($diffPercentage) . "%";
-                    } elseif ($actualDuration > $totalDuration) {
-                        return "-" . round(abs($diffPercentage)) . "%";
-                    } else {
-                        return "0%";
-                    }
+                    return $actualDuration == $totalDuration ? "0%"
+                        : ($actualDuration < $totalDuration ? "+" : "-") . round(abs($diffPercentage)) . "%";
                 })
-                ->setRowClass(function ($job) {
-                    $rowClass = '';
-
-                    // Warna berdasarkan status
-                    $statusClass = match ($job->status) {
-                        'overdue'     => 'table-danger',
-                        'completed'   => 'table-success',
-                        'in_progress' => 'table-info',
-                        'cancelled'   => 'table-secondary',
-                        default       => '',
-                    };
-
-                    // Evaluasi logika keterlambatan atau kecepatan
-                    $isLate = false;
-
-                    if ($job->end_date && $job->start_date) {
-                        $end = Carbon::parse($job->end_date);
-
-                        if ($job->completed_at) {
-                            $completed = Carbon::parse($job->completed_at);
-                            if ($completed->greaterThan($end)) {
-                                $isLate = true;
-                            }
-                        } else {
-                            $today = Carbon::today();
-                            if ($today->greaterThan($end)) {
-                                $isLate = true;
-                            }
-                        }
-                    }
-
-                    // Jika terlambat → prioritaskan warna merah
-                    if ($isLate) {
-                        $rowClass = 'table-danger';
-                    } elseif ($statusClass) {
-                        $rowClass = $statusClass;
-                    }
-
-                    return $rowClass;
-                })
+                ->addColumn('status', fn($job) => $job->status)
                 ->addColumn('revisions', fn($job) => $job->notes ?? '-')
                 ->addColumn('actions', function ($job) {
                     $buttons = '';
                     $userId = Auth::id();
 
                     if ($job->assigner_id == $userId) {
-                        $buttons .= '<button class="btn btn-sm btn-warning mr-1 rounded-partner" title="Edit" type="button" onclick="modalEdit(this)" data-id="' . $job->id . '">
-                        <i class="fas fa-pencil-alt"></i>
-                     </button>';
+                        $buttons .= '<button class="btn btn-sm btn-warning mr-1" onclick="modalEdit(this)" data-id="' . $job->id . '"><i class="fas fa-pencil-alt"></i></button>';
                     }
 
                     if ($job->status == 'checking' && $job->assigner_id == $userId) {
-                        $buttons .= '<button class="btn btn-sm btn-success m-1 rounded-partner" title="Approve" type="button" onclick="modalApprove(this)" data-id="' . $job->id . '">
-                        <i class="fas fa-clipboard-check"></i>
-                     </button>';
+                        $buttons .= '<button class="btn btn-sm btn-success mr-1" onclick="modalApprove(this)" data-id="' . $job->id . '"><i class="fas fa-clipboard-check"></i></button>';
                     }
 
                     return '<div class="text-nowrap">' . $buttons . '</div>';
                 })
-                ->filterColumn('assignee', function ($query, $keyword) {
-                    $query->whereHas('assignee', function ($query) use ($keyword) {
-                        $query->where('name', 'like', "%{$keyword}%");
-                    });
-                })
-                ->filterColumn('department', function ($query, $keyword) {
-                    $query->whereHas('assignee', function ($query) use ($keyword) {
-                        $query->whereHas('department', function ($query) use ($keyword) {
-                            $query->where('name', 'like', "%{$keyword}%");
-                        });
-                    });
-                })
-                ->filterColumn('job_detail', function ($query, $keyword) {
-                    $query->where('job_detail', 'like', "%{$keyword}%");
+                ->setRowClass(function ($job) {
+                    $statusClass = match ($job->status) {
+                        'overdue' => 'table-danger',
+                        'completed' => 'table-success',
+                        'in_progress' => 'table-info',
+                        'cancelled' => 'table-secondary',
+                        'checking' => 'table-warning',
+                        default => '',
+                    };
+
+                    $isLate = false;
+                    if ($job->end_date && $job->start_date && !$job->completed_at) {
+                        $isLate = Carbon::today()->gt(Carbon::parse($job->end_date));
+                    }
+
+                    return $isLate ? 'table-danger' : $statusClass;
                 })
                 ->with([
-                    'total_efficiency' => (!empty($searchKeyword) && $efficiencyCount > 0)
-                        ? round($efficiencySum)
-                        : 0
+                    'total_efficiency' => $totalEfficiency
                 ])
                 ->rawColumns(['actions', 'report_file', 'feedback'])
                 ->make(true);
         }
 
-        $users = User::whereNotIn('id', [Auth::id(), 1])->with('department')->get();
-        return view('jobs.index', compact('users'));
+        $users = User::whereNotIn('id', [Auth::id(), 1])->get();
+        $departments = Department::select('id', 'name')->whereIn('id', [1, 3, 5, 8])->get();
+
+        return view('jobs.index', compact('users', 'departments'));
     }
 
     public function myTasks(Request $request)
@@ -420,6 +366,7 @@ class UserJobController extends Controller
                         'completed'   => 'table-success',
                         'in_progress' => 'table-info',
                         'cancelled'   => 'table-secondary',
+                        'checking'    => 'table-warning',
                         default       => '',
                     };
 
@@ -432,7 +379,7 @@ class UserJobController extends Controller
                         if ($job->completed_at) {
                             $completed = Carbon::parse($job->completed_at);
                             if ($completed->greaterThan($end)) {
-                                $isLate = true;
+                                $isLate = false;
                             }
                         } else {
                             $today = Carbon::today();

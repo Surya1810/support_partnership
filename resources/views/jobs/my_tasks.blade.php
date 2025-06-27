@@ -69,7 +69,7 @@
                                     </form>
                                 </div>
                             </div>
-                            <div class="table-responsive w-100">
+                            <div class="w-100">
                                 <div class="row mb-4">
                                     {{-- Total Point Wrapper --}}
                                     <div class="col-12 col-md-2 mt-3 mt-md-0">

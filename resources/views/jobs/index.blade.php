@@ -43,7 +43,7 @@
                     <div class="card card-outline rounded-partner card-primary">
                         <div class="card-body table-responsive w-100">
                             <div class="row mb-3 align-items-end">
-                                <div class="col-12 col-md-2 mt-0">
+                                <div class="col-12 col-md-1 mt-0">
                                     <select class="form-control" id="statusFilter">
                                         <option value="all" disabled selected>Pilih Status</option>
                                         <option value="all">Semua</option>
@@ -56,7 +56,29 @@
                                     </select>
                                 </div>
 
-                                <div class="col-12 col-md-3 my-3 my-md-0">
+                                @if (auth()->user()->role_id == 2)
+                                    <div class="col-12 col-md-2 mt-2 mt-md-0">
+                                        <select class="form-control" id="staffFilter">
+                                            <option value="" disabled selected>Pilih Staff</option>
+                                            <option value="all">Semua</option>
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 col-md-2 mt-2 mt-md-0">
+                                        <select class="form-control" id="departmentFilter">
+                                            <option value="" disabled selected>Pilih Divisi</option>
+                                            <option value="all">Semua</option>
+                                            @foreach ($departments as $department)
+                                                <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
+
+                                <div class="col-12 col-md-2 my-3 my-md-0">
                                     <div class="btn-group col-12 col-md-0" role="group">
                                         <button class="btn btn-primary rounded-partner" type="button"
                                             id="buttonAddJobModal">
@@ -69,12 +91,14 @@
                                     </div>
                                 </div>
 
-                                <div class="col-12 col-md-7 mt-2 mt-0 text-right">
+                                <div
+                                    class="col-12 {{ auth()->user()->role_id == 2 ? 'col-md-5' : 'col-md-9' }} mt-2 mt-0 text-right">
                                     <form method="GET" action="{{ route('jobs.export') }}"
                                         class="form-inline justify-content-end">
-                                        <input type="date" name="start_date" class="form-control mr-2" placeholder="Tanggal Mulai" required>
-                                        <input type="date" name="end_date" class="form-control mr-2 mt-2 mt-md-0" placeholder="Tanggal Akhir"
-                                            required>
+                                        <input type="date" name="start_date" class="form-control mr-0 mr-md-2"
+                                            placeholder="Tanggal Mulai" required>
+                                        <input type="date" name="end_date" class="form-control mr-0 mr-md-2 mt-2 mt-md-0"
+                                            placeholder="Tanggal Akhir" required>
                                         <button type="submit"
                                             class="btn btn-success rounded-partner col-12 col-md-2 mt-2 mt-md-0">
                                             <i class="fas fa-file-excel"></i> Export Excel
@@ -108,14 +132,16 @@
                             </div>
 
                             <div class="table-responsive">
-                                <table class="table table-bordered table-striped text-sm" id="jobTable" style="width:100%">
+                                <table class="table table-bordered table-striped text-sm" id="jobTable"
+                                    style="width:100%">
                                     <thead class="thead-dark">
                                         <tr>
                                             <th rowspan="2" style="vertical-align: middle">No.</th>
                                             <th colspan="2" style="text-align: center">Penugasan</th>
                                             <th rowspan="2" style="vertical-align: middle">Divisi</th>
                                             <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
-                                            <th colspan="3" style="text-align: center" id="dateHeaderColumn">Tanggal</th>
+                                            <th colspan="3" style="text-align: center" id="dateHeaderColumn">Tanggal
+                                            </th>
                                             <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari</th>
                                             <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan</th>
                                             <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan</th>
@@ -359,8 +385,8 @@
                 pageLength: 10,
                 ordering: false,
                 lengthMenu: [
-                    [10, 25, 50, 100],
-                    [10, 25, 50, 100]
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, 'Semua']
                 ],
                 processing: true,
                 serverSide: true,
@@ -383,6 +409,8 @@
                     type: "GET",
                     data: function(data) {
                         data.status = $('#statusFilter').find(':selected').val();
+                        data.staff = $('#staffFilter').find(':selected').val();
+                        data.department = $('#departmentFilter').find(':selected').val();
                     },
                 },
                 columns: [{
@@ -396,8 +424,7 @@
                         data: 'assigner',
                         name: 'assigner',
                         class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false,
-                        searchable: false
+                        orderable: false
                     },
                     {
                         data: 'assignee',
@@ -415,7 +442,8 @@
                         data: 'job_detail',
                         name: 'job_detail',
                         class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false
+                        orderable: false,
+                        searhable: false
                     },
                     {
                         data: 'start_date',
@@ -490,8 +518,55 @@
                 ]
             });
 
+            let debounceTimer;
+            $('#jobTable_filter input[type="search"]').off().on('input', function() {
+                clearTimeout(debounceTimer);
+
+                debounceTimer = setTimeout(function() {
+                    table.search($('#jobTable_filter input[type="search"]').val()).draw();
+                }, 500); // menunggu 500ms setelah user berhenti mengetik
+            });
+
+            table.on('xhr.dt', function(e, settings, json, xhr) {
+                const searchValue = table.search().trim();
+                const staffFilter = $('#staffFilter').val();
+                const deptFilter = $('#departmentFilter').val();
+
+                const hasStaffFilter = staffFilter && staffFilter !== 'all';
+                const hasDeptFilter = deptFilter && deptFilter !== 'all';
+
+                if (json && json.total_efficiency !== undefined && (searchValue || hasStaffFilter ||
+                        hasDeptFilter)) {
+                    $('#totalEfficiencyOutput').val(json.total_efficiency + '%');
+                    $('#totalEfficiencyWrapper').show();
+                } else {
+                    $('#totalEfficiencyWrapper').hide();
+                }
+            });
+
             $("#statusFilter").on('change', function() {
                 table.ajax.reload();
+            });
+
+            $('#departmentFilter').on('change', function() {
+                const staffVal = $('#staffFilter').val();
+                if (staffVal !== 'all') {
+                    $('#staffFilter').val('all');
+                }
+                table.ajax.reload();
+            });
+
+            $('#staffFilter').on('change', function() {
+                const deptVal = $('#departmentFilter').val();
+                if (deptVal !== 'all') {
+                    $('#departmentFilter').val('all');
+                }
+                table.ajax.reload();
+            });
+
+            $('#jobTable_filter input[type="search"]').on('input', function() {
+                $('#staffFilter').val('all');
+                $('#departmentFilter').val('all');
             });
 
             $('#buttonAddJobModal').on('click', function() {
@@ -563,25 +638,6 @@
                     error: function(xhr) {
                         console.log(xhr);
                         showToast('error', xhr.responseJSON.message);
-                    }
-                });
-            });
-
-            /**
-             * 24 June 2025
-             * Get total completion efficiency/point
-             **/
-            let searchBox = $('div.dataTables_filter input');
-
-            searchBox.on('keyup', function() {
-                table.on('xhr.dt', function(e, settings, json, xhr) {
-                    let searchValue = table.search().trim();
-
-                    if (searchValue.length > 0) {
-                        $('#totalEfficiencyOutput').val(json.total_efficiency + '%');
-                        $('#totalEfficiencyWrapper').show();
-                    } else {
-                        $('#totalEfficiencyWrapper').hide();
                     }
                 });
             });
