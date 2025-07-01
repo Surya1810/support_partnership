@@ -59,12 +59,13 @@
                                 <div class="col-12 col-md-10 text-right">
                                     <form method="GET" action="{{ route('jobs.export.my_tasks') }}"
                                         class="form-inline justify-content-end">
-                                        <input type="date" name="start_date" class="form-control mr-0 mr-md-2" placeholder="Tanggal Mulai" required>
-                                        <input type="date" name="end_date" class="form-control mr-0 mr-md-2 mt-2 mt-md-0" placeholder="Tanggal Akhir"
-                                            required>
+                                        <input type="date" name="start_date" class="form-control mr-0 mr-md-2"
+                                            placeholder="Tanggal Mulai" required>
+                                        <input type="date" name="end_date" class="form-control mr-0 mr-md-2 mt-2 mt-md-0"
+                                            placeholder="Tanggal Akhir" required>
                                         <button type="submit"
                                             class="btn btn-success rounded-partner col-12 col-md-2 mt-2 mt-md-0">
-                                            <i class="fas fa-file-excel"></i> Export Excel
+                                            <i class="fas fa-file-excel"></i> Export
                                         </button>
                                     </form>
                                 </div>
@@ -93,31 +94,55 @@
                                     </div>
                                 </div>
 
-                                <table class="table table-bordered table-striped text-sm" id="jobTable" style="width:100%">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th rowspan="2" style="vertical-align: middle">No.</th>
-                                            <th colspan="2" style="text-align: center">Penugasan</th>
-                                            <th rowspan="2" style="vertical-align: middle">Divisi</th>
-                                            <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
-                                            <th colspan="3" style="text-align: center" id="dateHeaderColumn">Tanggal</th>
-                                            <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari</th>
-                                            <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan</th>
-                                            <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan</th>
-                                            <th rowspan="2" style="vertical-align: middle">Point</th>
-                                            <th rowspan="2" style="vertical-align: middle">Status</th>
-                                            <th rowspan="2" style="vertical-align: middle">Revisi</th>
-                                            <th rowspan="2" style="vertical-align: middle">Aksi</th>
-                                        </tr>
-                                        <tr>
-                                            <th>Pemberi</th>
-                                            <th>Penerima</th>
-                                            <th>Mulai</th>
-                                            <th>Akhir</th>
-                                            <th>Selesai</th>
-                                        </tr>
-                                    </thead>
-                                </table>
+                                @if ($isMobile)
+                                    <table class="table table-bordered table-striped text-sm" id="jobTable"
+                                        style="width:100%">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th style="vertical-align: middle">No.</th>
+                                                <th style="vertical-align: middle">Aksi</th>
+                                                <th style="vertical-align: middle">Pemberi</th>
+                                                <th style="vertical-align: middle">Detail Pekerjaan</th>
+                                                <th style="vertical-align: middle">Sisa Waktu<br />/Hari
+                                                </th>
+                                                <th style="vertical-align: middle">Divisi</th>
+                                                <th style="vertical-align: middle">Point</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                @else
+                                    <table class="table table-bordered table-striped text-sm" id="jobTable"
+                                        style="width:100%">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th rowspan="2" style="vertical-align: middle">No.</th>
+                                                <th colspan="2" style="text-align: center">Penugasan</th>
+                                                <th rowspan="2" style="vertical-align: middle">Divisi</th>
+                                                <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
+                                                <th colspan="3" style="text-align: center" id="dateHeaderColumn">
+                                                    Tanggal
+                                                </th>
+                                                <th rowspan="2" style="vertical-align: middle">Sisa Waktu<br />/Hari
+                                                </th>
+                                                <th rowspan="2" style="vertical-align: middle">Report<br />Pekerjaan
+                                                </th>
+                                                <th rowspan="2" style="vertical-align: middle">Adendum<br />/Catatan
+                                                </th>
+                                                <th rowspan="2" style="vertical-align: middle">Point</th>
+                                                <th rowspan="2" style="vertical-align: middle">Status</th>
+                                                <th rowspan="2" style="vertical-align: middle">Revisi</th>
+                                                <th rowspan="2" style="vertical-align: middle">Aksi</th>
+                                            </tr>
+                                            <tr>
+                                                <th>Pemberi</th>
+                                                <th>Penerima</th>
+                                                <th>Mulai</th>
+                                                <th>Akhir</th>
+                                                <th>Selesai</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -151,6 +176,91 @@
             </form>
         </div>
     </div>
+
+    {{-- Modal Detail Job --}}
+    <div class="modal fade text-sm" id="showJobModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form id="formDetailJob">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detail Penugasan</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="job_id">
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Pemberi</label>
+                                    <input type="tecxt" id="job_assigner" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Penerima</label>
+                                    <input type="text" id="job_assignee" class="form-control" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Divisi</label>
+                            <input type="text" id="department" class="form-control muted" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Detail Pekerjaan</label>
+                            <textarea id="job_detail" class="form-control" required disabled></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <input type="text" id="job_status" class="form-control muted" readonly>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Tanggal Mulai</label>
+                                    <input type="date" id="start_date" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Tanggal Akhir</label>
+                                    <input type="date" id="end_date" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Tanggal Selesai</label>
+                                    <input type="date" id="completed_date" class="form-control" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="feedback">Adendum/Catatan</label>
+                            <textarea id="feedback" class="form-control" disabled></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes">Revisi</label>
+                            <textarea type="text" id="revision" class="form-control" disabled></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary rounded-partner"
+                            data-dismiss="modal">Tutup</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -165,16 +275,168 @@
     <script src="{{ asset('js/loading-overlay.js') }}"></script>
 
     <script type="text/javascript">
+        let isMobile = @json($isMobile);
+        let columns = null;
+
+        if (isMobile) {
+            columns = [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false,
+                    class: 'text-center',
+                },
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    class: 'text-center',
+                    orderable: false,
+                    searhable: false,
+                },
+                {
+                    data: 'assigner',
+                    name: 'assigner',
+                    class: 'text-start',
+                    orderable: false,
+                },
+                {
+                    data: 'job_detail',
+                    name: 'job_detail',
+                    class: 'text-start',
+                    orderable: false
+                },
+                {
+                    data: 'time_remaining',
+                    name: 'time_remaining',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'department',
+                    name: 'department',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'completion_efficiency',
+                    name: 'completion_efficiency',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                }
+            ];
+        } else {
+            columns = [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false,
+                    class: 'text-center',
+                },
+                {
+                    data: 'assigner',
+                    name: 'assigner',
+                    class: 'text-center',
+                    orderable: false,
+                },
+                {
+                    data: 'assignee',
+                    name: 'assignee',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'department',
+                    name: 'department',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'job_detail',
+                    name: 'job_detail',
+                    class: 'text-center',
+                    orderable: false
+                },
+                {
+                    data: 'start_date',
+                    name: 'start_date',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
+                    data: 'end_date',
+                    name: 'end_date',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'completed_at',
+                    name: 'completed_at',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'time_remaining',
+                    name: 'time_remaining',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'report_file',
+                    name: 'report_file',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'feedback',
+                    name: 'feedback',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'completion_efficiency',
+                    name: 'completion_efficiency',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'revisions',
+                    name: 'revisions',
+                    class: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false,
+                    class: 'text-center'
+                },
+            ];
+        };
+
         $(document).ready(function() {
-            let isMobile = window.innerWidth <= 768;
-
-            if (isMobile) {
-                $('#dateHeaderColumn').hide();
-            }
-
             let table = $('#jobTable').DataTable({
-                scrollX: !isMobile,
-                responsive: isMobile,
+                scrollX: true,
                 autoWidth: true,
                 pageLength: 10,
                 ordering: false,
@@ -205,107 +467,7 @@
                         data.status = $('#statusFilter').find(':selected').val();
                     }
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false,
-                        class: 'text-center'
-                    },
-                    {
-                        data: 'assigner',
-                        name: 'assigner',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false,
-                        searchable: false,
-                    },
-                    {
-                        data: 'assignee',
-                        name: 'assignee',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false,
-                        searchable: false,
-                    },
-                    {
-                        data: 'department',
-                        name: 'department',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false,
-                        searchable: false,
-                    },
-                    {
-                        data: 'detail',
-                        name: 'detail',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false
-                    },
-                    {
-                        data: 'start_date',
-                        name: 'start_date',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false
-                    },
-                    {
-                        data: 'end_date',
-                        name: 'end_date',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false
-                    },
-                    {
-                        data: 'completed_at',
-                        name: 'completed_at',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false
-                    },
-                    {
-                        data: 'time_remaining',
-                        name: 'time_remaining',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false,
-                        searchable: false,
-                    },
-                    {
-                        data: 'report_file',
-                        name: 'report_file',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false,
-                        searchable: false,
-                    },
-                    {
-                        data: 'feedback',
-                        name: 'feedback',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false
-                    },
-                    {
-                        data: 'completion_efficiency',
-                        name: 'completion_efficiency',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false,
-                        searchable: false,
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false,
-                        searchable: false,
-                    },
-                    {
-                        data: 'revisions',
-                        name: 'revisions',
-                        class: isMobile ? 'text-start' : 'text-center',
-                        orderable: false,
-                        searchable: false,
-                    },
-                    {
-                        data: 'actions',
-                        name: 'actions',
-                        orderable: false,
-                        searchable: false,
-                        class: isMobile ? 'text-start' : 'text-center'
-                    },
-                ]
+                columns: columns
             });
 
             $("#statusFilter").on('change', function() {
@@ -359,6 +521,32 @@
             const final = `${parts[0]}, ${parts.slice(1).join(' ')}`;
 
             $('#time').val(final);
+        }
+
+        function modalDetailJob(jobId) {
+            $.LoadingOverlay("show");
+            $.get(`/jobs/${jobId}`, function(data) {
+                $('#job_assigner').val(data.assigner.name);
+                $('#job_assignee').val(data.assignee.name);
+                $('#department').val(data.department.name);
+                $('#job_status').val(data.status);
+                $('#job_detail').val(data.job_detail);
+                $('#start_date').val(data.start_date);
+                $('#end_date').val(data.end_date);
+
+                const feedback = data.feedback;
+                const splittedFeedback = feedback.split('\n');
+
+                data.completed_at ?
+                    $('#completed_date').attr('type', 'date').val(data.completed_at) :
+                    $('#completed_date').attr('type', 'text');
+
+                $('#feedback').val(splittedFeedback[2]);
+                $('#revision').val(data.notes);
+
+                $.LoadingOverlay("hide");
+                $('#showJobModal').modal('show');
+            });
         }
     </script>
 @endpush

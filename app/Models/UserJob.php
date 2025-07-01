@@ -36,7 +36,6 @@ class UserJob extends Model
         return 'unknown';
     }
 
-
     public function assigner()
     {
         return $this->belongsTo(User::class, 'assigner_id');
@@ -45,5 +44,10 @@ class UserJob extends Model
     public function assignee()
     {
         return $this->belongsTo(User::class, 'assignee_id');
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
     }
 }

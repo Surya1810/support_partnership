@@ -19,7 +19,8 @@ use App\Models\Department;
 use App\Imports\UserJobImport;
 use App\Exports\UserJobExport;
 use App\Exports\MyTaskExport;
-use Illuminate\Support\Facades\Log;
+
+use Jenssegers\Agent\Agent;
 
 class UserJobController extends Controller
 {
@@ -28,6 +29,9 @@ class UserJobController extends Controller
      */
     public function index(Request $request)
     {
+        $agent = new Agent();
+        $isMobile = $agent->isMobile();
+
         if ($request->ajax()) {
             $jobs = UserJob::with(['assigner', 'assignee.department']);
 
@@ -70,23 +74,22 @@ class UserJobController extends Controller
             // Global search dari datatables
             $searchKeyword = $request->input('search.value');
             if (!empty($searchKeyword)) {
-                $jobs->where(function ($q) use ($searchKeyword) {
-                    $q->whereHas('assignee', function ($q2) use ($searchKeyword) {
-                            $q2->where('name', 'like', "%{$searchKeyword}%");
-                        })
-                        ->orWhereHas('assignee.department', function ($q3) use ($searchKeyword) {
-                            $q3->where('name', 'like', "%{$searchKeyword}%");
-                        })
-                        ->orWhereHas('assigner', function ($q4) use ($searchKeyword) {
-                            $q4->where('name', 'like', "%{$searchKeyword}%");
-                        });
-                });
+                $jobs->where('job_detail', 'like', '%' . $searchKeyword . '%');
             }
 
             $jobs->orderByDesc('created_at');
 
             // Hitung efisiensi jika ada filter
-            $efficiencyJobs = (clone $jobs)->get();
+            $isStaffFilterValid = $request->has('staff') && $request->staff !== 'all';
+
+            if ($isStaffFilterValid) {
+                $efficiencyJobs = (clone $jobs)
+                    ->where('assignee_id', $request->staff)
+                    ->get();
+            } else {
+                $efficiencyJobs = (clone $jobs)->get();
+            }
+
             $efficiencySum = 0;
             $efficiencyCount = 0;
 
@@ -144,7 +147,7 @@ class UserJobController extends Controller
                         $completed = Carbon::parse($job->completed_at);
                         if ($completed->equalTo($end)) return "0";
                         $diff = $end->diffInDays($completed);
-                        return $completed->lt($end) ? "+" . ($diff * -1) : $diff;
+                        return $completed->lt($end) ? "+" . $diff : (-1 * $diff);
                     }
 
                     $today = Carbon::today();
@@ -175,16 +178,28 @@ class UserJobController extends Controller
                 })
                 ->addColumn('status', fn($job) => $job->status)
                 ->addColumn('revisions', fn($job) => $job->notes ?? '-')
-                ->addColumn('actions', function ($job) {
+                ->addColumn('actions', function ($job) use ($isMobile) {
                     $buttons = '';
                     $userId = Auth::id();
 
+                    if ($isMobile) {
+                        if ($job->is_priority) {
+                            $buttons .= '<img width="30px" src="' . asset('assets/img/jangrik.gif') . '" />';
+                        }
+
+                        $buttons .= '<button class="btn btn-sm btn-info m-1 d-block" title="Detail" onclick="modalDetailJob(' . $job->id . ')"><i class="fas fa-circle-info"></i></button>';
+
+                        if ($job->report_file) {
+                            $buttons .= '<a href="' . asset('storage/' . $job->report_file) . '" title="File Laporan" target="_blank" class="btn btn-sm btn-danger m-1 d-block"><i class="fas fa-file-pdf"></i></a>';
+                        }
+                    }
+
                     if ($job->assigner_id == $userId) {
-                        $buttons .= '<button class="btn btn-sm btn-warning mr-1" onclick="modalEdit(this)" data-id="' . $job->id . '"><i class="fas fa-pencil-alt"></i></button>';
+                        $buttons .= '<button class="btn btn-sm btn-warning m-1 d-block d-md-inline-block" title="Adendum/Catatan" onclick="modalEdit(this)" data-id="' . $job->id . '"><i class="fas fa-pencil-alt"></i></button>';
                     }
 
                     if ($job->status == 'checking' && $job->assigner_id == $userId) {
-                        $buttons .= '<button class="btn btn-sm btn-success mr-1" onclick="modalApprove(this)" data-id="' . $job->id . '"><i class="fas fa-clipboard-check"></i></button>';
+                        $buttons .= '<button class="btn btn-sm btn-success m-1 d-block d-md-inline-block" title="Approve/Revisi" onclick="modalApprove(this)" data-id="' . $job->id . '"><i class="fas fa-check"></i></button>';
                     }
 
                     return '<div class="text-nowrap">' . $buttons . '</div>';
@@ -207,7 +222,8 @@ class UserJobController extends Controller
                     return $isLate ? 'table-danger' : $statusClass;
                 })
                 ->with([
-                    'total_efficiency' => $totalEfficiency
+                    'total_efficiency' => $totalEfficiency,
+                    'is_mobile' => $isMobile
                 ])
                 ->rawColumns(['actions', 'report_file', 'feedback'])
                 ->make(true);
@@ -216,11 +232,14 @@ class UserJobController extends Controller
         $users = User::whereNotIn('id', [Auth::id(), 1])->get();
         $departments = Department::select('id', 'name')->whereIn('id', [1, 3, 5, 8])->get();
 
-        return view('jobs.index', compact('users', 'departments'));
+        return view('jobs.index', compact('users', 'departments', 'isMobile'));
     }
 
     public function myTasks(Request $request)
     {
+        $agent = new Agent();
+        $isMobile = $agent->isMobile();
+
         if ($request->ajax()) {
             $jobs = UserJob::with(['assigner', 'assignee'])
                 ->where('assignee_id', Auth::user()->id)
@@ -335,7 +354,7 @@ class UserJobController extends Controller
                             // Telat
                             $actualDuration = $start->diffInSeconds($today);
                             $diffPercentage = (($actualDuration - $totalDuration) / $totalDuration) * 100;
-                            return round($diffPercentage) . "%";
+                            return round($diffPercentage) * -1 . "%";
                         } else {
                             // Belum selesai tapi masih dalam waktu
                             $actualDuration = $start->diffInSeconds($today);
@@ -404,21 +423,41 @@ class UserJobController extends Controller
                         ? round($efficiencySum)
                         : 0
                 ])
-                ->addColumn('actions', function ($job) {
-                    $button = '';
+                ->addColumn('actions', function ($job) use ($isMobile) {
+                    $buttons = '';
 
-                    if ($job->status != 'completed' && $job->status != 'cancelled') {
-                        $button .= '<button class="btn btn-sm btn-warning mr-1" title="Upload Bukti Pekerjaan Selesai" type="button" onclick="modalUploadReportFile(' . $job->id . ')">
+                    if ($isMobile) {
+                        if ($job->is_priority) {
+                            $buttons .= '<img width="30px" src="' . asset('assets/img/jangrik.gif') . '" />';
+                        }
+
+                        $buttons .= '<button class="btn btn-sm btn-info m-1 d-block" title="Detail" onclick="modalDetailJob(' . $job->id . ')"><i class="fas fa-circle-info"></i></button>';
+
+                        $statusArr = ['completed', 'checking', 'revision'];
+                        if (in_array($job->status, $statusArr)) {
+                            $buttons .= '<a href="' . asset('storage/' . $job->report_file) . '" title="File Laporan" target="_blank" class="btn btn-sm btn-danger m-1 d-block"><i class="fas fa-file-pdf"></i></a>';
+                        }
+                    }
+
+                    $statusArr = ['completed', 'checking', 'cancelled'];
+                    if (!in_array($job->status, $statusArr)) {
+                        $buttons .= '<button class="btn btn-sm btn-warning m-1 d-block d-md-inline-block" title="Upload Bukti Pekerjaan Selesai" type="button" onclick="modalUploadReportFile(' . $job->id . ')">
                             <i class="fas fa-upload"></i>
                         </button>';
                     }
 
-                    return $button;
+                    return $buttons;
+                })
+                ->filterColumn('assigner', function ($query, $keyword) {
+                    $query->whereHas('assigner', function ($query) use ($keyword) {
+                        $query->where('name', 'like', '%' . $keyword . '%');
+                    });
                 })
                 ->rawColumns(['actions', 'report_file', 'feedback'])
                 ->make(true);
         }
-        return view('jobs.my_tasks');
+
+        return view('jobs.my_tasks', compact('isMobile'));
     }
 
     public function store(Request $request)
@@ -428,6 +467,7 @@ class UserJobController extends Controller
             'detail' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'is_priority' => 'nullable|boolean',
         ]);
 
         $assignee = User::where('id', $request->assignee_id)->first();
@@ -447,6 +487,7 @@ class UserJobController extends Controller
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'feedback' => 'Pengerjaan ke-1',
+                'is_priority' => $request->is_priority ?? false
             ]);
 
             DB::commit();
@@ -462,7 +503,14 @@ class UserJobController extends Controller
 
     public function show($id)
     {
-        $job = UserJob::findOrFail($id);
+        $job = UserJob::with('assignee', 'assigner', 'department')
+            ->where('id', $id)
+            ->first();
+
+        if (!$job) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
+
         return response()->json($job);
     }
 
@@ -499,6 +547,7 @@ class UserJobController extends Controller
             $explodedFeedback = explode('-', $request->feedback);
             $feedback = 'Pengerjaan ke-' . $explodedFeedback[1]
                 . "\n" . "tgl. $today s.d. " . $request->end_date . "\n" . $request->notes;
+            $isPriority = filter_var($request->is_priority, FILTER_VALIDATE_BOOLEAN);
 
             $job->update([
                 'title'       => $request->title,
@@ -506,6 +555,7 @@ class UserJobController extends Controller
                 'end_date'    => $request->end_date,
                 'feedback'    => $feedback,
                 'status'      => $status,
+                'is_priority' => $isPriority
             ]);
 
             DB::commit();

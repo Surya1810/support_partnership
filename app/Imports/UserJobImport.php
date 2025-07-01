@@ -19,6 +19,7 @@ class UserJobImport implements ToCollection
             $detail = trim($column[2]);
             $start = $this->parseDate($column[3]);
             $end = $this->parseDate($column[4]);
+            $isPriority = trim($column[5]);
 
             if (!$username || !$start || !$end) {
                 return;
@@ -35,6 +36,7 @@ class UserJobImport implements ToCollection
                 'assignee_id' => $user->id,
                 'department_id' => $user->department_id,
                 'job_detail' => $detail,
+                'is_priority' => $isPriority == 'ya' ? true : false,
                 'start_date' => $start,
                 'end_date' => $end,
                 'feedback' => 'Pengerjaan ke-1',
