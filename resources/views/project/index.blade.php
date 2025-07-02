@@ -37,15 +37,14 @@
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col-6">
-                                    <h3 class="card-title">Project List - <a href="{{ route('project.archive') }}"
+                                    <h3 class="card-title">List Project - <a href="{{ route('project.archive') }}"
                                             class="btn btn-xs btn-outline-secondary rounded-partner">Archive</a></h3>
                                 </div>
                                 @if (auth()->user()->role_id != 5)
                                     <div class="col-6">
                                         <a href="{{ route('project.create') }}"
                                             class="btn btn-sm btn-primary rounded-partner float-right"><i
-                                                class="fas fa-plus"></i> Create
-                                            Project</a>
+                                                class="fas fa-plus"></i> Buat Project</a>
                                     </div>
                                 @endif
                             </div>
@@ -55,27 +54,24 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th style="width: 45%">
-                                            Project Name
+                                            Nama Project
+                                        </th>
+                                        <th style="width: 10%">
+                                            PIC
                                         </th>
                                         <th style="width: 18%">
                                             Progress
                                         </th>
                                         <th style="width: 5%">
-                                            Start Date
+                                            Tanggal Mulai
                                         </th>
                                         <th style="width: 5%">
-                                            Due Date
+                                            Tanggal Selesai
                                         </th>
                                         <th style="width: 5%">
-                                            Days
+                                            Sisa Hari
                                         </th>
-                                        <th style="width: 5%">
-                                            Status
-                                        </th>
-                                        <th style="width: 5">
-                                            Urgency
-                                        </th>
-                                        <th style="width: 15%">Action</th>
+                                        <th style="width: 15%; text-align: center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -88,6 +84,9 @@
                                                     </span>
                                                     <br>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                {{ $project->pic->name }}
                                             </td>
                                             <td>
                                                 @php
@@ -137,60 +136,28 @@
                                                 <td>{{ $project->deadline->diffInDays($today, true) }} days`</td>
                                             @endif
                                             <td class="text-center">
-                                                @if ($project->status == 'Finished')
-                                                    <span class="badge badge-success">
-                                                        {{ $project->status }}
-                                                    </span>
-                                                @elseif ($project->status == 'On Going')
-                                                    <span class="badge badge-info">
-                                                        {{ $project->status }}
-                                                    </span>
-                                                @elseif ($project->status == 'Planning')
-                                                    <span class="badge badge-warning">
-                                                        {{ $project->status }}
-                                                    </span>
-                                                @else
-                                                    <span class="badge badge-light">
-                                                        {{ $project->status }}
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                @if ($project->urgency == 'High')
-                                                    <span class="badge badge-danger">
-                                                        {{ $project->urgency }}
-                                                    </span>
-                                                @elseif ($project->urgency == 'Medium')
-                                                    <span class="badge badge-orange">
-                                                        {{ $project->urgency }}
-                                                    </span>
-                                                @else
-                                                    <span class="badge badge-warning">
-                                                        {{ $project->urgency }}
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
                                                 @if (auth()->user()->role_id != 5)
-                                                    <a class="btn btn-sm btn-info rounded-partner"
+                                                    <a class="btn btn-sm btn-info rounded-partner" title="Detail Project"
                                                         href="{{ route('project.detail', $project->kode) }}">
                                                         <i class="fa-solid fa-eye"></i>
                                                     </a>
                                                     @if ($project->status != 'Finished')
                                                         <a class="btn btn-sm btn-success rounded-partner"
+                                                            title="Edit Project"
                                                             href="{{ route('project.edit', $project->kode) }}">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </a>
                                                     @endif
-                                                    <button class="btn btn-sm btn-danger rounded-partner"
-                                                        onclick="deleteProject({{ $project->id }})"><i
-                                                            class="fas fa-trash"></i></button>
-                                                    <form id="delete-form-{{ $project->id }}"
-                                                        action="{{ route('project.destroy', $project->id) }}"
-                                                        method="POST" style="display: none;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
+                                                    {{-- ! Belum diimplement --}}
+                                                    <a class="btn btn-sm btn-primary rounded-partner muted"
+                                                        title="To-do List"
+                                                        href="{{ route('project.task', $project->kode) }}">
+                                                        <i class="fas fa-tasks"></i>
+                                                    </a>
+                                                    <a class="btn btn-sm btn-secondary rounded-partner muted"
+                                                        title="Dokumen Project" href="#">
+                                                        <i class="fas fa-file"></i>
+                                                    </a>
                                                 @else
                                                     <a class="btn btn-sm btn-info rounded-partner"
                                                         href="{{ route('project.detail', $project->kode) }}">
@@ -225,39 +192,28 @@
     <script type="text/javascript">
         $(function() {
             $('#projectTable').DataTable({
-                "paging": true,
-                'processing': true,
-                "searching": false,
-                "info": true,
-                "scrollX": true,
-                "order": [],
-                "columnDefs": [{
-                    "orderable": true,
-                }]
+                paging: true,
+                processing: true,
+                searching: false,
+                info: true,
+                scrollX: true,
+                headerScroll: true,
+                ordering: false,
+                language: {
+                    processing: '<i class="fa fa-spinner fa-spin"></i><span class="sr-only">Loading...</span>',
+                    paginate: {
+                        previous: '<i class="fas fa-angle-left"></i>',
+                        next: '<i class="fas fa-angle-right"></i>'
+                    },
+                    emptyTable: 'Tidak ada data',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                    infoEmpty: 'Menampilkan 0 sampai 0 dari 0 data',
+                    infoFiltered: '(filtered from _MAX_ total records)',
+                    search: 'Cari:',
+                    lengthMenu: 'Tampilkan _MENU_ data',
+                    zeroRecords: 'Data tidak ditemukan'
+                },
             });
         });
-
-        function deleteProject(id) {
-            Swal.fire({
-                title: 'Are you sure?',
-                icon: 'warning',
-                showCancelButton: false,
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'Delete'
-            }).then((result) => {
-                if (result.value) {
-                    event.preventDefault();
-                    document.getElementById('delete-form-' + id).submit();
-                } else if (
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-                    swal(
-                        'Cancelled',
-                        'Your data is safe !',
-                        'error'
-                    )
-                }
-            })
-        }
     </script>
 @endpush

@@ -13,19 +13,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // $this->call(RoleSeeder::class);
-        // $this->call(DepartmentSeeder::class);
-        $this->call(UserSeeder::class);
-
-        // $this->call(ClientSeeder::class);
-        // $this->call(SupplierSeeder::class);
-        // $this->call(PartnerSeeder::class);
-
-        // User::factory(10)->create();
-
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        if (getenv('APP_ENV') == 'local') {
+            $this->call(RoleSeeder::class);
+            $this->call(DepartmentSeeder::class);
+            $this->call(UserSeeder::class);
+            $this->call(UserExtensionSeeder::class);
+            $this->call(CostCenterCategoriesSeeder::class);
+            $this->call(ClientSeeder::class);
+            $this->call(SupplierSeeder::class);
+            $this->call(PartnerSeeder::class);
+        }
     }
 }

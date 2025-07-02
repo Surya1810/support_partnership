@@ -78,7 +78,7 @@
                                     </div>
                                 @endif
 
-                                <div class="col-12 col-md-2 my-3 my-md-0">
+                                <div class="col-12 col-md-3 my-3 my-md-0">
                                     <div class="btn-group col-12 col-md-0" role="group">
                                         <button class="btn btn-primary rounded-partner" type="button"
                                             id="buttonAddJobModal">
@@ -92,7 +92,7 @@
                                 </div>
 
                                 <div
-                                    class="col-12 {{ auth()->user()->role_id == 2 ? 'col-md-5' : 'col-md-7' }} mt-2 mt-0 text-right">
+                                    class="col-12 {{ auth()->user()->role_id == 2 ? 'col-md-5' : 'col-md-6' }} mt-2 mt-0 text-right">
                                     <form method="GET" action="{{ route('jobs.export') }}"
                                         class="form-inline justify-content-end">
                                         <input type="date" name="start_date" class="form-control mr-0 mr-md-2"
