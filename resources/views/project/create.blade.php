@@ -362,7 +362,7 @@
                                         </div>
                                         <div class="card bg-warning text-center col-10 col-md-6 mx-1 h-100">
                                             <div class="card-header">
-                                                <b>Total Kredit</b>
+                                                <b>Total Limit</b>
                                             </div>
                                             <div class="card-body">
                                                 <p class="card-text" id="totalLimitProjectText">
@@ -494,8 +494,8 @@
 
             // Trigger juga setiap kali margin dihitung ulang
             const originalCalculateSP2DandMargin = calculateSP2DandMargin;
-            window.calculateSP2DandMargin = function() {
-                originalCalculateSP2DandMargin();
+            window.calculateSP2DandMargin = function(hasRAB = false, amount = null) {
+                originalCalculateSP2DandMargin(hasRAB, amount);
                 calculateProfitShares();
             };
 
@@ -531,116 +531,117 @@
             });
 
             $('#start, #deadline').on('change', calculateDays);
-        });
 
-        $('#formImportRAB').on('submit', function(e) {
-            e.preventDefault();
-            $.LoadingOverlay('show');
+            $('#formImportRAB').on('submit', function(e) {
+                e.preventDefault();
+                $.LoadingOverlay('show');
 
-            let formData = new FormData();
-            formData.append('file', $('#formImportRAB #file')[0].files[0]);
+                let formData = new FormData();
+                formData.append('file', $('#formImportRAB #file')[0].files[0]);
 
-            $.ajax({
-                url: "{{ route('project.import.rab') }}",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(data) {
-                    console.log(data);
+                $.ajax({
+                    url: "{{ route('project.import.rab') }}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(data) {
+                        const saldo = data.saldo;
 
-                    const saldo = data.saldo;
+                        $('#totalSaldoProjectText').text(formatCurrency(saldo.total_debet));
+                        $('#totalSaldoProjectInput').val(saldo.total_debet);
+                        $('#totalLimitProjectText').text(formatCurrency(saldo.total_limit));
+                        $('#totalLimitProjectInput').val(saldo.total_limit);
 
-                    $('#totalSaldoProjectText').text(formatCurrency(saldo.total_debet));
-                    $('#totalSaldoProjectInput').val(saldo.total_debet);
-                    $('#totalLimitProjectText').text(formatCurrency(saldo.total_limit));
-                    $('#totalLimitProjectInput').val(saldo.total_limit);
+                        calculateSP2DandMargin(true, saldo.total_debet);
 
-                    let tbody = $('#tablePreviewRAB tbody');
-                    tbody.empty();
+                        let tbody = $('#tablePreviewRAB tbody');
+                        tbody.empty();
 
-                    if (data.items.length === 0) {
-                        tbody.append(
-                            '<tr><td colspan="6" class="text-center">Tidak ada data</td></tr>');
-                        return Swal.fire({
-                            icon: 'warning',
-                            text: 'Data cost center untuk project tidak ada atau format excel tidak sesuai',
-                            toast: true,
-                            timer: 5000,
-                            timerProgressBar: true,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        $.each(data.items, function(i, row) {
-                            tbody.append(`
-                            <tr>
-                                <td>${row.no}.</td>
-                                <td>
-                                    ${row.tanggal}
-                                    <input type="hidden" value="${row.tanggal}" name="items[${i}][tanggal]"/>
-                                </td>
-                                <td style="max-width: 200px">
-                                    ${row.nama_item}
-                                    <input type="hidden" value="${row.nama_item}" name="items[${i}][name]"/>
-                                </td>
-                                <td>
-                                    ${row.bulan}
-                                    <input type="hidden" value="${row.bulan_index}" name="items[${i}][bulan]"/>
-                                </td>
-                                <td>
-                                    ${row.tahun}
-                                    <input type="hidden" value="${row.tahun}" name="items[${i}][tahun]"/>
-                                </td>
-                                <td class="${row.debet ? 'bg-success' : ''}">
-                                    ${row.debet
-                                        ? formatCurrency(row.debet)
-                                            +  '<input type="hidden" value="'
-                                            + row.debet + '" name="items[' + i + '][debet] "/>'
-                                        : '-'
-                                            + '<input type="hidden" value="" name="items[' + i + '][debet]"/>'
-                                        }
-                                </td>
-                                <td class="${row.limit ? 'bg-warning' : ''}">
-                                    ${row.limit
-                                        ? formatCurrency(row.limit)
-                                            +  '<input type="hidden" value="'
-                                            + row.limit + '" name="items[' + i + '][kredit] "/>'
-                                        : '-'
-                                            + '<input type="hidden" value="" name="items[' + i + '][kredit]"/>'
-                                        }
-                                </td>
-                                <td>
-                                    ${row.kode_ref}
-                                    <input type="hidden" value="${row.kode_ref}" name="items[${i}][kode_ref]"/>
-                                </td>
-                            </tr>
-                        `);
+                        if (data.items.length === 0) {
+                            tbody.append(
+                                '<tr><td colspan="6" class="text-center">Tidak ada data</td></tr>'
+                            );
+                            return Swal.fire({
+                                icon: 'warning',
+                                text: 'Data cost center untuk project tidak ada atau format excel tidak sesuai',
+                                toast: true,
+                                timer: 5000,
+                                timerProgressBar: true,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            $.each(data.items, function(i, row) {
+                                tbody.append(`
+                                        <tr>
+                                            <td>${row.no}.</td>
+                                            <td>
+                                                ${row.tanggal}
+                                                <input type="hidden" value="${row.tanggal}" name="items[${i}][tanggal]"/>
+                                            </td>
+                                            <td style="max-width: 200px">
+                                                ${row.nama_item}
+                                                <input type="hidden" value="${row.nama_item}" name="items[${i}][name]"/>
+                                            </td>
+                                            <td>
+                                                ${row.bulan}
+                                                <input type="hidden" value="${row.bulan_index}" name="items[${i}][bulan]"/>
+                                            </td>
+                                            <td>
+                                                ${row.tahun}
+                                                <input type="hidden" value="${row.tahun}" name="items[${i}][tahun]"/>
+                                            </td>
+                                            <td class="${row.debet ? 'bg-success' : ''}">
+                                                ${row.debet
+                                                    ? formatCurrency(row.debet)
+                                                        +  '<input type="hidden" value="'
+                                                        + row.debet + '" name="items[' + i + '][debet] "/>'
+                                                    : '-'
+                                                        + '<input type="hidden" value="" name="items[' + i + '][debet]"/>'
+                                                    }
+                                            </td>
+                                            <td class="${row.limit ? 'bg-warning' : ''}">
+                                                ${row.limit
+                                                    ? formatCurrency(row.limit)
+                                                        +  '<input type="hidden" value="'
+                                                        + row.limit + '" name="items[' + i + '][kredit] "/>'
+                                                    : '-'
+                                                        + '<input type="hidden" value="" name="items[' + i + '][kredit]"/>'
+                                                    }
+                                            </td>
+                                            <td>
+                                                ${row.kode_ref}
+                                                <input type="hidden" value="${row.kode_ref}" name="items[${i}][kode_ref]"/>
+                                            </td>
+                                        </tr>
+                                    `);
+                            });
+                        }
+                        $('#tablePreviewRAB').removeClass('d-none');
+                        $('#modalImportRAB').modal('hide');
+                        $('#isRABReady').val('1');
+                        $('#cardSaldoRABWrapper').addClass('d-flex').show();
+                        $.LoadingOverlay('hide');
+                    },
+                    error: function(xhr) {
+                        console.log(xhr);
+                        $('#isRABReady').val('0');
+                        $('#cardSaldoRABWrapper').removeClass('d-flex').hide();
+                        $.LoadingOverlay('hide');
+                        Swal.fire({
+                            'icon': xhr.status === 400 ? 'warning' : 'error',
+                            'toast': true,
+                            'position': 'top-right',
+                            'showConfirmButton': false,
+                            'timer': 5000,
+                            'timerProgressBar': true,
+                            'text': xhr.responseJSON.message
                         });
                     }
-                    $('#tablePreviewRAB').removeClass('d-none');
-                    $('#modalImportRAB').modal('hide');
-                    $('#isRABReady').val('1');
-                    $('#cardSaldoRABWrapper').addClass('d-flex').show();
-                    $.LoadingOverlay('hide');
-                },
-                error: function(xhr) {
-                    console.log(xhr);
-                    $('#isRABReady').val('0');
-                    $('#cardSaldoRABWrapper').removeClass('d-flex').hide();
-                    $.LoadingOverlay('hide');
-                    Swal.fire({
-                        'icon': xhr.status === 400 ? 'warning' : 'error',
-                        'toast': true,
-                        'position': 'top-right',
-                        'showConfirmButton': false,
-                        'timer': 5000,
-                        'timerProgressBar': true,
-                        'text': xhr.responseJSON.message
-                    });
-                }
+                });
             });
         });
 
@@ -686,7 +687,7 @@
             return parseFloat(value.replace(/[^0-9,-]+/g, '').replace(',', '.')) || 0;
         }
 
-        function calculateSP2DandMargin() {
+        function calculateSP2DandMargin(hasRAB = false, amount = null) {
             const pekerjaan = getNumberFromCurrency($('#nilai_pekerjaan').val());
             const ppnPercent = parseFloat($('#ppn').val()) || 0;
             const pphPercent = parseFloat($('#pph').val()) || 0;
@@ -700,8 +701,14 @@
             // Tampilkan hasil SP2D dan Margin
             $('#sp2d').val(formatCurrency(sp2d));
             $('#sp2d_numeric').val(sp2d);
-            $('#margin').val(formatCurrency(margin));
-            $('#margin_numeric').val(margin);
+
+            if (hasRAB) {
+                $('#margin').val(formatCurrency(margin - amount));
+                $('#margin_numeric').val(margin - amount);
+            } else {
+                $('#margin').val(formatCurrency(margin));
+                $('#margin_numeric').val(margin);
+            }
 
             // Lanjut hitung distribusi profit jika ada
             calculateProfitShares();

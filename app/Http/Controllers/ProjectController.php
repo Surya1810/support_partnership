@@ -30,7 +30,9 @@ class ProjectController extends Controller
     public function index()
     {
         $today = Carbon::now()->toFormattedDateString('d/m/y');
-        $projects = Project::with('pic')->where('status', '!=', 'Finished')->get();
+        $projects = Project::with('pic')
+            ->where('status', '!=', 'Finished')
+            ->get();
 
         return view('project.index', compact('projects', 'today'));
     }
@@ -71,10 +73,10 @@ class ProjectController extends Controller
             'assisten' => 'bail|required',
             'start' => 'bail|required',
             'deadline' => 'bail|required',
-            'profit_perusahaan' => 'nullable|max:40',
-            'profit_penyusutan' => 'nullable|max:20',
-            'profit_divisi' => 'nullable|max:20',
-            'profit_bonus' => 'nullable|max:30',
+            'profit_perusahaan' => 'nullable|numeric',
+            'profit_penyusutan' => 'nullable|numeric',
+            'profit_divisi' => 'nullable|numeric',
+            'profit_bonus' => 'nullable|numeric',
             'items' => 'bail|array', // RAB
             'items.*.name' => 'bail|required|string|max:255',
             'items.*.bulan' => 'bail|required|string|max:255',
@@ -124,7 +126,7 @@ class ProjectController extends Controller
                 ]);
 
                 /**
-                 * Masukkan item RAB ke cost_center_subs
+                 * Masukkan item RAB ke cost_center
                  */
                 $departmentId   = Auth::user()->department_id;
                 $department = Department::where('id', $departmentId)->first();
@@ -174,7 +176,7 @@ class ProjectController extends Controller
                     $addProfits = ProjectProfit::create([
                         'project_id' => $addProject->id,
                         'percent_company' => (int) $request->profit_perusahaan,
-                        'percent_depresiation' => (int) $request->profit_penyusutan,
+                        'percent_depreciation' => (int) $request->profit_penyusutan,
                         'percent_cash_department' => (int) $request->profit_divisi,
                         'percent_team_bonus' => (int) $request->profit_bonus,
                     ]);
@@ -190,7 +192,6 @@ class ProjectController extends Controller
                 }
             }
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
             return redirect()->back()->with([
                 'pesan' => 'Project gagal ditambahkan',
@@ -204,12 +205,15 @@ class ProjectController extends Controller
      */
     public function edit($kode)
     {
-        $project = Project::where('kode', $kode)->first();
+        $project = Project::where('kode', $kode)
+            ->with(['financial', 'profit', 'costCenters'])
+            ->first();
         $users = User::where('id', '!=', '1')->get();
         $clients = Client::all();
         $departments = Department::all()->except([2, 4, 6, 7, 8]);
+        $totalDebetProject = $project->costCenters->sum('amount_credit');
 
-        return view('project.edit', compact('project', 'users', 'clients', 'departments'));
+        return view('project.edit', compact('project', 'users', 'clients', 'departments', 'totalDebetProject'));
     }
 
     /**
@@ -218,37 +222,105 @@ class ProjectController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'bail|required',
-            'client' => 'bail|required',
-            'creative_brief' => 'bail|required',
-            'pic' => 'bail|required',
-            'assisten' => 'bail|required',
-            'status' => 'bail|required',
-            'urgency' => 'bail|required',
-            'deadline' => 'bail|required',
-            'start' => 'bail|required',
+            'name' => 'required',
+            'client' => 'required',
+            'creative_brief' => 'nullable|string',
+            'nilai_pekerjaan' => 'required|numeric',
+            'ppn' => 'required|numeric',
+            'pph' => 'required|numeric',
+            'pic' => 'required',
+            'assisten' => 'required|array',
+            'start' => 'required|date',
+            'deadline' => 'required|date',
+            'profit_perusahaan' => 'nullable|numeric',
+            'profit_penyusutan' => 'nullable|numeric',
+            'profit_divisi' => 'nullable|numeric',
+            'profit_bonus' => 'nullable|numeric',
         ]);
 
-        $project = Project::find($id);
-        $project->name = $request->name;
-        $project->client_id = $request->client;
-        $project->department_id = $request->department_id;
-        $project->creative_brief = $request->creative_brief;
-        $project->user_id = $request->pic;
-        $project->status = $request->status;
-        $project->urgency = $request->urgency;
-        $project->deadline = $request->deadline;
-        $project->start = $request->start;
-        $project->assisten_id = implode(',', $request->assisten);
-        $project->update();
+        $calculateProfit = (int) $request->profit_perusahaan
+            + (int) $request->profit_penyusutan
+            + (int) $request->profit_divisi
+            + (int) $request->profit_bonus;
 
-        return redirect()->route('project.index')->with(['pesan' => 'Project updated successfully', 'level-alert' => 'alert-warning']);
+        if ($calculateProfit > 100) {
+            return redirect()->back()->with([
+                'pesan' => 'Persentase keuntungan tidak boleh melebihi 100%',
+                'level-alert' => 'alert-warning'
+            ]);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $project = Project::findOrFail($id);
+            $project->update([
+                'name' => $request->name,
+                'client_id' => $request->client,
+                'user_id' => $request->pic,
+                'start' => $request->start,
+                'deadline' => $request->deadline,
+                'assisten_id' => implode(',', $request->assisten)
+            ]);
+
+            $projectFinancial = ProjectFinancial::where('project_id', $project->id)->first();
+            if ($projectFinancial) {
+                $projectFinancial->update([
+                    'job_value' => (int) $request->nilai_pekerjaan,
+                    'vat_percent' => $request->ppn,
+                    'tax_percent' => $request->pph,
+                    'sp2d_amount' => (int) $request->sp2d,
+                    'margin' => (int) $request->margin
+                ]);
+            }
+
+            $costCenterItems = CostCenter::where('project_id', $project->id)->get();
+            $remainingAmount = 0;
+
+            foreach ($costCenterItems as $item) {
+                // Perhitungan saldo tersisa per baris
+                if (!is_null($item->amount_debit) && $item->amount_debit != 0) {
+                    $remainingAmount = (int) $item->amount_debit;
+                }
+
+                if (!is_null($item->amount_credit) && $item->amount_credit != 0) {
+                    $remainingAmount -= (int) $item->amount_credit;
+                }
+
+                $item->amount_remaining = $remainingAmount;
+                $item->save();
+            }
+
+            // Update atau insert project profit
+            ProjectProfit::updateOrCreate(
+                ['project_id' => $project->id],
+                [
+                    'percent_company' => (int) $request->profit_perusahaan,
+                    'percent_depreciation' => (int) $request->profit_penyusutan,
+                    'percent_cash_department' => (int) $request->profit_divisi,
+                    'percent_team_bonus' => (int) $request->profit_bonus,
+                ]
+            );
+
+            DB::commit();
+
+            return redirect()->route('project.index')->with([
+                'pesan' => 'Data project berhasil diperbarui',
+                'level-alert' => 'alert-success'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with([
+                'pesan' => 'Gagal memperbarui project: ' . $e->getMessage(),
+                'level-alert' => 'alert-danger'
+            ]);
+        }
     }
 
     public function detail($kode)
     {
         $project = Project::where('kode', $kode)
-            ->with(['financial.otherCosts', 'financial.netProfits', 'costCenterSubs'])
+            ->with(['financial', 'profit', 'costCenters'])
             ->first();
         $asisten = explode(',', $project->assisten_id);
         $team = User::whereIn('id', $asisten)->get();

@@ -42,4 +42,17 @@ class Project extends Model
     {
         return $this->hasOne(Income::class, 'project_id');
     }
+
+    public function profit() {
+        return $this->hasOne(ProjectProfit::class, 'project_id');
+    }
+
+    public function financial()
+    {
+        return $this->hasOne(ProjectFinancial::class, 'project_id');
+    }
+
+    public function costCenters() {
+        return $this->hasMany(CostCenter::class, 'project_id');
+    }
 }

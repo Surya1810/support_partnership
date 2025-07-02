@@ -141,19 +141,19 @@
                                                         href="{{ route('project.detail', $project->kode) }}">
                                                         <i class="fa-solid fa-eye"></i>
                                                     </a>
-                                                    @if ($project->status != 'Finished')
+                                                    @if ($project->status != 'Finished' && (auth()->user()->department_id == $project->department_id))
                                                         <a class="btn btn-sm btn-success rounded-partner"
                                                             title="Edit Project"
                                                             href="{{ route('project.edit', $project->kode) }}">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </a>
                                                     @endif
-                                                    {{-- ! Belum diimplement --}}
                                                     <a class="btn btn-sm btn-primary rounded-partner muted"
                                                         title="To-do List"
                                                         href="{{ route('project.task', $project->kode) }}">
                                                         <i class="fas fa-tasks"></i>
                                                     </a>
+                                                    {{-- ! Belum diimplement --}}
                                                     <a class="btn btn-sm btn-secondary rounded-partner muted"
                                                         title="Dokumen Project" href="#">
                                                         <i class="fas fa-file"></i>
