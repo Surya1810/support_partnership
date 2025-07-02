@@ -132,6 +132,12 @@ class UserJobController extends Controller
 
             return DataTables::of($jobs)
                 ->addIndexColumn()
+                ->addColumn('priority', function ($job) {
+                    if ($job->is_priority) {
+                        return '<img src="'. asset('assets/img/jangrik.gif') .'" width="40px" />';
+                    }
+                    return '';
+                })
                 ->addColumn('assigner', fn($job) => $job->assigner->name ?? '-')
                 ->addColumn('assignee', fn($job) => $job->assignee->name ?? '-')
                 ->addColumn('department', fn($job) => $job->assignee->department->name ?? '-')
@@ -225,7 +231,7 @@ class UserJobController extends Controller
                     'total_efficiency' => $totalEfficiency,
                     'is_mobile' => $isMobile
                 ])
-                ->rawColumns(['actions', 'report_file', 'feedback'])
+                ->rawColumns(['actions', 'report_file', 'feedback', 'priority'])
                 ->make(true);
         }
 
@@ -291,6 +297,11 @@ class UserJobController extends Controller
 
             return DataTables::of($jobs)
                 ->addIndexColumn()
+                ->addColumn('priority', function ($job) {
+                    if ($job->is_priority) {
+                        return '<img src="' . asset('assets/img/jangrik.gif') . '" width="40px" />';
+                    }
+                })
                 ->addColumn('assigner', fn($job) => $job->assigner->name ?? '-')
                 ->addColumn('assignee', fn($job) => $job->assignee->name ?? '-')
                 ->addColumn('department', fn($job) => $job->assignee->department->name ?? '-')
@@ -453,7 +464,7 @@ class UserJobController extends Controller
                         $query->where('name', 'like', '%' . $keyword . '%');
                     });
                 })
-                ->rawColumns(['actions', 'report_file', 'feedback'])
+                ->rawColumns(['actions', 'report_file', 'feedback', 'priority'])
                 ->make(true);
         }
 

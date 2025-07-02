@@ -116,6 +116,7 @@
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th rowspan="2" style="vertical-align: middle">No.</th>
+                                                <th rowspan="2" style="vertical-align: middle">Jangkrik?</th>
                                                 <th colspan="2" style="text-align: center">Penugasan</th>
                                                 <th rowspan="2" style="vertical-align: middle">Divisi</th>
                                                 <th rowspan="2" style="vertical-align: middle">Detail Pekerjaan</th>
@@ -334,6 +335,12 @@
                     orderable: false,
                     searchable: false,
                     class: 'text-center',
+                },
+                {
+                    data: 'priority',
+                    name: 'priority',
+                    class: 'text-center',
+                    orderable: false,
                 },
                 {
                     data: 'assigner',

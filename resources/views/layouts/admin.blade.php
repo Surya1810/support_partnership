@@ -155,6 +155,7 @@
                                 </p>
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fa-solid fa-chart-pie"></i>
@@ -178,6 +179,10 @@
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Approval</p>
                                         </a>
+                                        <a href="{{ route('cost-center.index') }}" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Cost Center</p>
+                                        </a>
                                     @endif
                                     <a href="{{ route('application.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
@@ -186,6 +191,7 @@
                                 </li>
                             </ul>
                         </li>
+
                         <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fa-solid fa-circle-info"></i>
@@ -232,6 +238,7 @@
                                 </p>
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a href="{{ route('project.index') }}" class="nav-link">
                                 <i class="nav-icon fa-solid fa-helmet-safety"></i>
@@ -240,6 +247,7 @@
                                 </p>
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a href="{{ route('files.index') }}" class="nav-link">
                                 <i class="nav-icon fa-solid fa-folder-open"></i>
