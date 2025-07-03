@@ -340,7 +340,8 @@
                                     <input type="hidden" id="isRABReady" value="0">
                                     <div class="form-group">
                                         <label for="import_rab">RAB</label>
-                                        <button class="btn btn-sm btn-primary" id="buttonModalImportRAB" type="button">
+                                        <button class="btn btn-sm btn-primary rounded-partner" id="buttonModalImportRAB"
+                                            type="button">
                                             <i class="fas fa-file-import"></i> Import dari Excel
                                         </button>
                                     </div>
@@ -419,7 +420,8 @@
                 <div class="modal-body">
                     <form id="formImportRAB" method="POST" enctype="multipart/form-data">
                         <div class="form-group">
-                            <button class="btn btn-sm btn-warning">
+                            <button class="btn btn-sm btn-warning rounded-partner" type="button"
+                                id="buttonDownloadTemplate">
                                 <i class="fas fa-file-download"></i> Download Template
                             </button>
                         </div>
@@ -429,14 +431,14 @@
                                 accept=".xlsx">
                         </div>
                         <div class="form-group">
-                            <button class="btn float-right btn-sm btn-success" id="buttonImportRAB">
+                            <button class="btn float-right btn-sm btn-success rounded-partner" id="buttonImportRAB">
                                 <i class="fas fa-file-import"></i> Import
                             </button>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-secondary rounded-partner" data-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -642,6 +644,10 @@
                         });
                     }
                 });
+            });
+
+            $('#buttonDownloadTemplate').on('click', function() {
+                window.open('{{ route('project.create.download-template-rab') }}', '_blank');
             });
         });
 

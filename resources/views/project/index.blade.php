@@ -153,9 +153,8 @@
                                                         href="{{ route('project.task', $project->kode) }}">
                                                         <i class="fas fa-tasks"></i>
                                                     </a>
-                                                    {{-- ! Belum diimplement --}}
                                                     <a class="btn btn-sm btn-secondary rounded-partner muted"
-                                                        title="Dokumen Project" href="#">
+                                                        title="Dokumen Penyelesaian" href="{{ route('project.finalization', $project->kode) }}">
                                                         <i class="fas fa-file"></i>
                                                     </a>
                                                 @else

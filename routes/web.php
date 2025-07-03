@@ -109,11 +109,19 @@ Route::middleware('auth')->group(function () {
     Route::middleware('auth.development')
         ->group(function () {
             Route::resource('project', ProjectController::class);
-            Route::get('/project/detail/{kode}', [ProjectController::class, 'detail'])->name('project.detail');
-            Route::get('/project/task/{kode}', [ProjectController::class, 'task'])->name('project.task');
-            Route::get('/project/review/{kode}', [ProjectController::class, 'review'])->name('project.review');
-            Route::post('/project/done/{id}', [ProjectController::class, 'done'])->name('project.done');
-            Route::get('/projects/arsip', [ProjectController::class, 'archive'])->name('project.archive');
+            Route::controller(ProjectController::class)
+                ->prefix('projects')
+                ->group(function () {
+                    Route::get('/create/download-template-rab', 'downloadTemplateImport')
+                        ->name('project.create.download-template-rab');
+                    Route::get('/detail/{kode}', 'detail')->name('project.detail');
+                    Route::get('/task/{kode}', 'task')->name('project.task');
+                    Route::get('/review/{kode}', 'review')->name('project.review');
+                    Route::get('/finalization/{kode}', 'finalization')->name('project.finalization');
+                    Route::post('/finalization/{id}', 'storeFinalization')->name('project.store.finalization');
+                    Route::post('/done/{id}', 'done')->name('project.done');
+                    Route::get('/arsip', 'archive')->name('project.archive');
+                });
         });
 
     // Files

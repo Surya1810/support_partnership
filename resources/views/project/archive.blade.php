@@ -59,6 +59,9 @@
                                         <th style="width: 20%">
                                             Review
                                         </th>
+                                        <th class="text-center">
+                                            Aksi
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -68,6 +71,25 @@
                                             <td>{{ $project->department->name }}</td>
                                             <td>{{ $project->client->name }}</td>
                                             <td>{{ $project->review }}</td>
+                                            <td class="text-center">
+                                                @if (auth()->user()->role_id != 5)
+                                                    <a class="btn btn-sm btn-info rounded-partner" title="Detail Project"
+                                                        href="{{ route('project.detail', $project->kode) }}">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </a>
+                                                    <a class="btn btn-sm btn-secondary rounded-partner muted"
+                                                        title="Dokumen Penyelesaian"
+                                                        href="{{ route('project.finalization', $project->kode) }}">
+                                                        <i class="fas fa-file"></i>
+                                                    </a>
+                                                @else
+                                                    <a class="btn btn-sm btn-info rounded-partner"
+                                                        href="{{ route('project.detail', $project->kode) }}">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                        View Project
+                                                    </a>
+                                                @endif
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>

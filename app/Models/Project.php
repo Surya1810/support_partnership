@@ -52,6 +52,10 @@ class Project extends Model
         return $this->hasOne(ProjectFinancial::class, 'project_id');
     }
 
+    public function finalization() {
+        return $this->hasOne(ProjectFinalization::class, 'project_id');
+    }
+
     public function costCenters() {
         return $this->hasMany(CostCenter::class, 'project_id');
     }

@@ -13,7 +13,7 @@ use App\Models\ProjectProfit;
 use App\Models\User;
 
 use App\Imports\ImportRABProject;
-
+use App\Models\ProjectFinalization;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
@@ -473,6 +474,101 @@ class ProjectController extends Controller
                 'status' => 'fail',
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function downloadTemplateImport()
+    {
+        $filePath = storage_path('app/public/uploads/files/templates/Template_Cost_Center_Project.xlsx');
+
+        if (!file_exists($filePath)) {
+            return back()->with([
+                'pesan' => 'Template tidak ditemukan.',
+                'level-alert' => 'alert-danger'
+            ]);
+        }
+
+        return response()->streamDownload(function () use ($filePath) {
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+            readfile($filePath);
+        }, 'template_import_penugasan.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="template_import_penugasan.xlsx"',
+        ]);
+    }
+
+    public function finalization($kode)
+    {
+        $project = Project::where('kode', $kode)
+            ->with('finalization')
+            ->first();
+        return view('project.finalization', compact('kode', 'project'));
+    }
+
+    public function storeFinalization(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'invoice' => 'bail|required|string|max:255',
+                'id_billing' => 'bail|required|string|max:255',
+                'e_faktur' => 'bail|required|string|max:255',
+                'file_bast' => 'bail|required|mimes:pdf|max:10240',
+            ]);
+
+            DB::beginTransaction();
+
+            $project = Project::where('id', $id)->first();
+            $project->status = 'Finished';
+            $project->save();
+
+            $file = $request->file('file_bast');
+            $filename = time() . '-' . Str::random(10) . '.' . $file->extension();
+            $path = $file->storeAs('uploads/files/project_finalizations', $filename, 'public');
+            $projectFinalization = ProjectFinalization::where('project_id', $project->id)->first();
+
+            if ($projectFinalization) {
+                if ($projectFinalization->bast_file && Storage::disk('public')->exists($projectFinalization->bast_file)) {
+                    Storage::disk('public')->delete($projectFinalization->bast_file);
+                }
+
+                $projectFinalization->invoice_number = $request->invoice;
+                $projectFinalization->id_billing = $request->id_billing;
+                $projectFinalization->e_faktur = $request->e_faktur;
+                $projectFinalization->bast_file = $path;
+                $projectFinalization->save();
+
+                DB::commit();
+
+                return redirect()->route('project.finalization',$project->kode)
+                    ->with([
+                        'pesan' => 'Dokumen penyelesaian project berhasil diperbarui',
+                        'level-alert' => 'alert-success'
+                    ]);
+            } else {
+                $projectFinalization = new ProjectFinalization();
+                $projectFinalization->project_id = $project->id;
+                $projectFinalization->invoice_number = $request->invoice;
+                $projectFinalization->id_billing = $request->id_billing;
+                $projectFinalization->e_faktur = $request->e_faktur;
+                $projectFinalization->bast_file = $path;
+                $projectFinalization->save();
+
+                DB::commit();
+
+                return redirect()->route('project.finalization', $project->kode)
+                    ->with([
+                        'pesan' => 'Dokumen penyelesaian project berhasil ditambahkan',
+                        'level-alert' => 'alert-success'
+                    ]);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with([
+                'pesan' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'level-alert' => 'alert-danger'
+            ]);
         }
     }
 }

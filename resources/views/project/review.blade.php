@@ -49,6 +49,12 @@
                                         href="{{ route('project.review', $project->kode) }}" role="tab"
                                         aria-controls="tabs_review" aria-selected="true">Review</a>
                                 </li>
+                                @if (auth()->user()->role_id != 5)
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="tabs_finalization" href="{{ route('project.finalization', $project->kode) }}" role="tab"
+                                            aria-controls="tabs_finalization" aria-selected="false">Finalization</a>
+                                    </li>
+                                @endif
                             </ul>
                         </div>
                         <div class="card-body">
