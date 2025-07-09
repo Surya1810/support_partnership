@@ -22,7 +22,7 @@
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item">Finance</li>
                         <li class="breadcrumb-item">Cost Center</li>
-                        <li class="breadcrumb-item active"><strong>General Report Credit</strong></li>
+                        <li class="breadcrumb-item active"><strong>General Report Credit {{ date('Y') }}</strong></li>
                     </ol>
                 </div>
             </div>
@@ -34,7 +34,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <h4><b>General Report Credit</b></h4>
+                    <h4><b>General Report Credit {{ date('Y') }}</b></h4>
                 </div>
             </div>
             <div class="text-sm mt-3">
@@ -43,7 +43,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Debet</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
+                                <h6>{{ $sums['debit'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Kredit</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
+                                <h6>{{ $sums['credit'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -59,7 +59,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Sisa Saldo</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <h6>{{ $sums['remaining'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -78,88 +78,16 @@
 
             <div class="text-sm mt-3">
                 <div class="row">
-                    <div class="col-12 col-md-3">
-                        <div class="card card-outline rounded-partner card-info bg-primary">
-                            <div class="card-body">
-                                <p><strong>(BF) Belanja Follow Up</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
+                    @foreach ($sums['categories'] as $category)
+                        <div class="col-12 col-md-3">
+                            <div class="card card-outline rounded-partner card-info bg-primary">
+                                <div class="card-body">
+                                    <p><strong>{{ $category['name'] }}</strong></p>
+                                    <h6>{{ $category['total_debit'] }}</h6>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <div class="card card-outline rounded-partner card-info bg-primary">
-                            <div class="card-body">
-                                <p><strong>(BF) Belanja Follow Up</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <div class="card card-outline rounded-partner card-info bg-primary">
-                            <div class="card-body">
-                                <p><strong>(BO) Belanja Overhead</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <div class="card card-outline rounded-partner card-info bg-primary">
-                            <div class="card-body">
-                                <p><strong>(BG) Belanja Gaji</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <div class="card card-outline rounded-partner card-info bg-primary">
-                            <div class="card-body">
-                                <p><strong>(BA) Belanja Aset</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <div class="card card-outline rounded-partner card-info bg-primary">
-                            <div class="card-body">
-                                <p><strong>(BP) Belanja Project</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <div class="card card-outline rounded-partner card-info bg-primary">
-                            <div class="card-body">
-                                <p><strong>(BH) Biaya Hutang</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <div class="card card-outline rounded-partner card-info bg-primary">
-                            <div class="card-body">
-                                <p><strong>(PP) Pemasukan Piutang</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3"></div>
-                    <div class="col-12 col-md-3">
-                        <div class="card card-outline rounded-partner card-info bg-primary">
-                            <div class="card-body">
-                                <p><strong>(PR) Pemeliharaan Rutin</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <div class="card card-outline rounded-partner card-info bg-primary">
-                            <div class="card-body">
-                                <p><strong>(BR) Belanja Rembes</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3"></div>
+                    @endforeach
                 </div>
             </div>
 
@@ -169,10 +97,11 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="card card-outline rounded-partner card-primary p-3">
-                                <h4><b>Realisasi General Report Credit</b></h4>
+                                <h4><b>Realisasi General Report Credit {{ date('Y') }}</b></h4>
                                 <div class="row mt-3">
                                     <div class="col-12">
-                                        <button type="button" class="btn btn-sm btn-success rounded-partner px-4 float-right">
+                                        <button type="button"
+                                            class="btn btn-sm btn-success rounded-partner px-4 float-right">
                                             <i class="fas fa-file-excel"></i> Export
                                         </button>
                                     </div>

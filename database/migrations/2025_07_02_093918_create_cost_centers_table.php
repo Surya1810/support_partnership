@@ -23,6 +23,7 @@ return new class extends Migration
             $table->decimal('amount_credit', 15, 2)->default(0);
             $table->decimal('amount_remaining', 15, 2)->default(0);
             $table->year('year');
+            $table->text('detail')->nullable();
             $table->tinyInteger('month')->unsigned();
             $table->timestamps();
         });

@@ -18,4 +18,8 @@ class Department extends Model
     {
         return $this->hasMany(Income::class);
     }
+
+    public function costCenters() {
+        return $this->hasMany(CostCenter::class);
+    }
 }

@@ -493,9 +493,9 @@ class ProjectController extends Controller
                 ob_end_clean();
             }
             readfile($filePath);
-        }, 'template_import_penugasan.xlsx', [
+        }, 'Template_Cost_Center_Project.xlsx', [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="template_import_penugasan.xlsx"',
+            'Content-Disposition' => 'attachment; filename="Template_Cost_Center_Project.xlsx"',
         ]);
     }
 

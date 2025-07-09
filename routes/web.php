@@ -82,13 +82,24 @@ Route::middleware('auth')->group(function () {
     Route::middleware('auth.development')
         ->group(function () {
             Route::resource('application', ExpenseRequestController::class);
-            Route::put('/application/{id}/approve', [ExpenseRequestController::class, 'approve'])->name('application.approve');
-            Route::get('/approval/pengajuan', [ExpenseRequestController::class, 'approval'])->name('application.approval');
-            Route::put('/application/{id}/reject', [ExpenseRequestController::class, 'reject'])->name('application.reject');
-            Route::post('/application/bulk-action', [ExpenseRequestController::class, 'bulkAction'])->name('application.bulkAction');
-            Route::put('/application/{id}/process', [ExpenseRequestController::class, 'process'])->name('application.process');
-            Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])->name('application.report');
-            Route::get('/application/{id}/pdf', [ExpenseRequestController::class, 'pdf'])->name('application.pdf');
+
+            Route::middleware('auth.module.finance')
+                ->group(function () {
+                    Route::put('/application/{id}/approve', [ExpenseRequestController::class, 'approve'])
+                        ->name('application.approve');
+                    Route::get('/approval/pengajuan', [ExpenseRequestController::class, 'approval'])
+                        ->name('application.approval');
+                    Route::put('/application/{id}/reject', [ExpenseRequestController::class, 'reject'])
+                        ->name('application.reject');
+                    Route::post('/application/bulk-action', [ExpenseRequestController::class, 'bulkAction'])
+                        ->name('application.bulkAction');
+                    Route::put('/application/{id}/process', [ExpenseRequestController::class, 'process'])
+                        ->name('application.process');
+                    Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])
+                        ->name('application.report');
+                    Route::get('/application/{id}/pdf', [ExpenseRequestController::class, 'pdf'])
+                        ->name('application.pdf');
+            });
         });
 
     // Debt
@@ -187,12 +198,35 @@ Route::middleware('auth')->group(function () {
      * Wed, 02 July 2025
      */
     Route::controller(CostCenterController::class)
-        ->middleware('auth.development')
+        ->middleware(['auth.development', 'auth.module.finance'])
         ->prefix('/cost-center')
         ->group(function () {
             Route::get('/', 'index')->name('cost-center.index');
-            Route::get('/create/rab-department', 'indexCreateRABDepartment')->name('cost-center.create.rab-department');
-            Route::get('/transactions/rab-department/credit', 'indexTransactionRABDepartment')
-                ->name('cost-center.transactions.rab-department.credit');
+            Route::get('/create/rab-general', 'indexCreateRABGeneral')
+                ->name('cost-center.create.rab-general');
+
+            Route::middleware('auth.admin')
+                ->group(function () {
+                    Route::post('/create/rab-general', 'storeRABGeneral')
+                        ->name('cost-center.store.rab-general');
+                    Route::get('/edit/rab-general/{id}/list', 'getRABGeneralJSON')
+                        ->name('cost-center.edit.rab-general.list');
+                    Route::put('/edit/rab-general/{id}/update', 'updateRABGeneral')
+                        ->name('cost-center.edit.rab-general.update');
+                });
+
+            Route::get('/transactions/rab-general/credit', 'indexTransactionCreditRABGeneral')
+                ->name('cost-center.transactions.rab-general.credit');
+
+            // per divisi
+            Route::prefix('/departments')
+                ->group(function () {
+                    Route::get('/{id}', 'indexDepartment')
+                        ->name('cost-center.departments.index');
+                    Route::get('/{id}/projects', 'indexDepartmentProjects')
+                        ->name('cost-center.departments.projects');
+                    Route::get('/{id}/requests', 'indexDepartmentRequests')
+                        ->name('cost-center.departments.requests');
+                });
         });
 });

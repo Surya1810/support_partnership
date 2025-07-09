@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title')
-    Cost Center Buat RAB Divisi
+    Cost Center {{ $department->name }} Report Credit
 @endsection
 
 @push('css')
@@ -16,13 +16,15 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <h1>Cost Center</h1>
                     <ol class="breadcrumb text-black-50">
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item">Finance</li>
                         <li class="breadcrumb-item">Cost Center</li>
-                        <li class="breadcrumb-item active"><strong>Buat RAB Divisi</strong></li>
+                        <li class="breadcrumb-item active">
+                            <strong>{{ $department->name }} Report Credit {{ date('Y') }}</strong>
+                        </li>
                     </ol>
                 </div>
             </div>
@@ -34,7 +36,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <h4><b>RAB PT. Partnership Procurement Solution {{ date('Y') }}</b></h4>
+                    <h4><b>{{ $department->name }} Report Credit {{ date('Y') }}</b></h4>
                 </div>
             </div>
             <div class="text-sm mt-3">
@@ -43,7 +45,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Debet</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
+                                <h6>{{ $sums['debit'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -51,7 +53,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Kredit</strong></p>
-                                <h6>{{ formatRupiah(1000000) }}</h6>
+                                <h6>{{ $sums['credit'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -59,7 +61,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Sisa Saldo</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <h6>{{ $sums['remaining'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -74,49 +76,34 @@
                 </div>
             </div>
 
-            {{-- Department --}}
-            <div class="content mt-3 text-sm">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card card-outline rounded-partner card-primary p-3">
-                                    <h4><b>Rancangan Anggaran Biaya {{ date('Y') }}</b></h4>
-                                <div class="row mt-3">
-                                    <div class="col-6">
-                                        <button type="button" class="btn btn-sm btn-primary rounded-partner">
-                                            <i class="fas fa-plus"></i> Tambah RAB
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-warning rounded-partner mr-1">
-                                            <i class="fas fa-pencil"></i> Ubah RAB
-                                        </button>
-                                    </div>
-                                    <div class="col-6">
-                                        <button type="button" class="btn btn-sm btn-success rounded-partner float-right">
-                                            <i class="fas fa-file-excel"></i> Export
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger rounded-partner mr-1 float-right">
-                                            <i class="fas fa-upload"></i> Import
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="card-body table-responsive w-100 px-0">
-                                    <table class="table table-bordered table-striped text-sm" id="tableRAB"
-                                        style="width:100%">
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th>No.</th>
-                                                <th>Nama Item</th>
-                                                <th>Kode Transaksi</th>
-                                                <th>Divisi</th>
-                                                <th>Bulan Realisasi</th>
-                                                <th>Debet</th>
-                                                <th>Tahun</th>
-                                                <th>Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+            <hr />
+
+            <div class="text-sm mt-3">
+                <div class="row">
+                    @foreach ($sums['categories'] as $category)
+                        <div class="col-12 col-md-3">
+                            <div class="card card-outline rounded-partner card-info bg-primary">
+                                <div class="card-body">
+                                    <p><strong>{{ $category['name'] }}</strong></p>
+                                    <h6>{{ $category['total_debit'] }}</h6>
                                 </div>
                             </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Button to View Data Project and Data Kas --}}
+            <div class="content mt-3 mb-5 pb-5">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <a href="{{ route('cost-center.departments.projects', $department->id) }}" class="btn btn-outline-dark">
+                                View Data Project
+                            </a>
+                            <a href="{{ route('cost-center.departments.requests', $department->id) }}" class="btn btn-outline-dark">
+                                View Data Kas
+                            </a>
                         </div>
                     </div>
                 </div>

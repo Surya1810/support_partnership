@@ -197,7 +197,7 @@
     {{-- Modal Tambah Penugasan --}}
     <div class="modal fade" id="modalAddJob" tabindex="-1" role="dialog" aria-labelledby="modalLabelJob"
         aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <form id="formAddJob">
                 @csrf
                 <div class="modal-content">
@@ -251,7 +251,7 @@
 
     {{-- Modal Edit Penugasan --}}
     <div class="modal fade" id="editJobModal" tabindex="-1" role="dialog" data-backdrop="static">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <form id="formEditJob">
                     <div class="modal-header">
@@ -315,7 +315,6 @@
                             <input type="text" id="edit_feedback" class="form-control muted" readonly>
                         </div>
                     </div>
-
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-warning rounded-partner">Update</button>
                     </div>
@@ -327,7 +326,7 @@
     {{-- Modal Import File --}}
     <div class="modal fade" id="modalImportFile" tabindex="-1" role="dialog" aria-labelledby="modalLabelImportFile"
         aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <form id="formImportFile" method="POST" enctype="multipart/form-data" action="{{ route('jobs.import') }}">
                 @csrf
                 <div class="modal-content">
@@ -358,7 +357,7 @@
     {{-- Modal Pengecekan --}}
     <div class="modal fade" id="modalPengecekanJob" tabindex="-1" role="dialog"
         aria-labelledby="modalLabelPengecekan" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <form id="formPengecekan">
                 @csrf
                 <div class="modal-content">
@@ -840,10 +839,8 @@
                 window.open('{{ route('jobs.download_template') }}', '_blank');
             });
 
-            $(document).ready(function() {
-                $('#buttonOpenModalImportJobs').click(function() {
-                    $('#modalImportFile').modal('show');
-                });
+            $('#buttonOpenModalImportJobs').click(function() {
+                $('#modalImportFile').modal('show');
             });
 
             $('input[name="action"]').on('change', function() {
@@ -906,7 +903,7 @@
                     $('#completed_date').attr('type', 'date').val(data.completed_at) :
                     $('#completed_date').attr('type', 'text').val('');
 
-                $('#feedback').val(splittedFeedback[2]);
+                $('#feedback').val(splittedFeedback[0] + '\n' + splittedFeedback[2]);
                 $('#revision').val(data.notes);
 
                 $.LoadingOverlay("hide");

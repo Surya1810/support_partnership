@@ -3,7 +3,10 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+
 use App\Http\Middleware\IsOnDevelopment;
+use App\Http\Middleware\HasAccessToFinanceModule;
+use App\Http\Middleware\OnlyForAdmin;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->appendToGroup('auth.development', [IsOnDevelopment::class]);
+        $middleware->appendToGroup('auth.module.finance', [HasAccessToFinanceModule::class]);
+        $middleware->appendToGroup('auth.admin', [OnlyForAdmin::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (\Exception $e) {
