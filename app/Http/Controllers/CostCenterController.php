@@ -137,7 +137,6 @@ class CostCenterController extends Controller
                 ]);
             }
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollBack();
             return redirect()->back()->with([
                 'pesan' => 'Terjadi kesalahan: ' . $e->getMessage(),
@@ -375,6 +374,7 @@ class CostCenterController extends Controller
         }
     }
 
+    // view data project
     public function indexDepartmentProjects(Request $request, $id) {
         try {
             $department = Department::where('id', $id)->first();
@@ -412,6 +412,38 @@ class CostCenterController extends Controller
             }
 
             return view('cost-center.transactions_rab_in_department_projects', compact('department'));
+        } catch (\Exception $e) {
+            dd($e);
+            return redirect()->back()->with([
+                'pesan' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'level-alert' => 'alert-danger'
+            ]);
+        }
+    }
+
+    // view data kas
+    public function indexDepartmentRequests(Request $request, $id) {
+        try {
+            $department = Department::where('id', $id)->first();
+
+            if (!$department) {
+                return redirect()->back()->with([
+                    'pesan' => 'Divisi tidak ditemukan',
+                    'level-alert' => 'alert-danger'
+                ]);
+            }
+
+            if ($request->ajax()) {
+                $generalRequests = CostCenter::where('type', 'department')
+                    ->whereHas('expenses', function ($query) {
+                        $query->with(['user', 'items']);
+                    })
+                    ->where('department_id', $department->id)
+                    ->where('year', date('Y'))
+                    ->with(['department', 'expenses']);
+            }
+
+            return view('cost-center.transactions_rab_in_department_general', compact('department'));
         } catch (\Exception $e) {
             dd($e);
             return redirect()->back()->with([

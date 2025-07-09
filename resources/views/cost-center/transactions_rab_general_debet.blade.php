@@ -141,7 +141,7 @@
                         <div class="form-group row">
                             <label for="department" class="col-sm-4 col-form-label">Divisi</label>
                             <div class="col-sm-8">
-                                <select name="department" id="department" class="form-control">
+                                <select name="department" id="department" class="form-control" required>
                                     <option value="" selected disabled>-- Pilih Divisi --</option>
                                     @foreach ($departments as $department)
                                         <option value="{{ $department->id }}">{{ $department->name }}</option>
@@ -152,7 +152,7 @@
                         <div class="form-group row">
                             <label for="category" class="col-sm-4 col-form-label">Kategori</label>
                             <div class="col-sm-8">
-                                <select name="category" id="category" class="form-control select2">
+                                <select name="category" id="category" class="form-control select2" required>
                                     <option value="" selected disabled>-- Pilih Cost Center --</option>
                                     @foreach ($costCenterCategories as $category)
                                         <option value="{{ $category->id }}">
@@ -165,20 +165,20 @@
                             <label for="name" class="col-sm-4 col-form-label">Nama Item</label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control text-sm" id="name" name="name"
-                                    placeholder="Masukan nama RAB">
+                                    placeholder="Masukan nama RAB" required>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="nominal" class="col-sm-4 col-form-label">Nominal Debet</label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control text-sm price" id="nominal" name="nominal"
-                                    placeholder="Rp0">
+                                    placeholder="Rp0" required>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="month" class="col-sm-4 col-form-label">Bulan Realisasi</label>
                             <div class="col-sm-8">
-                                <select name="month" id="month" class="form-control text-sm select2">
+                                <select name="month" id="month" class="form-control text-sm select2" required>
                                     <option value="" selected disabled>-- Pilih Bulan --</option>
                                     @foreach ($months as $index => $month)
                                         <option value="{{ $index + 1 }}">{{ $month }}</option>
@@ -189,7 +189,7 @@
                         <div class="form-group row">
                             <label for="year" class="col-sm-4 col-form-label">Tahun Realisasi</label>
                             <div class="col-sm-8">
-                                <select name="year" id="year" class="form-control text-sm select2">
+                                <select name="year" id="year" class="form-control text-sm select2" required>
                                     <option value="" selected disabled>-- Pilih Tahun --</option>
                                     @foreach ($years as $year)
                                         <option value="{{ $year }}">{{ $year }}</option>
@@ -233,7 +233,7 @@
                         <div class="form-group row">
                             <label for="targetEdit" class="col-sm-4 col-form-label">Target</label>
                             <div class="col-sm-8">
-                                <select name="target" id="targetEdit" class="form-control select2" disabled>
+                                <select name="target" id="targetEdit" class="form-control select2" required disabled>
                                     <option value="" selected disabled>Pilih Divisi Terlebih Dahulu</option>
                                 </select>
                             </div>
@@ -594,6 +594,7 @@
             });
 
             $('#formEditRAB').on('submit', function(e) {
+                e.preventDefault();
                 const idRAB = $('#targetEdit').find(':selected').val();
 
                 if (idRAB == '') {
@@ -605,7 +606,7 @@
                     .replace(':id', idRAB);
 
                 $(this).attr('action', urlAction);
-                $(this).submit();
+                this.submit();
             });
         });
 
