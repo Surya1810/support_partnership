@@ -95,11 +95,14 @@ Route::middleware('auth')->group(function () {
                         ->name('application.bulkAction');
                     Route::put('/application/{id}/process', [ExpenseRequestController::class, 'process'])
                         ->name('application.process');
-                    Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])
-                        ->name('application.report');
-                    Route::get('/application/{id}/pdf', [ExpenseRequestController::class, 'pdf'])
-                        ->name('application.pdf');
-            });
+                    Route::put('/application/{id}/checking', [ExpenseRequestController::class, 'checking'])
+                        ->name('application.checking');
+                });
+
+            Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])
+                ->name('application.report');
+            Route::get('/application/{id}/pdf', [ExpenseRequestController::class, 'pdf'])
+                ->name('application.pdf');
         });
 
     // Debt
@@ -225,6 +228,16 @@ Route::middleware('auth')->group(function () {
                         ->name('cost-center.departments.index');
                     Route::get('/{id}/projects', 'indexDepartmentProjects')
                         ->name('cost-center.departments.projects');
+                    Route::get('/projects/{projectId}/budget-plan', 'indexDepartmentProjectBudgetPlan')
+                        ->name('cost-center.departments.projects.budget-plan');
+                    Route::get('/projects/{projectId}/budget-plan/json', 'getCostCentersProjectJSON')
+                        ->name('cost-center.departments.projects.budget-plan.json');
+                    Route::post('/projects/{projectId}/budget-plan', 'storeRABProject')
+                        ->name('cost-center.departments.projects.budget-plan.store');
+                    Route::put('/projects/{projectId}/budget-plan', 'updateRABProject')
+                        ->name('cost-center.departments.projects.budget-plan.update');
+                    Route::get('/projects/{projectId}/profit', 'getProjectProfitTable')
+                        ->name('cost-center.departments.projects.profit');
                     Route::get('/{id}/requests', 'indexDepartmentRequests')
                         ->name('cost-center.departments.requests');
                 });

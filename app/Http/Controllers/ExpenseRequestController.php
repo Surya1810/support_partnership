@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CostCenter;
 use App\Models\Department;
 use App\Models\ExpenseItem;
 use App\Models\ExpenseRequest;
@@ -10,6 +11,7 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ExpenseRequestController extends Controller
 {
@@ -19,11 +21,14 @@ class ExpenseRequestController extends Controller
     public function index()
     {
         $departments = Department::all()->except([2, 4, 6, 7, 8]);
-        $projects = Project::where('status', '!=', 'Finished')->get();
-
-        //query saya
-        $my_expenses = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->orderBy('created_at', 'desc')->get();
-        $reports = ExpenseRequest::where('user_id', Auth::id())->whereIn('status', ['report', 'finish'])->orderBy('created_at', 'desc')->get();
+        $my_expenses = ExpenseRequest::where('user_id', Auth::id())
+            ->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->orderBy('created_at', 'desc')
+            ->with('costCenter')
+            ->get();
+        $reports = ExpenseRequest::where('user_id', Auth::id())
+            ->whereIn('status', ['report', 'checking', 'finish'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         $user_department = Auth::user()->department_id;
         $limit = ExpenseRequest::where('department_id', $user_department)
@@ -31,14 +36,28 @@ class ExpenseRequestController extends Controller
             ->whereNotIn('status', ['finish', 'rejected'])
             ->count();
 
-        return view('finance.application', compact('departments', 'projects', 'my_expenses', 'reports', 'limit'));
+        // get cost center depends on user department_id and project
+        $projects = Project::where('department_id', $user_department)
+            ->where('status', '!=', 'Finished')
+            ->get();
+        $generalCostCenters = CostCenter::where('department_id', $user_department)
+            ->where('type', 'department')
+            ->whereNot('cost_center_category_id', 1)
+            ->where('year', date('Y'))
+            ->get();
+
+        return view(
+            'finance.application',
+            compact('departments', 'projects', 'my_expenses', 'reports', 'limit', 'generalCostCenters')
+        );
     }
 
     public function approval()
     {
         if (Auth::user()->role_id == 1 || (Auth::user()->role_id == 2 || Auth::user()->department_id == 8)) {
             //query seluruh data
-            $all_expenses = ExpenseRequest::orderBy('created_at', 'desc')->get();
+            $all_expenses = ExpenseRequest::with(['items', 'costCenter'])
+                ->orderBy('created_at', 'desc')->get();
         } else {
             $all_expenses = [];
         }
@@ -52,6 +71,7 @@ class ExpenseRequestController extends Controller
                         ->orWhere('approved_by_manager', false);
                 })
                 ->where('user_id', '!=', Auth::user()->id)
+                ->with('costCenter')
                 ->orderBy('created_at', 'desc')
                 ->get();
         } elseif (Auth::user()->department_id == 5) {
@@ -62,13 +82,14 @@ class ExpenseRequestController extends Controller
                         ->orWhere('approved_by_manager', false);
                 })
                 ->where('user_id', '!=', Auth::user()->id)
+                ->with('costCenter')
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
             $managerRequests = [];
         }
 
-        //query direktur  
+        //query direktur
         if (Auth::user()->id == 2) {
             $directorRequests = ExpenseRequest::where('status', 'pending')
                 ->where(function ($query) {
@@ -78,6 +99,7 @@ class ExpenseRequestController extends Controller
                             $q->where('role_id', 3);
                         });
                 })
+                ->with('costCenter')
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
@@ -85,14 +107,6 @@ class ExpenseRequestController extends Controller
         }
 
         return view('finance.approval', compact('managerRequests', 'directorRequests', 'all_expenses',));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -104,32 +118,41 @@ class ExpenseRequestController extends Controller
             'department_id' => 'bail|required',
             'category' => 'bail|required|',
             'use_date' => 'bail|required|max:255',
+            'project_cost_center_id' => 'bail|nullable|exists:cost_centers,id',
             'items' => 'required|array',
             'items.*.item_name' => 'required|string',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        $old = session()->getOldInput();
-
         $user = User::where('id', $request->user_id)->first();
 
         // Simpan data pengajuan biaya
         $expenseRequest = new ExpenseRequest();
         $expenseRequest->user_id = $request->user_id;
+
         if ($request->department_id == 1) {
             $expenseRequest->department_id = $request->department_id;
             $expenseRequest->approved_by_manager = true;
         } else {
             $expenseRequest->department_id = $request->department_id;
         }
+
         $expenseRequest->title = $request->title;
-        if (is_numeric($request->category)) {
-            $expenseRequest->project_id = $request->category;
+        $explodedCategory = explode('#', $request->category);
+        $category = $explodedCategory[1];
+
+        if ($category == 'project') {
+            $expenseRequest->project_id = $explodedCategory[0];
+            $expenseRequest->cost_center_id = $request->project_cost_center_id;
         } else {
-            $expenseRequest->category = $request->category;
+            $expenseRequest->project_id = null;
+            $expenseRequest->cost_center_id = $explodedCategory[0];
         }
+
+        $expenseRequest->category = $category;
         $expenseRequest->use_date = $request->use_date;
+
         if ($request->pencairan == 'saya') {
             $expenseRequest->bank_name = $user->extension->bank;
             $expenseRequest->account_number = $user->extension->account;
@@ -143,9 +166,11 @@ class ExpenseRequestController extends Controller
             $expenseRequest->account_number = $request->rekening;
             $expenseRequest->account_holder_name = '-';
         }
-        if (Auth::user()->role_id === 3) {
+
+        if (Auth::user()->role_id == 3) {
             $expenseRequest->approved_by_manager = true;
         }
+
         $expenseRequest->total_amount = 0;
         $expenseRequest->save();
 
@@ -160,7 +185,6 @@ class ExpenseRequestController extends Controller
             $expenseItem->unit_price = $item['unit_price'];
             $expenseItem->total_price = $item['quantity'] * (int)$item['unit_price'];
             $expenseItem->save();
-
             $totalAmount += $expenseItem->total_price;
         }
 
@@ -168,7 +192,10 @@ class ExpenseRequestController extends Controller
         $expenseRequest->total_amount = $totalAmount;
         $expenseRequest->save();
 
-        return redirect()->route('application.index')->with(['pesan' => 'Pengajuan created successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('application.index')->with([
+            'pesan' => 'Pengajuan berhasil dibuat!',
+            'level-alert' => 'alert-success'
+        ]);
     }
 
     /**
@@ -276,7 +303,6 @@ class ExpenseRequestController extends Controller
         $expenseRequest->save();
     }
 
-
     /**
      * Remove the specified resource from storage.
      */
@@ -300,22 +326,45 @@ class ExpenseRequestController extends Controller
     public function process($id)
     {
         $expenseRequest = ExpenseRequest::findOrFail($id);
+
+        /**
+         * kurangin sisa saldo cost center
+         * yang menjadi target dari pengajuan
+         */
+        $costCenter = CostCenter::find($expenseRequest->cost_center_id);
+
+        if ($costCenter->amount_remaining < $expenseRequest->total_amount) {
+            return redirect()->back()->with(['pesan' => 'Saldo cost center tidak mencukupi', 'level-alert' => 'alert-danger']);
+        }
+
+        $costCenter->amount_remaining -= $expenseRequest->total_amount;
+        $costCenter->save();
+
         $expenseRequest->status = 'report';
         $expenseRequest->processed_by_finance = true;
         $expenseRequest->save();
 
-        return redirect()->route('application.approval')->with(['pesan' => 'Pengajuan processed successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('application.approval')->with(['pesan' => 'Pengajuan berhasil diproses', 'level-alert' => 'alert-success']);
     }
 
     public function report(Request $request, $id)
     {
         // Validasi awal input dasar
         $request->validate([
+            'report_file' => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:122880',
             'actual_amounts' => 'required|array',
             'actual_amounts.*' => 'numeric|min:0',
         ]);
 
         $expenseRequest = ExpenseRequest::with('items')->findOrFail($id);
+
+        // Upload file
+        if ($request->hasFile('report_file')) {
+            $reportFile = $request->file('report_file');
+            $randomFileName = time() . '-' . Str::random(10) . '.' . $reportFile->getClientOriginalExtension();
+            $path = $reportFile->storeAs('uploads/files/pengajuan/reports', $randomFileName, 'public');
+            $expenseRequest->report_file = $path;
+        }
 
         foreach ($request->actual_amounts as $itemId => $actualAmount) {
             $item = ExpenseItem::findOrFail($itemId);
@@ -331,13 +380,49 @@ class ExpenseRequestController extends Controller
             $item->update(['actual_amount' => $actualAmount]);
         }
 
-        $expenseRequest->status = 'finish';
+        $expenseRequest->status = 'checking';
+        $expenseRequest->reason_reject_report = null;
         $expenseRequest->save();
 
         return redirect()->route('application.index')->with([
-            'pesan' => 'Pengajuan reported successfully',
+            'pesan' => 'Laporan pengajuan berhasil dibuat',
             'level-alert' => 'alert-success'
         ]);
+    }
+
+    public function checking(Request $request, $id)
+    {
+        // dd($request->all());
+        $expenseRequest = ExpenseRequest::findOrFail($id);
+
+        if ($request->has('reason')) {
+            $expenseRequest->status = 'report';
+            $expenseRequest->reason_reject_report = $request->input('reason');
+            $expenseRequest->save();
+
+            return redirect()->back()->with(['pesan' => 'Laporan pengajuan berhasil ditolak', 'level-alert' => 'alert-success']);
+        }
+
+        $expenseRequest->status = 'finish';
+        $expenseRequest->reason_reject_report = null;
+        $expenseRequest->save();
+
+        /**
+         * jika ada sisa, maka kembalikan ke cost centernya
+         */
+        $costCenter = CostCenter::find($expenseRequest->cost_center_id);
+        $costCenter->amount_remaining += $expenseRequest->total_amount - $expenseRequest->items()->sum('actual_amount');
+
+        $note = $costCenter->detail ? $costCenter->detail . '<hr style="margin:0"/>' : '';
+        $note .= '<small><span class="text-success">RAB ditambah: '
+            . formatRupiah((int) $request->new_nominal)
+            . '<br/>Tanggal: ' . date('d-m-Y')
+            . '<br/>Sumber: Sisa Pengajuan dari ' . $expenseRequest->user->name
+            . '</small>';
+        $costCenter->detail = $note;
+        $costCenter->save();
+
+        return redirect()->back()->with(['pesan' => 'Laporan pengajuan berhasil disetujui', 'level-alert' => 'alert-success']);
     }
 
     public function bulkAction(Request $request)

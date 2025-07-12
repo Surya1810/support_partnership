@@ -43,10 +43,10 @@
                                         <small class="text-danger float-right">*Harap selesaikan 3 pengajuan sebelumnya di
                                             divisimu.</small>
                                     @else --}}
-                                        <button type="button" class="btn btn-sm btn-primary rounded-partner float-right"
-                                            data-toggle="modal" data-target="#addApplication"><i class="fas fa-plus"></i>
-                                            Buat
-                                            Pengajuan</button>
+                                    <button type="button" class="btn btn-sm btn-primary rounded-partner float-right"
+                                        data-toggle="modal" data-target="#addApplication"><i class="fas fa-plus"></i>
+                                        Buat
+                                        Pengajuan</button>
                                     {{-- @endif --}}
                                 </div>
                             </div>
@@ -60,6 +60,9 @@
                                         </th>
                                         <th style="width: 10%">
                                             Kategori
+                                        </th>
+                                        <th style="width: 10%">
+                                            Cost Center
                                         </th>
                                         <th style="width: 5%">
                                             Tanggal Digunakan
@@ -77,11 +80,14 @@
                                         <tr>
                                             <td>{{ $my_expense->title }}</td>
                                             <td>
-                                                @if ($my_expense->category == null)
-                                                    <strong>Project</strong> {{ $my_expense->project->name }}
+                                                @if ($my_expense->category == 'project')
+                                                    <strong>Project</strong>
                                                 @else
-                                                    <strong>Rumah Tangga</strong> {{ $my_expense->category }}
+                                                    <strong>General</strong>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                {{ $my_expense->costCenter?->code_ref }}
                                             </td>
                                             <td>{{ $my_expense->use_date->format('d/m/y') }}</td>
                                             <td>{{ formatRupiah($my_expense->total_amount) }}</td>
@@ -118,11 +124,14 @@
                             <table id="reportTable" class="table table-bordered text-nowrap">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th style="width: 65%">
+                                        <th style="width: 50%">
                                             Judul
                                         </th>
                                         <th style="width: 10%">
                                             Kategori
+                                        </th>
+                                        <th style="width: 15%">
+                                            Cost Center
                                         </th>
                                         <th style="width: 5%">
                                             Tanggal Digunakan
@@ -134,7 +143,7 @@
                                             Status
                                         </th>
                                         <th style="width: 5%">
-                                            Action
+                                            Aksi
                                         </th>
                                     </tr>
                                 </thead>
@@ -143,17 +152,23 @@
                                         <tr>
                                             <td>{{ $report->title }}</td>
                                             <td>
-                                                @if ($report->category == null)
+                                                @if ($report->category == 'project')
                                                     <strong>Project</strong> {{ $report->project->name }}
                                                 @else
-                                                    <strong>Rumah Tangga</strong> {{ $report->category }}
+                                                    <strong>General</strong>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                {{ $report->costCenter?->code_ref }}
                                             </td>
                                             <td>{{ $report->use_date->toFormattedDateString('d/m/y') }}</td>
                                             <td>{{ formatRupiah($report->total_amount) }}</td>
                                             <td>
                                                 @if ($report->status == 'report')
                                                     <span class="badge badge-warning">{{ $report->status }}</span>
+                                                @elseif ($report->status == 'checking')
+                                                    <span class="badge"
+                                                        style="background-color: #ee00ff">{{ $report->status }}</span>
                                                 @elseif ($report->status == 'finish')
                                                     <span class="badge badge-success">{{ $report->status }}</span>
                                                 @endif
@@ -164,6 +179,11 @@
                                                         data-toggle="modal" data-target="#reportModal{{ $report->id }}">
                                                         <i class="fa-regular fa-flag"></i>
                                                     </button>
+                                                @elseif ($report->status == 'checking')
+                                                    <a href="{{ asset('storage/' . $report->report_file) }}" target="_blank"
+                                                        class="btn btn-sm btn-info rounded-partner">
+                                                        <i class="fa-regular fa-file-pdf"></i>
+                                                    </a>
                                                 @elseif ($report->status == 'finish')
                                                     <a href="{{ route('application.pdf', $report->id) }}"
                                                         class="btn btn-sm btn-info rounded-partner" target="_blank">
@@ -182,7 +202,7 @@
         </div>
     </section>
 
-    <!-- Modal Add Application-->
+    {{-- Modal Add Pengajuan --}}
     <div class="modal fade" id="addApplication" tabindex="-1" aria-labelledby="addApplicationLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -194,30 +214,31 @@
                 </div>
                 <form action="{{ route('application.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="modal-body">
+                    <div class="modal-body pt-0">
                         <div class="form-group">
                             <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
                         </div>
 
                         <div class="row w-100">
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-4">
                                 <label for="user" class="mb-0 form-label col-form-label-sm">Nama</label>
                                 <input type="text" class="form-control @error('user') is-invalid @enderror"
                                     id="user" name="user" value="{{ auth()->user()->name }}" readonly>
                             </div>
 
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-8">
                                 <label for="department_id" class="mb-0 form-label col-form-label-sm">Divisi</label>
-                                <select class="form-control department" style="width: 100%;" id="department_id"
-                                    name="department_id" required>
+                                <select class="form-control department" style="width: 100%;" required disabled>
                                     <option></option>
                                     @foreach ($departments as $department)
                                         <option value="{{ $department->id }}"
-                                            {{ old('department_id') == $department->id ? 'selected' : '' }}>
+                                            {{ auth()->user()->department_id == $department->id ? 'selected' : '' }}>
                                             {{ $department->name }}
                                         </option>
                                     @endforeach
                                 </select>
+                                <input type="hidden" name="department_id" id="department_id"
+                                    value="{{ auth()->user()->department_id }}">
                                 @error('department_id')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -225,7 +246,7 @@
                                 @enderror
                             </div>
 
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-4 mt-3">
                                 <label for="use_date" class="mb-0 form-label col-form-label-sm">Tanggal Digunakan</label>
                                 <input type="date" class="form-control @error('use_date') is-invalid @enderror"
                                     id="use_date" name="use_date" value="{{ old('use_date') }}" required>
@@ -236,46 +257,24 @@
                                 @enderror
                             </div>
 
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-8 mt-3">
                                 <label for="category" class="mb-0 form-label col-form-label-sm">Kategori</label>
-                                <select class="form-control category" style="width: 100%;" id="category"
+                                <select class="form-control category text-small" style="width: 100%;" id="category"
                                     name="category" required>
                                     <option></option>
-                                    <optgroup label="Pengeluaran Project">
+                                    <optgroup label="Kebutuhan Project">
                                         @foreach ($projects as $project)
-                                            <option value="{{ $project->id }}">{{ $project->name }} -
-                                                <strong>{{ $project->department->name }}</strong>
+                                            <option value="{{ $project->id }}#project" data-type="project">
+                                                {{ $project->name }}
                                             </option>
                                         @endforeach
                                     </optgroup>
-                                    <optgroup label="Pengeluaran Rumah Tangga">
-                                        <option value="Reimbursement"
-                                            {{ old('category') == 'Reimbursement' ? 'selected' : '' }}>
-                                            Reimbursement
-                                        </option>
-                                        <option value="Maintenance"
-                                            {{ old('category') == 'Maintenance' ? 'selected' : '' }}>
-                                            Maintenance
-                                        </option>
-                                        <option value="Marketing & Iklan"
-                                            {{ old('category') == 'Marketing & Iklan' ? 'selected' : '' }}>
-                                            Marketing & Iklan
-                                        </option>
-                                        <option value="Kebutuhan Kantor / Divisi"
-                                            {{ old('category') == 'Kebutuhan Kantor / Divisi' ? 'selected' : '' }}>
-                                            Kebutuhan Kantor / Divisi
-                                        </option>
-                                        <option value="Pelatihan & Pendidikan"
-                                            {{ old('category') == 'Pelatihan & Pendidikan' ? 'selected' : '' }}>
-                                            Pelatihan & Pendidikan
-                                        </option>
-                                        <option value="Salary Tim"
-                                            {{ old('category') == 'Salary Tim' ? 'selected' : '' }}>
-                                            Salary Tim
-                                        </option>
-                                        <option value="Lain-lain" {{ old('category') == 'Lain-lain' ? 'selected' : '' }}>
-                                            Lain-lain
-                                        </option>
+                                    <optgroup label="Kebutuhan General Divisi">
+                                        @foreach ($generalCostCenters as $costCenter)
+                                            <option value="{{ $costCenter->id }}#department" data-type="department">
+                                                {{ $costCenter->code_ref . ' - ' . $costCenter->name }}
+                                            </option>
+                                        @endforeach
                                     </optgroup>
                                 </select>
                                 @error('category')
@@ -284,8 +283,17 @@
                                     </span>
                                 @enderror
                             </div>
+                            {{-- Cost Center Project Wrapper --}}
+                            <div class="col-12 col-md-12 mt-3 d-none" id="costCentersProjectWrapper">
+                                <label for="project_cost_center" class="mb-0 form-label col-form-label-sm">Cost Center
+                                    Project</label>
+                                <select name="project_cost_center_id" id="project_cost_center" class="form-control">
+                                    <option value="">Pilih Cost Center</option>
+                                </select>
+                            </div>
                         </div>
-                        <label for="pencairan" class="mb-0 form-label col-form-label-sm">Metode Pembayaran</label>
+
+                        <label for="pencairan" class="mb-0 form-label col-form-label-sm mt-3">Metode Pembayaran</label>
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-check m-3">
@@ -347,7 +355,6 @@
                             </div>
                         </div>
 
-
                         <label for="title" class="mb-0 form-label col-form-label-sm">Keterangan <small
                                 class="text-danger">*Wajib Detail & Lengkap</small></label>
                         <textarea type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title"
@@ -358,7 +365,7 @@
                             </span>
                         @enderror
 
-                        <label for="items" class="mb-0 form-label col-form-label-sm">Rincian Item</label>
+                        <label for="items" class="mb-0 form-label col-form-label-sm mt-3">Rincian Item</label>
                         <div class="table-responsive">
                             <table class="table table-sm" id="items-table">
                                 <tbody>
@@ -429,7 +436,23 @@
                                 <div class="col-lg-12">
                                     <div class="card rounded-partner">
                                         <div class="card-body">
-                                            <p>{{ $report->title }}</p>
+                                            <h6><strong>{{ $report->title }}</strong></h6>
+                                            @if ($report->reason_reject_report)
+                                            <div class="px-2">
+                                                <label class="mb-0 form-label col-form-label-sm">
+                                                    Laporan Ditolak Karena:
+                                                </label>
+                                                <div class="d-block">
+                                                    <p>{{ $report->reason_reject_report }}</p>
+                                                </div>
+                                            </div>
+                                            @endif
+                                            <div class="row px-3 mb-3">
+                                                <label class="mb-0 form-label col-form-label-sm">Bukti Pembayaran <small
+                                                        class="text-danger">*Gambar atau file PDF</small></label>
+                                                <input type="file" name="report_file" class="form-ontrol form-control-sm muted"
+                                                    accept="image/jpeg, image/png, image/jpg, image/webp, application/pdf">
+                                            </div>
                                             <table class="table table-bordered" id="items-table">
                                                 <thead>
                                                     <tr>
@@ -440,14 +463,17 @@
                                                     @foreach ($report->items as $item)
                                                         <tr>
                                                             <td>
-                                                                <label class="mb-0 form-label col-form-label-sm">Nama
-                                                                    item</label><br>
+                                                                <h6 class="mb-0 form-label col-form-label-sm"><strong>Nama
+                                                                        item</strong></h6>
                                                                 {{ $item->item_name }}
-                                                                <div class="row">
+                                                                <div class="row mt-3">
                                                                     <div class="col-6">
                                                                         <label
                                                                             class="mb-0 form-label col-form-label-sm">Diajukan</label>
-                                                                        {{ formatRupiah($item->total_price) }}
+                                                                        <input type="text"
+                                                                            class="form-ontrol form-control-sm muted"
+                                                                            value="{{ formatRupiah($item->total_price) }}"
+                                                                            disabled>
                                                                     </div>
                                                                     <div class="col-6">
                                                                         <label for="actual_amounts[{{ $item->id }}]"
@@ -491,55 +517,92 @@
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
-
     <script src="{{ asset('assets/adminLTE/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
 
-
     <script type="text/javascript">
-        $(function() {
+        $(document).ready(function() {
             //Initialize Select2 Elements
             $('.department').select2({
                 placeholder: "Pilih Divisi",
                 allowClear: true,
+                dropdownParent: $('#addApplication')
             })
             $('.category').select2({
                 placeholder: "Pilih Kategori",
                 allowClear: true,
+                dropdownParent: $('#addApplication')
             })
-        })
 
-        $('.price_report').inputmask({
-            alias: 'numeric',
-            prefix: 'Rp',
-            digits: 0,
-            groupSeparator: '.',
-            autoGroup: true,
-            removeMaskOnSubmit: true,
-            rightAlign: false
-        });
+            $('.price_report').inputmask({
+                alias: 'numeric',
+                prefix: 'Rp',
+                digits: 0,
+                groupSeparator: '.',
+                autoGroup: true,
+                removeMaskOnSubmit: true,
+                rightAlign: false
+            });
 
-        $(function() {
             $('#myexpenseTable').DataTable({
                 "paging": true,
                 'processing': true,
                 "searching": false,
                 "info": true,
                 "scrollX": true,
+                "headerScroll": true,
                 "order": [],
                 "columnDefs": [{
                     "orderable": true,
                 }]
             });
+
             $('#reportTable').DataTable({
                 "paging": true,
                 'processing': true,
                 "searching": false,
                 "info": true,
                 "scrollX": true,
+                "headerScroll": true,
                 "order": [],
                 "columnDefs": [{
                     "orderable": true,
                 }]
+            });
+
+            $('#category').on('change', function() {
+                let selected = $(this).val();
+                let parts = selected.split('#');
+                let id = parts[0];
+                let type = parts[1];
+
+                if (type === 'project') {
+                    $('#costCentersProjectWrapper').removeClass('d-none');
+
+                    $.ajax({
+                        url: '{{ route('cost-center.departments.projects.budget-plan.json', ':id') }}'
+                            .replace(':id', id),
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            let $select = $('#project_cost_center');
+                            $select.prop('required', true).empty();
+                            $select.append('<option value="">Pilih Cost Center</option>');
+
+                            $.each(response.data.cost_centers, function(i, item) {
+                                if (i > 0) {
+                                    $select.append('<option value="' + item.id + '">' +
+                                        item.code_ref + ' - ' + item.name +
+                                        '</option>');
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    // Sembunyikan jika bukan project
+                    $('#costCenterWrapper').addClass('d-none');
+                    $('#project_cost_center').prop('required', false)
+                        .empty().append('<option value="">Pilih Cost Center</option>');
+                }
             });
         });
 

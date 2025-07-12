@@ -449,7 +449,9 @@
     <script src="{{ asset('assets/adminLTE/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
     <script src="{{ asset('js/loading-overlay.js') }}"></script>
     <script>
-        $(function() {
+        let totalAmountRAB = 0;
+
+        $(document).ready(function() {
             $('.pic').select2({
                 placeholder: "Select PIC",
                 allowClear: true,
@@ -496,8 +498,8 @@
 
             // Trigger juga setiap kali margin dihitung ulang
             const originalCalculateSP2DandMargin = calculateSP2DandMargin;
-            window.calculateSP2DandMargin = function(hasRAB = false, amount = null) {
-                originalCalculateSP2DandMargin(hasRAB, amount);
+            window.calculateSP2DandMargin = function() {
+                originalCalculateSP2DandMargin();
                 calculateProfitShares();
             };
 
@@ -552,13 +554,14 @@
                     },
                     success: function(data) {
                         const saldo = data.saldo;
+                        totalAmountRAB = saldo.total_debet;
 
                         $('#totalSaldoProjectText').text(formatCurrency(saldo.total_debet));
                         $('#totalSaldoProjectInput').val(saldo.total_debet);
                         $('#totalLimitProjectText').text(formatCurrency(saldo.total_limit));
                         $('#totalLimitProjectInput').val(saldo.total_limit);
 
-                        calculateSP2DandMargin(true, saldo.total_debet);
+                        calculateSP2DandMargin();
 
                         let tbody = $('#tablePreviewRAB tbody');
                         tbody.empty();
@@ -693,7 +696,7 @@
             return parseFloat(value.replace(/[^0-9,-]+/g, '').replace(',', '.')) || 0;
         }
 
-        function calculateSP2DandMargin(hasRAB = false, amount = null) {
+        function calculateSP2DandMargin() {
             const pekerjaan = getNumberFromCurrency($('#nilai_pekerjaan').val());
             const ppnPercent = parseFloat($('#ppn').val()) || 0;
             const pphPercent = parseFloat($('#pph').val()) || 0;
@@ -702,19 +705,14 @@
             const pph = pekerjaan * (pphPercent / 100);
             const sp2d = pekerjaan - ppn - pph;
 
-            const margin = sp2d;
+            const margin = sp2d - totalAmountRAB;
 
             // Tampilkan hasil SP2D dan Margin
             $('#sp2d').val(formatCurrency(sp2d));
             $('#sp2d_numeric').val(sp2d);
 
-            if (hasRAB) {
-                $('#margin').val(formatCurrency(margin - amount));
-                $('#margin_numeric').val(margin - amount);
-            } else {
-                $('#margin').val(formatCurrency(margin));
-                $('#margin_numeric').val(margin);
-            }
+            $('#margin').val(formatCurrency(margin - totalAmountRAB));
+            $('#margin_numeric').val(margin - totalAmountRAB);
 
             // Lanjut hitung distribusi profit jika ada
             calculateProfitShares();

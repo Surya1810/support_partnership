@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title')
-    Cost Center Buat RAB Divisi
+    Cost Center Project Report of {{ $project->name }}
 @endsection
 
 @push('css')
@@ -16,13 +16,13 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <h1>Cost Center</h1>
                     <ol class="breadcrumb text-black-50">
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item">Finance</li>
                         <li class="breadcrumb-item">Cost Center</li>
-                        <li class="breadcrumb-item active"><strong>Buat RAB Divisi</strong></li>
+                        <li class="breadcrumb-item active"><strong>Project Report</strong></li>
                     </ol>
                 </div>
             </div>
@@ -34,32 +34,49 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <h4><b>RAB PT. Partnership Procurement Solution {{ date('Y') }}</b></h4>
+                    <h4><b>Project Report</b></h4>
+                    <input type="hidden" id="project_id" value="{{ $project->id }}">
                 </div>
             </div>
             <div class="text-sm mt-3">
                 <div class="row">
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Debet</strong></p>
-                                <h6>{{ $sums['debit'] }}</h6>
+                                <h6>{{ $totalAmount['total_debit'] }}</h6>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-primary">
+                            <div class="card-body">
+                                <p><strong>Total Kredit (Pengajuan Terealisasi)</strong></p>
+                                <h6>{{ formatRupiah(0) }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-primary">
+                            <div class="card-body">
+                                <p><strong>Sisa Saldo (Pengajuan Terealisasi + Uang Kas)</strong></p>
+                                <h6>{{ $totalAmount['total_remaining'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-primary">
+                            <div class="card-body">
+                                <p><strong>Pendapatan Tahun Berjalan</strong></p>
+                                <h6>{{ $totalAmount['total_yearly_margin'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Limit (Seluruh RAB)</strong></p>
-                                <h6>{{ $sums['credit'] }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <div class="card card-outline rounded-partner card-primary">
-                            <div class="card-body">
-                                <p><strong>Sisa Saldo</strong></p>
-                                <h6>{{ $sums['remaining'] }}</h6>
+                                <h6>{{ $totalAmount['total_credit'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -72,51 +89,63 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="card card-outline rounded-partner card-primary p-3">
-                                <h4><b>Rancangan Anggaran Biaya {{ date('Y') }}</b></h4>
-                                @php
-                                    $roleIds = [1, 2];
-                                    $deparmentsIds = [8];
-                                @endphp
-                                @if (in_array(auth()->user()->role_id, $roleIds) || in_array(auth()->user()->department_id, $deparmentsIds))
-                                    <div class="row mt-3">
-                                        <div class="col-6">
-                                            <button type="button" class="btn btn-sm btn-primary rounded-partner"
-                                                id="buttonAddRAB">
-                                                <i class="fas fa-plus"></i> Tambah RAB
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-warning rounded-partner mr-1"
-                                                id="buttonEditRAB">
-                                                <i class="fas fa-pencil"></i> Ubah RAB
-                                            </button>
-                                        </div>
-                                        <div class="col-6">
-                                            <button type="button"
-                                                class="btn btn-sm btn-success rounded-partner float-right">
-                                                <i class="fas fa-file-excel"></i> Export
-                                            </button>
-                                            <button type="button"
-                                                class="btn btn-sm btn-danger rounded-partner mr-1 float-right">
-                                                <i class="fas fa-upload"></i> Import
-                                            </button>
+                                <h4><b>Laporan Keuangan Project {{ $project->name }}</b></h4>
+                                <div class="row my-3">
+                                    @php
+                                        $roleIds = [1, 2, 3];
+                                        $deparmentsIds = [8];
+                                    @endphp
+                                    @if (in_array(auth()->user()->role_id, $roleIds) || in_array(auth()->user()->department_id, $deparmentsIds))
+                                        @if ($project->status != 'Finished' && $project->department_id == auth()->user()->department_id)
+                                            <div class="col-md-6 mb-2">
+                                                <button type="button" class="btn btn-sm btn-primary rounded-partner"
+                                                    id="buttonAddRAB">
+                                                    <i class="fas fa-plus"></i> Tambah RAB
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-warning rounded-partner mr-1"
+                                                    id="buttonEditRAB">
+                                                    <i class="fas fa-pencil"></i> Ubah RAB
+                                                </button>
+                                            </div>
+                                        @endif
+                                    @endif
+
+                                    <div
+                                        class="{{ $project->status == 'Finished' ? 'col-md-12' : 'col-md-6' }} mb-2 text-right">
+                                        @if (in_array(auth()->user()->role_id, $roleIds) || in_array(auth()->user()->department_id, $deparmentsIds))
+                                            @if ($project->status != 'Finished' && $project->department_id == auth()->user()->department_id)
+                                                <button type="button" class="btn btn-sm btn-danger rounded-partner mr-1"
+                                                    id="buttonImport">
+                                                    <i class="fas fa-upload"></i> Import
+                                                </button>
+                                            @endif
+                                        @endif
+                                        <button type="button" class="btn btn-sm btn-success rounded-partner"
+                                            id="buttonExport">
+                                            <i class="fas fa-file-excel"></i> Export
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="card-body w-100 px-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped text-sm" id="tableProject"
+                                                style="width:100%">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th></th> {{-- untuk expand detail profit dari project --}}
+                                                        <th>No.</th>
+                                                        <th>Tanggal</th>
+                                                        <th>Nama RAB</th>
+                                                        <th>Kode Transaksi</th>
+                                                        <th>Debet</th>
+                                                        <th>Limit</th>
+                                                        <th>Keterangan</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
                                         </div>
                                     </div>
-                                @endif
-                                <div class="card-body table-responsive w-100 px-0">
-                                    <table class="table table-bordered table-striped text-sm" id="tableRAB"
-                                        style="width:100%">
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th>No.</th>
-                                                <th>Nama Item</th>
-                                                <th>Kode Transaksi</th>
-                                                <th>Divisi</th>
-                                                <th>Bulan Realisasi</th>
-                                                <th>Debet</th>
-                                                <th>Tahun</th>
-                                                <th>Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -130,7 +159,8 @@
     <div class="modal fade text-sm" id="modalAddRAB" tabindex="-1" role="dialog" aria-labelledby="modalAddRABTitle"
         aria-hidden="true" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg" role="document">
-            <form id="formAddRAB" action="{{ route('cost-center.store.rab-general') }}" method="POST">
+            <form id="formAddRAB" action="{{ route('cost-center.departments.projects.budget-plan.store', $project->id) }}"
+                method="POST">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header bg-primary">
@@ -141,25 +171,13 @@
                         <div class="form-group row">
                             <label for="department" class="col-sm-4 col-form-label">Divisi</label>
                             <div class="col-sm-8">
-                                <select name="department" id="department" class="form-control" required>
-                                    <option value="" selected disabled>-- Pilih Divisi --</option>
-                                    @foreach ($departments as $department)
-                                        <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                    @endforeach
+                                <select class="form-control" disabled>
+                                    <option value="{{ $initialValues['department']->id }}">
+                                        {{ $initialValues['department']->name }}
+                                    </option>
                                 </select>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="category" class="col-sm-4 col-form-label">Kategori</label>
-                            <div class="col-sm-8">
-                                <select name="category" id="category" class="form-control select2" required>
-                                    <option value="" selected disabled>-- Pilih Cost Center --</option>
-                                    <option value="1">(KS) Kas/Pemasukan</option>
-                                    @foreach ($costCenterCategories as $category)
-                                        <option value="{{ $category->id }}">
-                                            {{ '(' . $category->code . ') ' . $category->name }}</option>
-                                    @endforeach
-                                </select>
+                                <input type="hidden" name="department" id="department"
+                                    value="{{ $initialValues['department']->id }}">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -170,10 +188,21 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label for="remaining" class="col-sm-4 col-form-label">Sisa Saldo Kas</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control text-sm price"
+                                    value="{{ $initialValues['amount_remaining'] }}" disabled required>
+                                <input type="hidden" id="remaining" name="remaining"
+                                    value="{{ $initialValues['amount_remaining'] }}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label for="nominal" class="col-sm-4 col-form-label">Nominal Debet</label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control text-sm price" id="nominal" name="nominal"
                                     placeholder="Rp0" required>
+                                <small class="text-danger d-none" id="nominalAddAlert">Nominal melebihi saldo
+                                    tersisa!</small>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -181,7 +210,7 @@
                             <div class="col-sm-8">
                                 <select name="month" id="month" class="form-control text-sm select2" required>
                                     <option value="" selected disabled>-- Pilih Bulan --</option>
-                                    @foreach ($months as $index => $month)
+                                    @foreach ($initialValues['months'] as $index => $month)
                                         <option value="{{ $index + 1 }}">{{ $month }}</option>
                                     @endforeach
                                 </select>
@@ -192,7 +221,7 @@
                             <div class="col-sm-8">
                                 <select name="year" id="year" class="form-control text-sm select2" required>
                                     <option value="" selected disabled>-- Pilih Tahun --</option>
-                                    @foreach ($years as $year)
+                                    @foreach ($initialValues['years'] as $year)
                                         <option value="{{ $year }}">{{ $year }}</option>
                                     @endforeach
                                 </select>
@@ -223,24 +252,32 @@
                         <div class="form-group row">
                             <label for="departmentEdit" class="col-sm-4 col-form-label">Divisi</label>
                             <div class="col-sm-8">
-                                <select name="department" id="departmentEdit" class="form-control" required>
-                                    <option value="">-- Pilih Divisi --</option>
-                                    @foreach ($departments as $department)
-                                        <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                    @endforeach
+                                <select class="form-control" disabled>
+                                    <option value="{{ $initialValues['department']->id }}">
+                                        {{ $initialValues['department']->name }}
+                                    </option>
                                 </select>
+                                <input type="hidden" name="department" id="departmentEdit"
+                                    value="{{ $initialValues['department']->id }}">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="targetEdit" class="col-sm-4 col-form-label">Target</label>
                             <div class="col-sm-8">
-                                <select name="target" id="targetEdit" class="form-control select2" required disabled>
-                                    <option value="" selected disabled>Pilih Divisi Terlebih Dahulu</option>
+                                <select name="target" id="targetEdit" class="form-control select2" required>
+                                    <option value="" selected disabled>-- Pilih Target --</option>
+                                    @foreach ($initialValues['project_cost_centers'] as $target)
+                                        <option value="{{ $target->id }}" data-name="{{ $target->name }}"
+                                            data-debit="{{ $target->amount_debit }}"
+                                            data-remaining="{{ $target->amount_remaining }}">
+                                            {{ $target->code_ref . ' - ' . $target->name }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="nameEdit" class="col-sm-4 col-form-label">Nama Baru</label>
+                            <label for="nameEdit" class="col-sm-4 col-form-label">Nama</label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control text-sm" id="nameEdit" name="name"
                                     placeholder="Pilih Target Terlebih Dahulu" readonly>
@@ -272,12 +309,13 @@
                             <div class="form-group row">
                                 <label for="newNominalEdit" class="col-sm-4 col-form-label">Debet Tambahan</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control text-sm price" id="newNominalEdit" placeholder="Rp0">
+                                    <input type="text" class="form-control text-sm price" id="newNominalEdit"
+                                        placeholder="Rp0">
                                     <input type="hidden" id="newNominalEditHidden" name="new_nominal">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="totalAmountEdit" class="col-sm-4 col-form-label">Total</label>
+                                <label for="totalAmountEdit" class="col-sm-4 col-form-label">Total Saldo Tersisa</label>
                                 <div class="col-sm-8">
                                     <input type="text" class="form-control text-sm price" id="totalAmountEdit"
                                         name="total_amount" placeholder="Rp0" readonly>
@@ -285,18 +323,6 @@
                             </div>
                         </div>
                         <div id="splitToNewRABFields" class="d-none">
-                            <div class="form-group row">
-                                <label for="categoryEdit" class="col-sm-4 col-form-label">Kategori</label>
-                                <div class="col-sm-8">
-                                    <select name="category" id="categoryEdit" class="form-control select2">
-                                        <option value="" selected disabled>-- Pilih Cost Center --</option>
-                                        @foreach ($costCenterCategories as $category)
-                                            <option value="{{ $category->id }}">
-                                                {{ '(' . $category->code . ') ' . $category->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
                             <div class="form-group row">
                                 <label for="nameNewEdit" class="col-sm-4 col-form-label">Nama Item</label>
                                 <div class="col-sm-8">
@@ -307,7 +333,8 @@
                             <div class="form-group row">
                                 <label for="nominalNewEdit" class="col-sm-4 col-form-label">Nominal Debet</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control text-sm price" id="nominalNewEdit" placeholder="Rp0">
+                                    <input type="text" class="form-control text-sm price" id="nominalNewEdit"
+                                        placeholder="Rp0">
                                     <small class="text-danger d-none" id="nominalNewAlert">Nominal melebihi saldo
                                         tersisa!</small>
                                     <input type="hidden" id="nominalNewRABEditHidden" name="nominal_new_rab">
@@ -318,7 +345,7 @@
                                 <div class="col-sm-8">
                                     <select name="month" id="monthEdit" class="form-control text-sm select2">
                                         <option value="" selected disabled>-- Pilih Bulan --</option>
-                                        @foreach ($months as $index => $month)
+                                        @foreach ($initialValues['months'] as $index => $month)
                                             <option value="{{ $index + 1 }}">{{ $month }}</option>
                                         @endforeach
                                     </select>
@@ -329,7 +356,7 @@
                                 <div class="col-sm-8">
                                     <select name="year" id="yearEdit" class="form-control text-sm select2">
                                         <option value="" selected disabled>-- Pilih Tahun --</option>
-                                        @foreach ($years as $year)
+                                        @foreach ($initialValues['years'] as $year)
                                             <option value="{{ $year }}">{{ $year }}</option>
                                         @endforeach
                                     </select>
@@ -360,13 +387,13 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#month, #year, #category, #department').select2({
+            $('#month, #year, #category').select2({
                 theme: 'bootstrap4',
                 width: '100%',
                 dropdownParent: $('#modalAddRAB')
             });
 
-            $('#targetEdit, #departmentEdit, #monthEdit, #yearEdit, #categoryEdit').select2({
+            $('#targetEdit, #monthEdit, #yearEdit, #categoryEdit').select2({
                 theme: 'bootstrap4',
                 width: '100%',
                 dropdownParent: $('#modalEditRAB')
@@ -382,7 +409,7 @@
                 rightAlign: false
             });
 
-            let table = $('#tableRAB').DataTable({
+            let table = $('#tableProject').DataTable({
                 scrollX: true,
                 headerScroll: true,
                 autoWidth: true,
@@ -407,15 +434,27 @@
                     zeroRecords: 'Data tidak ditemukan',
                 },
                 ajax: {
-                    url: "{{ route('cost-center.create.rab-general') }}",
-                    type: "GET"
+                    url: "{{ route('cost-center.departments.projects.budget-plan', ':id') }}".replace(
+                        ':id', $('#project_id').val()),
+                    method: 'GET'
                 },
                 columns: [{
+                        className: 'details-control text-center',
+                        orderable: false,
+                        searchable: false,
+                        data: null,
+                        defaultContent: '<button class="badge bg-info border-0" title="Detail Profit"><i class="fas fa-dollar-sign"></i></button>',
+                    },
+                    {
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
-                        className: 'text-center',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at'
                     },
                     {
                         data: 'name',
@@ -426,26 +465,78 @@
                         name: 'code_ref'
                     },
                     {
-                        data: 'department',
-                        name: 'department'
-                    },
-                    {
-                        data: 'month',
-                        name: 'month'
-                    },
-                    {
                         data: 'debit',
                         name: 'debit'
                     },
                     {
-                        data: 'year',
-                        name: 'year'
+                        data: 'credit',
+                        name: 'credit'
                     },
                     {
                         data: 'detail',
                         name: 'detail'
                     }
                 ]
+            });
+
+            $('#tableProject tbody').on('click', 'td.details-control button', function() {
+                let tr = $(this).closest('tr');
+                let row = table.row(tr);
+                let projectId = row.data().id;
+
+                if (row.child.isShown()) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                    $(this).html('<i class="fas fa-dollar-sign"></i>');
+                } else {
+                    // Tambahkan HTML tabel kosong dengan ID unik
+                    let tableId = `tableProjectProfit-${projectId}`;
+                    let html = `
+                    <table id="${tableId}" class="table table-sm table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th>Nama Item</th>
+                                <th>Nilai (%)</th>
+                                <th>Nilai (Rp)</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    `;
+                    row.child(html).show();
+                    tr.addClass('shown');
+                    $(this).text('-');
+
+                    // Inisialisasi DataTables untuk tabel profit
+                    $(`#${tableId}`).DataTable({
+                        processing: true,
+                        serverSide: true,
+                        ordering: false,
+                        searching: false,
+                        paging: false,
+                        info: false,
+                        ajax: "{{ route('cost-center.departments.projects.profit', ':id') }}"
+                            .replace(':id', projectId),
+                        columns: [{
+                                data: 'DT_RowIndex',
+                                name: 'DT_RowIndex',
+                                className: 'text-center'
+                            },
+                            {
+                                data: 'name',
+                                name: 'name'
+                            },
+                            {
+                                data: 'percent',
+                                name: 'percent'
+                            },
+                            {
+                                data: 'idr',
+                                name: 'idr'
+                            }
+                        ]
+                    });
+                }
             });
 
             $('#buttonAddRAB').on('click', function() {
@@ -469,56 +560,11 @@
                 });
             });
 
-            $('#departmentEdit').on('change', function(e) {
-                const id = e.target.value;
-
-                if (id == '') {
-                    $('#targetEdit').prop('disabled', true).html(
-                        '<option value="" selected disabled>Pilih Divisi Terlebih Dahulu</option>');
-                    return;
-                }
-
-                $.ajax({
-                    url: "{{ route('cost-center.edit.rab-general.list', ':id') }}".replace(
-                        ':id', id),
-                    type: 'GET',
-                    beforeSend: function() {
-                        $('#targetEdit').html(
-                            '<option value="" selected disabled>Loading...</option>');
-                    },
-                    success: function(response) {
-                        console.log(response);
-                        let html =
-                            '<option value="" selected disabled>-- Pilih Cost Center Target --</option>';
-
-                        if (response.data.length == 0) {
-                            html =
-                                '<option value="" selected disabled>RAB Belum Tersedia</option>';
-                            $('#targetEdit').prop('disabled', true).html(html);
-                        } else {
-                            response.data.forEach(item => {
-                                html +=
-                                    `<option value="${item.id}" data-name="${item.name}" data-debit="${Number(item.amount_debit)}" data-remaining="${Number(item.amount_remaining)}">${item.code_ref} - ${item.name}</option>`;
-                            });
-                            $('#targetEdit').prop('disabled', false).prop('required', true)
-                                .html(html);
-                        }
-                    },
-                    error: function(xhr) {
-                        console.log(xhr);
-                        $('#targetEdit').prop('disabled', true).html(
-                            '<option value="" selected disabled>Error</option>');
-                        showToast('error', 'Gagal memuat data');
-                    }
-                });
-            });
-
             $('#targetEdit').on('change', function(e) {
                 const id = e.target.value;
 
                 if (id == '') {
                     $('#nameEdit').val('Pilih Cost Center Target Terlebih Dahulu').prop('disabled', true);
-                    $('#debitEdit').val('Rp0').prop('disabled', true);
                     $('#remainingEdit').val('Rp0').prop('disabled', true);
                     $('#targetEdit').val('Pilih Divisi Terlebih Dahulu').prop('disabled', true);
                     return;
@@ -531,8 +577,9 @@
 
                 console.log(name, debit, remaining);
 
-                $('#nameEdit').prop('disabled', false).prop('readonly', false).prop('required', true).val(
-                    name);
+                $('#nameEdit').prop('disabled', false)
+                    .prop('readonly', false).prop('required', true).val(name);
+                $('#debitAmountEdit').prop('disabled', true).val(debit);
                 $('#remainingAmountEdit').prop('disabled', true).val(remaining);
 
                 $('input[name="update_type"]').prop('disabled', false).prop('required', true);
@@ -562,6 +609,17 @@
 
                     $('#newNominalEdit').prop('required', true);
                     $('#totalAmountEdit').prop('required', true);
+                }
+            });
+
+            $('#nominal').on('input', function() {
+                const nominalBaru = parseCurrency($(this).val());
+                const saldoTersisa = parseFloat($('#remaining').val());
+
+                if (nominalBaru > saldoTersisa) {
+                    $('#nominalAddAlert').removeClass('d-none');
+                } else {
+                    $('#nominalAddAlert').addClass('d-none');
                 }
             });
 
@@ -595,8 +653,9 @@
                     return;
                 }
 
-                const urlAction = "{{ route('cost-center.edit.rab-general.update', ':id') }}"
-                    .replace(':id', idRAB);
+                const urlAction =
+                    "{{ route('cost-center.departments.projects.budget-plan.update', ':id') }}".replace(
+                        ':id', idRAB);
 
                 $(this).attr('action', urlAction);
                 this.submit();

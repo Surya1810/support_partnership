@@ -140,15 +140,15 @@ class ProjectController extends Controller
                 $remainingAmount = 0;
                 $preparedCostCenterItemsData = [];
 
+                /**
+                 * Pastikan posisi uang kas selalu
+                 * berada di index pertama
+                 */
                 foreach ($costCenterItems as $index => $item) {
                     $costCenterCategory = CostCenterCategory::where('code', 'BP')->first();
 
-                    if (!is_null($item['debet']) && $item['debet'] != 0) {
-                        $remainingAmount = (int) $item['debet'];
-                    }
-
                     if (!is_null($item['kredit']) && $item['kredit'] != 0) {
-                        $remainingAmount -= (int) $item['kredit'];
+                        $remainingAmount = (int) $item['kredit'];
                     }
 
                     $preparedCostCenterItemsData[] = [

@@ -39,4 +39,8 @@ class ExpenseRequest extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function costCenter() {
+        return $this->belongsTo(CostCenter::class);
+    }
 }

@@ -15,7 +15,7 @@ class CostCenter extends Model
 
     public function category()
     {
-        return $this->belongsTo(CostCenterCategory::class);
+        return $this->belongsTo(CostCenterCategory::class, 'cost_center_category_id');
     }
 
     public function department()

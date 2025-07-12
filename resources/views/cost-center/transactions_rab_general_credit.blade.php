@@ -50,7 +50,7 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Kredit</strong></p>
+                                <p><strong>Total Limit (Seluruh RAB General)</strong></p>
                                 <h6>{{ $sums['credit'] }}</h6>
                             </div>
                         </div>
@@ -112,13 +112,13 @@
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th>No.</th>
-                                                <th>Nama Item</th>
-                                                <th>Kode Transaksi</th>
+                                                <th>Nama Pengajuan</th>
+                                                <th>Cost Center Target</th>
                                                 <th>Divisi</th>
                                                 <th>Pengaju</th>
                                                 <th>Kredit</th>
                                                 <th>Sisa Saldo</th>
-                                                <th>Bukti Transaksi</th>
+                                                <th>Bukti</th>
                                                 <th>Keterangan</th>
                                             </tr>
                                         </thead>

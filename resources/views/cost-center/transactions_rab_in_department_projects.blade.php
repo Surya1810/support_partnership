@@ -43,24 +43,24 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Debet</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <p><strong>Total Debet (Modal Project)</strong></p>
+                                <h6>{{ $totalAmount['total_debit'] }}</h6>
                             </div>
                         </div>
                     </div>
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Kredit</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <p><strong>Total Kredit (Penggunaan Modal)</strong></p>
+                                <h6>{{ $totalAmount['total_credit'] }}</h6>
                             </div>
                         </div>
                     </div>
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Sisa Saldo</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <p><strong>Sisa Saldo (Sisa Modal)</strong></p>
+                                <h6>{{ $totalAmount['total_remaining'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Pendapatan Tahun Berjalan</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <h6>{{ $totalAmount['total_yearly_margin'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -81,28 +81,38 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="card card-outline rounded-partner card-primary p-3">
-                                <h4><b>Project Realizations</b></h4>
-                                <div class="card-body table-responsive w-100 px-0">
-                                    <table class="table table-bordered table-striped text-sm" id="tableRAB"
-                                        style="width:100%">
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th>No.</th>
-                                                <th>Nama Project</th>
-                                                <th>Nilai Project</th>
-                                                <th>Modal</th>
-                                                <th>Keuntungan</th>
-                                                <th>SP2D</th>
-                                                <th>PPN (11%/12%)</th>
-                                                <th>PPH (1.5%/2%)</th>
-                                                <th>Team Bonus</th>
-                                                <th>Penyusutan</th>
-                                                <th>Kas</th>
-                                                <th>PIC</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+                                <h4><b>Realisasi Project Tahun {{ date('Y') }}</b></h4>
+                                <div class="row my-3">
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-sm btn-success rounded-partner float-right"
+                                            id="buttonExport">
+                                            <i class="fas fa-file-excel"></i> Export
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="card-body w-100 px-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped text-sm" id="tableProject"
+                                                style="width:100%">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th></th> {{-- untuk expand detail profit dari project --}}
+                                                        <th>No.</th>
+                                                        <th>Nama Project</th>
+                                                        <th>Nilai Project</th>
+                                                        <th>Modal</th>
+                                                        <th>Keuntungan</th>
+                                                        <th>SP2D</th>
+                                                        <th>PPN (11%/12%)</th>
+                                                        <th>PPH (1.5%/2%)</th>
+                                                        <th>PIC</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -127,29 +137,7 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#month, #year, #category, #department').select2({
-                theme: 'bootstrap4',
-                width: '100%',
-                dropdownParent: $('#modalAddRAB')
-            });
-
-            $('#targetEdit, #departmentEdit, #monthEdit, #yearEdit, #categoryEdit').select2({
-                theme: 'bootstrap4',
-                width: '100%',
-                dropdownParent: $('#modalEditRAB')
-            });
-
-            $('.price').inputmask({
-                alias: 'numeric',
-                prefix: 'Rp',
-                digits: 0,
-                groupSeparator: '.',
-                autoGroup: true,
-                removeMaskOnSubmit: true,
-                rightAlign: false
-            });
-
-            let table = $('#tableRAB').DataTable({
+            let table = $('#tableProject').DataTable({
                 scrollX: true,
                 headerScroll: true,
                 autoWidth: true,
@@ -174,15 +162,23 @@
                     zeroRecords: 'Data tidak ditemukan',
                 },
                 ajax: {
-                    url: "{{route('cost-center.departments.projects', ':id')}}".replace(':id', $('#department_id').val()),
+                    url: "{{ route('cost-center.departments.projects', ':id') }}".replace(':id', $(
+                        '#department_id').val()),
                     method: 'GET'
                 },
-                columns: [
+                columns: [{
+                        className: 'details-control text-center',
+                        orderable: false,
+                        searchable: false,
+                        data: null,
+                        defaultContent: '<button class="badge bg-info border-0" title="Detail Profit"><i class="fas fa-dollar-sign"></i></button>',
+                    },
                     {
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        className: 'text-center'
                     },
                     {
                         data: 'title',
@@ -213,18 +209,6 @@
                         name: 'pph'
                     },
                     {
-                        data: 'team_bonus',
-                        name: 'team_bonus'
-                    },
-                    {
-                        data: 'depreciation',
-                        name: 'depreciation'
-                    },
-                    {
-                        data: 'cash_department',
-                        name: 'cash_department'
-                    },
-                    {
                         data: 'pic',
                         name: 'pic'
                     },
@@ -234,6 +218,67 @@
                     }
                 ]
             });
+
+            $('#tableProject tbody').on('click', 'td.details-control button', function() {
+                let tr = $(this).closest('tr');
+                let row = table.row(tr);
+                let projectId = row.data().id;
+
+                if (row.child.isShown()) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                    $(this).html('<i class="fas fa-dollar-sign"></i>');
+                } else {
+                    // Tambahkan HTML tabel kosong dengan ID unik
+                    let tableId = `tableProjectProfit-${projectId}`;
+                    let html = `
+            <table id="${tableId}" class="table table-sm table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>No.</th>
+                        <th>Nama Item</th>
+                        <th>Nilai (%)</th>
+                        <th>Nilai (Rp)</th>
+                    </tr>
+                </thead>
+            </table>
+        `;
+                    row.child(html).show();
+                    tr.addClass('shown');
+                    $(this).text('-');
+
+                    // Inisialisasi DataTables untuk tabel profit
+                    $(`#${tableId}`).DataTable({
+                        processing: true,
+                        serverSide: true,
+                        ordering: false,
+                        searching: false,
+                        paging: false,
+                        info: false,
+                        ajax: "{{ route('cost-center.departments.projects.profit', ':id') }}".replace(':id', projectId),
+                        columns: [
+                            {
+                                data: 'DT_RowIndex',
+                                name: 'DT_RowIndex',
+                                className: 'text-center'
+                            },
+                            {
+                                data: 'name',
+                                name: 'name'
+                            },
+                            {
+                                data: 'percent',
+                                name: 'percent'
+                            },
+                            {
+                                data: 'idr',
+                                name: 'idr'
+                            }
+                        ]
+                    });
+                }
+            });
+
         });
     </script>
 @endpush

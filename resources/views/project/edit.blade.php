@@ -354,9 +354,15 @@
                                 <div class="col-12">
                                     <h6><b>Rencana Anggaran Biaya (RAB)</b></h6>
                                     <small class="text-danger">
-                                        *Perubahan RAB hanya bisa dilakukan pada halaman Cost Center Project dan minimal
-                                        oleh
-                                        manager dari divisi terkait.
+                                        *Perubahan RAB hanya bisa dilakukan pada halaman Cost Center Khusus RAB Project dan minimal oleh manager dari divisi terkait.
+                                    </small>
+                                    <small>
+                                        <br/>
+                                        Untuk melakukan perubahan RAB silahkan klik tombol berikut.
+                                        <br/>
+                                        <a class="btn btn-sm btn-primary" href="{{ route('cost-center.departments.projects.budget-plan', $project->id) }}">
+                                            <i class="fa fa-edit"></i> Ubah RAB
+                                        </a>
                                     </small>
                                 </div>
                                 <div class="col-12">

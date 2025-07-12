@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('invoice_number');
             $table->string('id_billing');
             $table->string('e_faktur');
+            $table->string('ntpn');
             $table->string('bast_file');
             $table->timestamps();
         });

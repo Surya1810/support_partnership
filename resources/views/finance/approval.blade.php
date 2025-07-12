@@ -51,7 +51,7 @@
                                 </div>
                             </div>
                             <div class="card-body table-responsive">
-                                <div class="mb-2">
+                                <div class="mb-4">
                                     <button type="button" class="btn btn-success btn-sm rounded-partner"
                                         onclick="submitBulkAction('approve')">
                                         <i class="fa fa-check"></i> Approve Selected
@@ -69,20 +69,23 @@
                                 <table id="managerTable" class="table table-bordered">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 5%">
+                                            <th style="width: 3%">
                                                 <input type="checkbox" id="selectAll">
                                             </th>
                                             <th style="width: 10%">
-                                                User
+                                                Pengaju
                                             </th>
-                                            <th style="width: 45%">
-                                                Title
+                                            <th style="width: 20%">
+                                                Judul
+                                            </th>
+                                            <th style="width: 20%">
+                                                Kategori
+                                            </th>
+                                            <th style="width: 17%">
+                                                Cost Center
                                             </th>
                                             <th style="width: 10%">
-                                                Category
-                                            </th>
-                                            <th style="width: 10%">
-                                                Usage Date
+                                                Tanggal Digunakan
                                             </th>
                                             <th style="width: 15%">
                                                 Total Amount
@@ -92,7 +95,7 @@
                                             </th>
                                             @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 3)
                                                 <th style="width: 5%">
-                                                    Action
+                                                    Aksi
                                                 </th>
                                             @endif
                                         </tr>
@@ -108,7 +111,14 @@
                                                     <small><strong>{{ $manager->department->name }}</strong></small>
                                                 </td>
                                                 <td>{{ $manager->title }}</td>
-                                                <td>{{ $manager->category }}</td>
+                                                <td>
+                                                    @if ($manager->category == 'project')
+                                                        <strong>Project</strong> {{ $manager->project->name }}
+                                                    @else
+                                                        <strong>General</strong>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $manager->costCenter?->code_ref }}</td>
                                                 <td>{{ $manager->use_date->toFormattedDateString('d/m/y') }}</td>
                                                 <td>{{ formatRupiah($manager->total_amount) }}</td>
                                                 <td>
@@ -165,7 +175,7 @@
                                 </div>
                             </div>
                             <div class="card-body table-responsive">
-                                <div class="mb-2">
+                                <div class="mb-4">
                                     <button type="button" class="btn btn-success btn-sm rounded-partner"
                                         onclick="submitBulkAction('approve')">
                                         <i class="fa fa-check"></i> Approve Selected
@@ -184,30 +194,33 @@
                                 <table id="direkturTable" class="table table-bordered">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 5%">
+                                            <th style="width: 3%">
                                                 <input type="checkbox" id="selectAll">
                                             </th>
                                             <th style="width: 10%">
-                                                User
+                                                Pengaju
                                             </th>
-                                            <th style="width: 40%">
-                                                Title
+                                            <th style="width: 20%">
+                                                Judul
+                                            </th>
+                                            <th style="width: 20%">
+                                                Kategori
+                                            </th>
+                                            <th style="width: 17%">
+                                                Cost Center
                                             </th>
                                             <th style="width: 10%">
-                                                Category
-                                            </th>
-                                            <th style="width: 10%">
-                                                Usage Date
+                                                Tanggal Digunakan
                                             </th>
                                             <th style="width: 15%">
-                                                Total Amount
+                                                Nominal Diajukan
                                             </th>
                                             <th style="width: 5%">
                                                 Status
                                             </th>
                                             @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->role_id == 3)
                                                 <th style="width: 5%">
-                                                    Action
+                                                    Aksi
                                                 </th>
                                             @endif
                                         </tr>
@@ -223,7 +236,14 @@
                                                     <small><strong>{{ $direktur->department->name }}</strong></small>
                                                 </td>
                                                 <td>{{ $direktur->title }}</td>
-                                                <td>{{ $direktur->category }}</td>
+                                                <td>
+                                                    @if ($direktur->category == 'project')
+                                                        <strong>Project</strong> {{ $direktur->project->name }}
+                                                    @else
+                                                        <strong>General</strong>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $direktur->costCenter?->code_ref }}</td>
                                                 <td>{{ $direktur->use_date->toFormattedDateString('d/m/y') }}</td>
                                                 <td>{{ formatRupiah($direktur->total_amount) }}</td>
                                                 <td>
@@ -274,27 +294,33 @@
                                 <table id="allTable" class="table table-bordered">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 10%">
-                                                Pengguna
+                                            <th style="width: 13%">
+                                                Pengaju
                                             </th>
-                                            <th style="width: 45%">
+                                            <th style="width: 17%">
                                                 Judul
                                             </th>
-                                            <th style="width: 10%">
-                                                Kategory
+                                            <th style="width: 17%">
+                                                Kategori
+                                            </th>
+                                            <th style="width: 13%">
+                                                Cost Center
                                             </th>
                                             <th style="width: 10%">
                                                 Tanggal Digunakan
                                             </th>
-                                            <th style="width: 15%">
-                                                Nominal
+                                            <th style="width: 10%">
+                                                Nominal Diajukan
                                             </th>
                                             <th style="width: 5%">
                                                 Status
                                             </th>
+                                            <th style="width: 5%">
+                                                Report
+                                            </th>
                                             @if (auth()->user()->role_id == 1 || auth()->user()->department_id == 8)
                                                 <th style="width: 5%">
-                                                    Action
+                                                    Aksi
                                                 </th>
                                             @endif
                                         </tr>
@@ -307,11 +333,14 @@
                                                 </td>
                                                 <td>{{ $all_expense->title }}</td>
                                                 <td>
-                                                    @if ($all_expense->category == null)
+                                                    @if ($all_expense->category == 'project')
                                                         <strong>Project</strong> {{ $all_expense->project->name }}
                                                     @else
-                                                        <strong>Rumah Tangga</strong> {{ $all_expense->category }}
+                                                        <strong>General</strong>
                                                     @endif
+                                                </td>
+                                                <td>
+                                                    {{ $all_expense->costCenter?->code_ref }}
                                                 </td>
                                                 <td>{{ $all_expense->use_date->toFormattedDateString('d/m/y') }}</td>
                                                 <td>{{ formatRupiah($all_expense->total_amount) }}</td>
@@ -326,11 +355,21 @@
                                                     @elseif ($all_expense->status == 'report')
                                                         <span
                                                             class="badge badge-warning">{{ $all_expense->status }}</span>
+                                                    @elseif ($all_expense->status == 'checking')
+                                                        <span
+                                                            class="badge" style="background-color: #ee00ff">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'rejected')
                                                         <span class="badge badge-danger">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'finish')
                                                         <span
                                                             class="badge badge-success">{{ $all_expense->status }}</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if ($all_expense->report_file)
+                                                        <a class="btn btn-sm btn-danger rounded-partner" href="{{ asset('storage/' . $all_expense->report_file) }}" target="_blank"><i class="fa-solid fa-file-pdf"></i></a>
+                                                    @else
+                                                        -
                                                     @endif
                                                 </td>
                                                 @if (auth()->user()->role_id == 1 || auth()->user()->department_id == 8)
@@ -374,9 +413,31 @@
                                                                 @method('PUT')
                                                             </form>
                                                         @endif
+                                                        @if (auth()->user()->department_id == 8 && $all_expense->status == 'checking')
+                                                            <button class="btn btn-sm btn-success rounded-circle"
+                                                                onclick="approveCheckExpense({{ $all_expense->id }})"><i
+                                                                    class="fa-solid fa-check"></i></button>
+                                                            <form id="approve-check-form-{{ $all_expense->id }}"
+                                                                action="{{ route('application.checking', $all_expense->id) }}"
+                                                                method="POST" style="display: none;">
+                                                                @csrf
+                                                                @method('PUT')
+                                                            </form>
+                                                        @endif
+                                                        @if (auth()->user()->department_id == 8 && $all_expense->status == 'checking')
+                                                            <button class="btn btn-sm btn-danger rounded-circle"
+                                                                onclick="rejectCheckExpense({{ $all_expense->id }})"><i
+                                                                    class="fa-solid fa-x"></i></button>
+                                                            <form id="reject-check-form-{{ $all_expense->id }}"
+                                                                action="{{ route('application.checking', $all_expense->id) }}"
+                                                                method="POST" style="display: none;">
+                                                                @csrf
+                                                                @method('PUT')
+                                                            </form>
+                                                        @endif
                                                         @if ($all_expense->status == 'finish')
                                                             <a href="{{ route('application.pdf', $all_expense->id) }}"
-                                                                class="btn btn-sm btn-info rounded-partner"
+                                                                class="btn btn-sm btn-info rounded-partner m-1"
                                                                 target="_blank">
                                                                 <i class="fa-regular fa-file-pdf"></i>
                                                             </a>
@@ -400,63 +461,97 @@
         <!-- Modal Show Approval-->
         <div class="modal fade text-sm" id="editStepModal{{ $manager->id }}" tabindex="-1"
             aria-labelledby="editStepModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editStepModalLabel">Approval Application</h5>
+                        <h5 class="modal-title" id="editStepModalLabel">Approval Pengajuan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-lg-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5>Name</h5>
+                                        <h5><strong>Informasi Pengaju</strong></h5>
+                                        <hr>
+                                        <h6><strong>Nama</strong></h6>
                                         {{ $manager->user->name }}
                                         <hr>
-                                        <h5>Department</h5>
+                                        <h6><strong>Divisi</strong></h6>
                                         {{ $manager->department->name }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5>Category</h5>
-                                        {{ $manager->category }}
+                                        <h5><strong>Jenis Pengajuan</strong></h5>
                                         <hr>
-                                        <h5>Use Date</h5>
+                                        <h6><strong>Kategori</strong></h6>
+                                        @if ($manager->category == 'project')
+                                            <p><strong>Project</strong> {{ $manager->project->name }}</p>
+                                        @else
+                                            <p><strong>General</strong></p>
+                                        @endif
+                                        <hr>
+                                        <h6><strong>Tanggal Digunakan</strong></h6>
                                         {{ $manager->use_date->toFormattedDateString('d/m/y') }}
                                     </div>
                                 </div>
                             </div>
                             <hr>
-                            <div class="col-lg-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5>Bank Name</h5>
+                                        <h5><strong>Informasi Rekening</strong></h5>
+                                        <hr>
+                                        <h6><strong>Bank Name</strong></h6>
                                         {{ $manager->bank_name }}
                                         <hr>
-                                        <h5>Account Number</h5>
+                                        <h6><strong>Account Number</strong></h6>
                                         {{ $manager->account_number }}
                                         <hr>
-                                        <h5>Account Holder Name</h5>
+                                        <h6><strong>Account Holder Name</strong></h6>
                                         {{ $manager->account_holder_name }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <p>{{ $manager->title }}</p>
+                                        <h5><strong>Target Cost Center</strong></h5>
+                                        <hr>
+                                        <h6><strong>Nama</strong></h6>
+                                        {{ $manager->costCenter?->name }}
+                                        <hr>
+                                        <h6><strong>Kode Transaksi</strong></h6>
+                                        {{ $manager->costCenter?->code_ref }}
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <h6><strong>Limit Saldo</strong></h6>
+                                                {{ formatRupiah($manager->costCenter?->amount_credit) }}
+                                            </div>
+                                            <div class="col-6">
+                                                <h6><strong>Saldo Tersisa</strong></h6>
+                                                {{ formatRupiah($manager->costCenter?->amount_remaining) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5 class="mb-3"><strong>Pengajuan: {{ $manager->title }}</strong></h5>
                                         <table class="table table-bordered" id="items-table">
                                             <thead>
                                                 <tr>
-                                                    <th>Item Name</th>
+                                                    <th>Nama Item</th>
                                                     <th>Qty</th>
-                                                    <th>Price</th>
+                                                    <th>Harga</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -507,63 +602,97 @@
         <!-- Modal Show Approval-->
         <div class="modal fade text-sm" id="editStepModal{{ $direktur->id }}" tabindex="-1"
             aria-labelledby="editStepModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editStepModalLabel">Approval Application</h5>
+                        <h5 class="modal-title" id="editStepModalLabel"><strong>Approval Pengajuan</strong></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-lg-6">
+                            <div class="col-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5>Name</h5>
+                                        <h5><strong>Informasi Pengaju</strong></h5>
+                                        <hr>
+                                        <h6><strong>Nama</strong></h6>
                                         {{ $direktur->user->name }}
                                         <hr>
-                                        <h5>Department</h5>
+                                        <h6><strong>Divisi</strong></h6>
                                         {{ $direktur->department->name }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5>Category</h5>
-                                        {{ $direktur->category }}
+                                        <h5><strong>Jenis Pengajuan</strong></h5>
                                         <hr>
-                                        <h5>Use Date</h5>
+                                        <h6><strong>Kategori</strong></h6>
+                                        @if ($direktur->category == 'project')
+                                            <p><strong>Project</strong> {{ $direktur->project->name }}</p>
+                                        @else
+                                            <p><strong>General</strong></p>
+                                        @endif
+                                        <hr>
+                                        <h6><strong>Tanggal Digunakan</strong></h6>
                                         {{ $direktur->use_date->toFormattedDateString('d/m/y') }}
                                     </div>
                                 </div>
                             </div>
                             <hr>
-                            <div class="col-lg-6">
+                            <div class="col-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5>Bank Name</h5>
+                                        <h5><strong>Informasi Rekening</strong></h5>
+                                        <hr>
+                                        <h6><strong>Bank Name</strong></h6>
                                         {{ $direktur->bank_name }}
                                         <hr>
-                                        <h5>Account Number</h5>
+                                        <h6><strong>Account Number</strong></h6>
                                         {{ $direktur->account_number }}
                                         <hr>
-                                        <h5>Account Holder Name</h5>
+                                        <h6><strong>Account Holder Name</strong></h6>
                                         {{ $direktur->account_holder_name }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <p>{{ $direktur->title }}</p>
+                                        <h5><strong>Target Cost Center</strong></h5>
+                                        <hr>
+                                        <h6><strong>Nama</strong></h6>
+                                        {{ $direktur->costCenter?->name }}
+                                        <hr>
+                                        <h6><strong>Kode Transaksi</strong></h6>
+                                        {{ $direktur->costCenter?->code_ref }}
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <h6><strong>Limit Saldo</strong></h6>
+                                                {{ formatRupiah($direktur->costCenter?->amount_credit) }}
+                                            </div>
+                                            <div class="col-6">
+                                                <h6><strong>Saldo Tersisa</strong></h6>
+                                                {{ formatRupiah($direktur->costCenter?->amount_remaining) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5 class="mb-3"><strong>Pengajuan: {{ $direktur->title }}</strong></h5>
                                         <table class="table table-bordered" id="items-table">
                                             <thead>
                                                 <tr>
-                                                    <th>Item Name</th>
-                                                    <th>Qty</th>
-                                                    <th>Price</th>
+                                                    <th>Nama Item</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Harga</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -614,78 +743,126 @@
         <!-- Modal Show Approval-->
         <div class="modal fade text-sm" id="editStepModal{{ $all_expense->id }}" tabindex="-1"
             aria-labelledby="editStepModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editStepModalLabel">Approval Application</h5>
+                        <h5 class="modal-title" id="editStepModalLabel">Approval Pengajuan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-lg-6">
+                            <div class="col-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5>Name</h5>
+                                        <h5><strong>Informasi Pengaju</strong></h5>
+                                        <hr>
+                                        <h6><strong>Nama</strong></h6>
                                         {{ $all_expense->user->name }}
                                         <hr>
-                                        <h5>Department</h5>
+                                        <h6><strong>Divisi</strong></h6>
                                         {{ $all_expense->department->name }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5>Category</h5>
-                                        {{ $all_expense->category }}
+                                        <h5><strong>Jenis Pengajuan</strong></h5>
                                         <hr>
-                                        <h5>Use Date</h5>
+                                        <h6><strong>Kategori</strong></h6>
+                                        @if ($all_expense->category == 'project')
+                                            <p><strong>Project</strong> {{ $all_expense->project->name }}</p>
+                                        @else
+                                            <p><strong>General</strong></p>
+                                        @endif
+                                        <hr>
+                                        <h6><strong>Tanggal Digunakan</strong></h6>
                                         {{ $all_expense->use_date->toFormattedDateString('d/m/y') }}
                                     </div>
                                 </div>
                             </div>
                             <hr>
-                            <div class="col-lg-6">
+                            <div class="col-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5>Bank Name</h5>
+                                        <h5><strong>Informasi Rekening</strong></h5>
+                                        <hr>
+                                        <h6><strong>Bank Name</strong></h6>
                                         {{ $all_expense->bank_name }}
                                         <hr>
-                                        <h5>Account Number</h5>
+                                        <h6><strong>Account Number</strong></h6>
                                         {{ $all_expense->account_number }}
                                         <hr>
-                                        <h5>Account Holder Name</h5>
+                                        <h6><strong>Account Holder Name</strong></h6>
                                         {{ $all_expense->account_holder_name }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <p>{{ $all_expense->title }}</p>
+                                        <h5><strong>Target Cost Center</strong></h5>
+                                        <hr>
+                                        <h6><strong>Nama</strong></h6>
+                                        {{ $all_expense->costCenter?->name }}
+                                        <hr>
+                                        <h6><strong>Kode Transaksi</strong></h6>
+                                        {{ $all_expense->costCenter?->code_ref }}
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <h6><strong>Limit Saldo</strong></h6>
+                                                {{ formatRupiah($all_expense->costCenter?->amount_credit) }}
+                                            </div>
+                                            <div class="col-6">
+                                                <h6><strong>Saldo Tersisa</strong></h6>
+                                                {{ formatRupiah($all_expense->costCenter?->amount_remaining) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card rounded-partner">
+                                    <div class="card-body">
+                                        <h5 class="mb-3"><strong>Pengajuan: {{ $all_expense->title }}</strong></h5>
                                         <table class="table table-bordered" id="items-table">
                                             <thead>
                                                 <tr>
                                                     <th>Nama Item</th>
                                                     <th>Jumlah</th>
-                                                    <th>Nilai Satuan</th>
+                                                    <th>Harga</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @php
+                                                    $actual_amount = 0;
+                                                @endphp
                                                 @foreach ($all_expense->items as $item)
                                                     <tr>
                                                         <td>{{ $item->item_name }}</td>
                                                         <td>{{ $item->quantity }}</td>
                                                         <td>{{ formatRupiah($item->unit_price) }}</td>
                                                     </tr>
+                                                    @php
+                                                        $actual_amount += $item->actual_amount;
+                                                    @endphp
                                                 @endforeach
                                             </tbody>
                                         </table>
-                                        <div class="w-100 text-center mt-3">
-                                            <strong class="text-center">Total =
-                                                {{ formatRupiah($all_expense->total_amount) }}</strong>
+                                        <div class="row mt-3 px-3">
+                                            <div class="col-6 text-left">
+                                                <strong>
+                                                    Total = {{ formatRupiah($all_expense->total_amount) }}
+                                                </strong>
+                                            </div>
+                                            <div class="col-6 text-right">
+                                                <strong>
+                                                    Terpakai = {{ formatRupiah($actual_amount) }}
+                                                </strong>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -711,13 +888,13 @@
 
     <script src="{{ asset('assets/adminLTE/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
 
-
     <script type="text/javascript">
         $(function() {
             $('#managerTable').DataTable({
                 "paging": true,
                 'processing': true,
                 "searching": false,
+                "ordering": false,
                 "info": true,
                 "scrollX": true,
                 "order": [],
@@ -729,6 +906,7 @@
                 "paging": true,
                 'processing': true,
                 "searching": false,
+                "ordering": false,
                 "info": true,
                 "scrollX": true,
                 "order": [],
@@ -740,6 +918,7 @@
                 "paging": true,
                 'processing': true,
                 "searching": true,
+                "ordering": false,
                 "info": true,
                 "scrollX": true,
                 "order": [],
@@ -763,24 +942,25 @@
             modal.modal('hide');
         }
 
-
         function rejectExpense(id) {
             Swal.fire({
-                title: 'Are you sure?',
-                text: 'Please provide a reason for rejection:',
+                title: 'Apa Anda Yakin?',
+                text: 'Mohon masukan alasan penolakan.',
                 icon: 'warning',
                 input: 'textarea',
-                inputPlaceholder: 'Type your reason here...',
+                inputPlaceholder: 'Tulis alasan penolakan disini...',
                 inputAttributes: {
                     'aria-label': 'Rejection reason'
                 },
                 inputValidator: (value) => {
                     if (!value) {
-                        return 'You need to write a reason!'
+                        return 'Anda harus menulis alasan penolakan!'
                     }
                 },
                 confirmButtonColor: '#d33',
-                confirmButtonText: 'Reject'
+                confirmButtonText: 'Tolak',
+                cancelButtonText: 'Batal',
+                showCancelButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
                     let form = document.getElementById('reject-form-' + id);
@@ -794,14 +974,14 @@
             });
         }
 
-
         function deleteExpense(id) {
             Swal.fire({
-                title: 'Are you sure?',
+                title: 'Apa Anda Yakin?',
+                text: 'Anda akan menolak pengajuan ini!',
                 icon: 'warning',
-                showCancelButton: false,
                 confirmButtonColor: '#d33',
-                confirmButtonText: 'Delete'
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.value) {
                     event.preventDefault();
@@ -818,13 +998,72 @@
             })
         }
 
+        function rejectCheckExpense(id) {
+            Swal.fire({
+                title: 'Apa Anda Yakin?',
+                text: 'Mohon masukan alasan penolakan.',
+                icon: 'warning',
+                input: 'textarea',
+                inputPlaceholder: 'Tulis alasan penolakan disini...',
+                inputAttributes: {
+                    'aria-label': 'Rejection reason'
+                },
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Anda harus menulis alasan penolakan!'
+                    }
+                },
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Tolak',
+                cancelButtonText: 'Batal',
+                showCancelButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let form = document.getElementById('reject-check-form-' + id);
+                    let input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'reason';
+                    input.value = result.value;
+                    form.appendChild(input);
+                    form.submit();
+                }
+            });
+        }
+
+        function approveCheckExpense(id) {
+            Swal.fire({
+                title: 'Apa Anda Yakin?',
+                text: 'Anda akan menyetujui laporan dari pengajuan ini!',
+                icon: 'warning',
+                confirmButtonColor: '#5cb85c',
+                confirmButtonText: 'Setujui',
+                cancelButtonText: 'Batal',
+                showCancelButton: true
+            }).then((result) => {
+                if (result.value) {
+                    event.preventDefault();
+                    document.getElementById('approve-check-form-' + id).submit();
+                } else if (
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    swal(
+                        'Cancelled',
+                        'Pengajuan tidak jadi disetujui!',
+                        'info'
+                    )
+                }
+            })
+        }
+
         function approveExpense(id) {
             Swal.fire({
-                title: 'Are you sure?',
+                title: 'Apa Anda Yakin?',
+                text: 'Anda akan menyetujui pengajuan ini!',
                 icon: 'warning',
-                showCancelButton: false,
                 confirmButtonColor: '#5cb85c',
-                confirmButtonText: 'Approve'
+                confirmButtonText: 'Setujui',
+                cancelButtonText: 'Batal',
+                showCancelButton: true
             }).then((result) => {
                 if (result.value) {
                     event.preventDefault();
@@ -843,11 +1082,13 @@
 
         function bypassExpense(id) {
             Swal.fire({
-                title: 'Are you sure?',
+                title: 'Apa Anda Yakin?',
+                text: 'Anda akan menyetujui pengajuan ini!',
                 icon: 'warning',
                 showCancelButton: false,
                 confirmButtonColor: '#5cb85c',
-                confirmButtonText: 'Approve (bypass)'
+                confirmButtonText: 'Setujui (bypass)',
+                cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.value) {
                     event.preventDefault();
@@ -866,11 +1107,13 @@
 
         function processExpense(id) {
             Swal.fire({
-                title: 'Are you sure?',
+                title: 'Apa Anda Yakin?',
+                text: 'Anda akan memproses pengajuan ini!',
                 icon: 'warning',
-                showCancelButton: false,
                 confirmButtonColor: '#5cb85c',
-                confirmButtonText: 'Process'
+                confirmButtonText: 'Proses',
+                showCancelButton: true,
+                cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.value) {
                     event.preventDefault();
