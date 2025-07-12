@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title')
-    Archive
+    Project Terealisasi
 @endsection
 
 @push('css')
@@ -18,12 +18,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Archive</h1>
+                    <h1>Project Terealisasi</h1>
                     <ol class="breadcrumb text-black-50">
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a class="text-black-50"
                                 href="{{ route('project.index') }}">Projects</a>
-                        <li class="breadcrumb-item active"><strong>Archive</strong></li>
+                        <li class="breadcrumb-item active"><strong>Project Terealisasi</strong></li>
                     </ol>
                 </div>
             </div>

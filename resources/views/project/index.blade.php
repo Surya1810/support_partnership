@@ -38,7 +38,7 @@
                             <div class="row align-items-center">
                                 <div class="col-6">
                                     <h3 class="card-title">List Project - <a href="{{ route('project.archive') }}"
-                                            class="btn btn-xs btn-outline-secondary rounded-partner">Archive</a></h3>
+                                            class="btn btn-sm btn-outline-success rounded-partner">Project Terealisasi</a></h3>
                                 </div>
                                 @if (auth()->user()->role_id != 5)
                                     <div class="col-6">

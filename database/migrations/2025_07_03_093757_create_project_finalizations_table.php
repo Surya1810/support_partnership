@@ -16,9 +16,11 @@ return new class extends Migration
             $table->unsignedInteger('project_id')
                 ->references('id')->on('projects')->onDelete('cascade');
             $table->string('invoice_number');
-            $table->string('id_billing');
             $table->string('e_faktur');
-            $table->string('ntpn');
+            $table->string('id_billing_ppn');
+            $table->string('id_billing_pph');
+            $table->string('ntpn_ppn');
+            $table->string('ntpn_pph');
             $table->string('bast_file');
             $table->timestamps();
         });

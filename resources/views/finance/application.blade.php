@@ -62,7 +62,7 @@
                                             Kategori
                                         </th>
                                         <th style="width: 10%">
-                                            Cost Center
+                                            Kode Transaksi
                                         </th>
                                         <th style="width: 5%">
                                             Tanggal Digunakan
@@ -87,7 +87,7 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                {{ $my_expense->costCenter?->code_ref }}
+                                                {{ $my_expense->code_ref_request }}
                                             </td>
                                             <td>{{ $my_expense->use_date->format('d/m/y') }}</td>
                                             <td>{{ formatRupiah($my_expense->total_amount) }}</td>
@@ -131,7 +131,7 @@
                                             Kategori
                                         </th>
                                         <th style="width: 15%">
-                                            Cost Center
+                                            Kode Transaksi
                                         </th>
                                         <th style="width: 5%">
                                             Tanggal Digunakan
@@ -159,7 +159,7 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                {{ $report->costCenter?->code_ref }}
+                                                {{ $report->code_ref_request }}
                                             </td>
                                             <td>{{ $report->use_date->toFormattedDateString('d/m/y') }}</td>
                                             <td>{{ formatRupiah($report->total_amount) }}</td>
@@ -179,7 +179,7 @@
                                                         data-toggle="modal" data-target="#reportModal{{ $report->id }}">
                                                         <i class="fa-regular fa-flag"></i>
                                                     </button>
-                                                @elseif ($report->status == 'checking')
+                                                @elseif ($report->status == 'checking' && $report->report_file != null)
                                                     <a href="{{ asset('storage/' . $report->report_file) }}" target="_blank"
                                                         class="btn btn-sm btn-info rounded-partner">
                                                         <i class="fa-regular fa-file-pdf"></i>
@@ -189,6 +189,8 @@
                                                         class="btn btn-sm btn-info rounded-partner" target="_blank">
                                                         <i class="fa-regular fa-file-pdf"></i>
                                                     </a>
+                                                @else
+                                                    -
                                                 @endif
                                             </td>
                                         </tr>

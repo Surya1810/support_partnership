@@ -195,7 +195,7 @@ class ProjectController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with([
-                'pesan' => 'Project gagal ditambahkan',
+                'pesan' => 'Terjadi kesalahan: ' . $e->getMessage(),
                 'leve-alert' => 'alert-danger'
             ]);
         }
@@ -312,7 +312,7 @@ class ProjectController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with([
-                'pesan' => 'Gagal memperbarui project: ' . $e->getMessage(),
+                'pesan' => 'Terjadi kesalahan: ' . $e->getMessage(),
                 'level-alert' => 'alert-danger'
             ]);
         }
@@ -455,7 +455,7 @@ class ProjectController extends Controller
                         . $monthIndex
                         . '-' . $year
                         . '/' . $numberOfLastCostCenterProject
-                    ) . ($index == 1 ? '' : '/' . str_pad(((string)$index++), 4, '0', STR_PAD_LEFT)),
+                    ) . ($index == 1 ? '' : '/' . str_pad(((string)$index - 1 ), 4, '0', STR_PAD_LEFT)),
                 ];
 
                 $totalDebetProject += $row[4] ? (int) trim($row[4]) : 0;
@@ -512,9 +512,12 @@ class ProjectController extends Controller
         try {
             $request->validate([
                 'invoice' => 'bail|required|string|max:255',
-                'id_billing' => 'bail|required|string|max:255',
                 'e_faktur' => 'bail|required|string|max:255',
-                'file_bast' => 'bail|required|mimes:pdf|max:10240',
+                'id_billing_ppn' => 'bail|required|string|max:255',
+                'id_billing_pph' => 'bail|required|string|max:255',
+                'ntpn_ppn' => 'bail|required|string|max:255',
+                'ntpn_pph' => 'bail|required|string|max:255',
+                'file_bast' => 'bail|required|mimes:pdf|max:122880'
             ]);
 
             DB::beginTransaction();
@@ -524,7 +527,7 @@ class ProjectController extends Controller
             $project->save();
 
             $file = $request->file('file_bast');
-            $filename = time() . '-' . Str::random(10) . '.' . $file->extension();
+            $filename = time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('uploads/files/project_finalizations', $filename, 'public');
             $projectFinalization = ProjectFinalization::where('project_id', $project->id)->first();
 
@@ -534,8 +537,11 @@ class ProjectController extends Controller
                 }
 
                 $projectFinalization->invoice_number = $request->invoice;
-                $projectFinalization->id_billing = $request->id_billing;
                 $projectFinalization->e_faktur = $request->e_faktur;
+                $projectFinalization->id_billing_ppn = $request->id_billing_ppn;
+                $projectFinalization->id_billing_pph = $request->id_billing_pph;
+                $projectFinalization->ntpn_ppn = $request->ntpn_ppn;
+                $projectFinalization->ntpn_pph = $request->ntpn_pph;
                 $projectFinalization->bast_file = $path;
                 $projectFinalization->save();
 
@@ -550,8 +556,11 @@ class ProjectController extends Controller
                 $projectFinalization = new ProjectFinalization();
                 $projectFinalization->project_id = $project->id;
                 $projectFinalization->invoice_number = $request->invoice;
-                $projectFinalization->id_billing = $request->id_billing;
                 $projectFinalization->e_faktur = $request->e_faktur;
+                $projectFinalization->id_billing_ppn = $request->id_billing_ppn;
+                $projectFinalization->id_billing_pph = $request->id_billing_pph;
+                $projectFinalization->ntpn_ppn = $request->ntpn_ppn;
+                $projectFinalization->ntpn_pph = $request->ntpn_pph;
                 $projectFinalization->bast_file = $path;
                 $projectFinalization->save();
 
@@ -559,11 +568,12 @@ class ProjectController extends Controller
 
                 return redirect()->route('project.finalization', $project->kode)
                     ->with([
-                        'pesan' => 'Dokumen penyelesaian project berhasil ditambahkan',
+                        'pesan' => 'Dokumen penyelesaian project berhasil ditambahkan. Project dinyatakan selesai',
                         'level-alert' => 'alert-success'
                     ]);
             }
         } catch (\Exception $e) {
+            dd($e);
             DB::rollBack();
             return back()->with([
                 'pesan' => 'Terjadi kesalahan: ' . $e->getMessage(),

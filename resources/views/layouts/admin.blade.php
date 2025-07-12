@@ -171,10 +171,6 @@
                                             auth()->user()->role_id == 2 ||
                                             auth()->user()->role_id == 3 ||
                                             auth()->user()->department_id == 8)
-                                        <a href="{{ route('finance.index') }}" class="nav-link">
-                                            <i class="far fa-circle nav-icon"></i>
-                                            <p>Laporan</p>
-                                        </a>
                                         <a href="{{ route('application.approval') }}" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Approval</p>

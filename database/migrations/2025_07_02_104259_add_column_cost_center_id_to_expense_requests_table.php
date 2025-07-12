@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::table('expense_requests', function (Blueprint $table) {
             $table->foreignId('cost_center_id')->nullable()->after('department_id');
+            $table->string('code_ref_request')->nullable()->after('cost_center_id');
             $table->string('reference_file')->nullable()->after('processed_by_finance');
             $table->string('report_file')->nullable()->after('reference_file');
             $table->text('reason_reject_report')->nullable()->after('report_file');
@@ -28,6 +29,7 @@ return new class extends Migration
     {
         Schema::table('expense_requests', function (Blueprint $table) {
             $table->dropColumn('cost_center_id');
+            $table->dropColumn('code_ref_request');
             $table->dropColumn('reference_file');
             $table->dropColumn('report_file');
             $table->dropColumn('reason_reject_report');

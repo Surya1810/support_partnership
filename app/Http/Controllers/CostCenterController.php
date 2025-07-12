@@ -25,7 +25,7 @@ class CostCenterController extends Controller
 
     private function getYears()
     {
-        return [date('Y') - 1, date('Y'), date('Y') + 1];
+        return [date('Y'), date('Y') + 1];
     }
 
     public function index()
@@ -98,6 +98,11 @@ class CostCenterController extends Controller
                 ->addColumn('department', fn($item) => $item->department?->name)
                 ->addColumn('month', fn($item) => $item->month_name)
                 ->addColumn('debit', function ($item) {
+                    /**
+                     * jika cost center adalah uang kas
+                     * maka tampilkan debit
+                     * jika bukan maka tampilkan credit/limit rab
+                     */
                     return $item->cost_center_category_id == 1
                         ? formatRupiah($item->amount_debit)
                         : formatRupiah($item->amount_credit);
@@ -111,8 +116,7 @@ class CostCenterController extends Controller
         $sums = [
             'debit' => formatRupiah($query->sum('amount_debit')),
             'credit' => formatRupiah($query->sum('amount_credit')),
-            'remaining' => formatRupiah($query->sum('amount_remaining')),
-            'yearly_margin' => formatRupiah(0), // belum
+            'remaining' => formatRupiah($query->sum('amount_debit') - $query->sum('amount_credit')),
         ];
 
         return view('cost-center.transactions_rab_general_debet', compact('departments', 'months', 'years', 'costCenterCategories', 'sums'));
@@ -132,6 +136,7 @@ class CostCenterController extends Controller
 
             $departmentId = $request->department;
             $codeRef = $this->generateCodeRef($departmentId, $request);
+            $note = '<small>Dibuat oleh: ' . Auth::user()->username . '<br/>Tanggal: ' . date('d-m-Y') . '</small>';
             $dataRAB = [
                 'department_id' => $departmentId,
                 'cost_center_category_id' => $request->category,
@@ -142,6 +147,7 @@ class CostCenterController extends Controller
                 'amount_remaining' => $request->nominal,
                 'month' => $request->month,
                 'year' => $request->year,
+                'detail' => $note,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];

@@ -84,12 +84,39 @@
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="inputBilling"
-                                                        class="col-sm-2 col-form-label">ID-Billing</label>
+                                                    <label for="inputBillingPPN"
+                                                        class="col-sm-2 col-form-label">ID Billing PPN</label>
                                                     <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="inputBilling"
-                                                            name="id_billing"
-                                                            value="{{ $project->finalization?->id_billing }}" required {{ auth()->user()->department_id == 8 ? '' : ' disabled' }}>
+                                                        <input type="text" class="form-control" id="inputBillingPPN"
+                                                            name="id_billing_ppn"
+                                                            value="{{ $project->finalization?->id_billing_ppn }}" required {{ auth()->user()->department_id == 8 ? '' : ' disabled' }}>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="inputBillingPPH"
+                                                        class="col-sm-2 col-form-label">ID Billing PPH</label>
+                                                    <div class="col-sm-10">
+                                                        <input type="text" class="form-control" id="inputBillingPPH"
+                                                            name="id_billing_pph"
+                                                            value="{{ $project->finalization?->id_billing_pph }}" required {{ auth()->user()->department_id == 8 ? '' : ' disabled' }}>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="ntpnPPN"
+                                                        class="col-sm-2 col-form-label">NTPN PPN</label>
+                                                    <div class="col-sm-10">
+                                                        <input type="text" class="form-control" id="ntpnPPN"
+                                                            name="ntpn_ppn"
+                                                            value="{{ $project->finalization?->ntpn_ppn }}" required {{ auth()->user()->department_id == 8 ? '' : ' disabled' }}>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="ntpnPPH"
+                                                        class="col-sm-2 col-form-label">NTPN PPH</label>
+                                                    <div class="col-sm-10">
+                                                        <input type="text" class="form-control" id="ntpnPPH"
+                                                            name="ntpn_pph"
+                                                            value="{{ $project->finalization?->ntpn_pph }}" required {{ auth()->user()->department_id == 8 ? '' : ' disabled' }}>
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">

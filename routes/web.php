@@ -68,16 +68,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('employee', UserController::class);
     Route::resource('user-data', UserExtensionController::class);
 
-    // Finance
-    Route::middleware('auth.development')
-        ->group(function () {
-            Route::resource('finance', FinanceController::class);
-            Route::get('/procurement', [FinanceController::class, 'procurement'])->name('procurement.report');
-            Route::get('/technology',  [FinanceController::class, 'technology'])->name('technology.report');
-            Route::get('/construction',  [FinanceController::class, 'construction'])->name('construction.report');
-            Route::post('/pembagian',  [FinanceController::class, 'pembagian'])->name('finance.pembagian');
-        });
-
     // Application
     Route::middleware('auth.development')
         ->group(function () {
@@ -231,7 +221,8 @@ Route::middleware('auth')->group(function () {
                     Route::get('/projects/{projectId}/budget-plan', 'indexDepartmentProjectBudgetPlan')
                         ->name('cost-center.departments.projects.budget-plan');
                     Route::get('/projects/{projectId}/budget-plan/json', 'getCostCentersProjectJSON')
-                        ->name('cost-center.departments.projects.budget-plan.json');
+                        ->name('cost-center.departments.projects.budget-plan.json')
+                        ->withoutMiddleware('auth.module.finance');
                     Route::post('/projects/{projectId}/budget-plan', 'storeRABProject')
                         ->name('cost-center.departments.projects.budget-plan.store');
                     Route::put('/projects/{projectId}/budget-plan', 'updateRABProject')

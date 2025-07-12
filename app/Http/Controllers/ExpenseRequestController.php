@@ -171,6 +171,7 @@ class ExpenseRequestController extends Controller
             $expenseRequest->approved_by_manager = true;
         }
 
+        $expenseRequest->code_ref_request = $this->generateCodeRefRequest($expenseRequest->cost_center_id);
         $expenseRequest->total_amount = 0;
         $expenseRequest->save();
 
@@ -198,28 +199,34 @@ class ExpenseRequestController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ExpenseRequest $expenseRequest)
+    private function generateCodeRefRequest($costCenterId)
     {
-        //
-    }
+        $costCenterTarget = CostCenter::where('id', $costCenterId)
+            ->with('category')
+            ->first();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ExpenseRequest $expenseRequest)
-    {
-        //
-    }
+        if ($costCenterTarget->category->code == 'BP') {
+            return $costCenterTarget->code_ref;
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ExpenseRequest $expenseRequest)
-    {
-        //
+        $expenseRequest = ExpenseRequest::where('cost_center_id', $costCenterId)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $currentTransactionNumber = '0001';
+
+        if ($expenseRequest) {
+            $lastCodeRefRequest = $expenseRequest->code_ref_request;
+            $explodedLastCodeRefRequest = explode('/', $lastCodeRefRequest);
+
+            if (array_key_exists(2, $explodedLastCodeRefRequest)) {
+                $currentTransactionNumber = str_pad((int) $explodedLastCodeRefRequest[2] + 1, 4, '0', STR_PAD_LEFT);
+            }
+        }
+
+        $codeRef = $costCenterTarget->code_ref. '/' . $currentTransactionNumber;
+
+        return $codeRef;
     }
 
     /**
@@ -245,7 +252,7 @@ class ExpenseRequestController extends Controller
 
         // Pastikan pengajuan belum disetujui
         if ($expenseRequest->status === 'approved') {
-            return redirect()->back()->with(['pesan' => 'Pengajuan approved before', 'level-alert' => 'alert-warning']);
+            return redirect()->back()->with(['pesan' => 'Pengajuan telah disetujui sebelumnya.', 'level-alert' => 'alert-warning']);
         }
 
         // Ambil role pengguna dari auth
@@ -266,7 +273,7 @@ class ExpenseRequestController extends Controller
         if ($userRole === 'Director') {
             // if (!$expenseRequest->approved_by_manager && $expenseRequest->total_amount > 150000) {
             if (!$expenseRequest->approved_by_manager && $expenseRequest->total_amount > 150000) {
-                return redirect()->back()->with(['pesan' => 'Pengajuan must approved by manager first', 'level-alert' => 'alert-danger']);
+                return redirect()->back()->with(['pesan' => 'Pengajuan harus disetujui oleh manager terlebih dahulu', 'level-alert' => 'alert-danger']);
             }
             $expenseRequest->approved_by_director = true;
         }
@@ -281,7 +288,7 @@ class ExpenseRequestController extends Controller
             $this->sendToFinance($expenseRequest);
             $expenseRequest->save();
 
-            return redirect()->route('application.approval')->with(['pesan' => 'Pengajuan approved successfully by admin', 'level-alert' => 'alert-success']);
+            return redirect()->route('application.approval')->with(['pesan' => 'Pengajuan berhasil disetujui oleh admin', 'level-alert' => 'alert-success']);
         }
 
         // Cek apakah approval selesai
@@ -294,7 +301,7 @@ class ExpenseRequestController extends Controller
 
         $expenseRequest->save();
 
-        return redirect()->route('application.approval')->with(['pesan' => 'Pengajuan approved successfully', 'level-alert' => 'alert-success']);
+        return redirect()->route('application.approval')->with(['pesan' => 'Pengajuan berhasil disetujui', 'level-alert' => 'alert-success']);
     }
 
     private function sendToFinance($expenseRequest)
@@ -351,7 +358,7 @@ class ExpenseRequestController extends Controller
     {
         // Validasi awal input dasar
         $request->validate([
-            'report_file' => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:122880',
+            'report_file' => 'required|mimes:jpg,jpeg,png,webp,pdf|max:122880',
             'actual_amounts' => 'required|array',
             'actual_amounts.*' => 'numeric|min:0',
         ]);
@@ -411,15 +418,16 @@ class ExpenseRequestController extends Controller
          * jika ada sisa, maka kembalikan ke cost centernya
          */
         $costCenter = CostCenter::find($expenseRequest->cost_center_id);
-        $costCenter->amount_remaining += $expenseRequest->total_amount - $expenseRequest->items()->sum('actual_amount');
+        $remaining = $expenseRequest->total_amount - $expenseRequest->items()->sum('actual_amount');
+        $costCenter->amount_remaining += $remaining;
 
         $note = $costCenter->detail ? $costCenter->detail . '<hr style="margin:0"/>' : '';
-        $note .= '<small><span class="text-success">RAB ditambah: '
-            . formatRupiah((int) $request->new_nominal)
+        $note .= '<small><span class="text-success">Saldo kembali: '
+            . formatRupiah($remaining) . '</span>'
             . '<br/>Tanggal: ' . date('d-m-Y')
-            . '<br/>Sumber: Sisa Pengajuan dari ' . $expenseRequest->user->name
+            . '<br/>Sumber: Sisa Pengajuan ' . $expenseRequest->code_ref_request
             . '</small>';
-        $costCenter->detail = $note;
+        $costCenter->detail = $remaining > 0 ? $note : null;
         $costCenter->save();
 
         return redirect()->back()->with(['pesan' => 'Laporan pengajuan berhasil disetujui', 'level-alert' => 'alert-success']);
@@ -489,9 +497,8 @@ class ExpenseRequestController extends Controller
             }
         }
 
-        return redirect()->back()->with(['pesan' => "Pengajuan $approvedCount approved, $rejectedCount rejected.", 'level-alert' => 'alert-success']);
+        return redirect()->back()->with(['pesan' => "$approvedCount pengajuan telah disetujui, dan $rejectedCount pengajuan ditolak.", 'level-alert' => 'alert-success']);
     }
-
 
     public function pdf($id)
     {

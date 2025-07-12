@@ -53,11 +53,11 @@
                             <div class="card-body table-responsive">
                                 <div class="mb-4">
                                     <button type="button" class="btn btn-success btn-sm rounded-partner"
-                                        onclick="submitBulkAction('approve')">
+                                        onclick="submitBulkAction('Menyetujui Masal')">
                                         <i class="fa fa-check"></i> Approve Selected
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm rounded-partner"
-                                        onclick="submitBulkAction('reject')">
+                                        onclick="submitBulkAction('Menolak Masal')">
                                         <i class="fa fa-times"></i> Reject Selected
                                     </button>
                                     <form id="bulkActionForm" method="POST" action="{{ route('application.bulkAction') }}">
@@ -194,7 +194,7 @@
                                 <table id="direkturTable" class="table table-bordered">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 3%">
+                                            <th style="width: 2%">
                                                 <input type="checkbox" id="selectAll">
                                             </th>
                                             <th style="width: 10%">
@@ -294,17 +294,17 @@
                                 <table id="allTable" class="table table-bordered">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 13%">
+                                            <th style="width: 15%">
                                                 Pengaju
                                             </th>
-                                            <th style="width: 17%">
+                                            <th style="width: {{  auth()->user()->role_id == 2 ? '25%' : '10%' }}">
                                                 Judul
                                             </th>
-                                            <th style="width: 17%">
+                                            <th style="width: 20%">
                                                 Kategori
                                             </th>
-                                            <th style="width: 13%">
-                                                Cost Center
+                                            <th style="width: {{  auth()->user()->role_id == 2 ? '20%' : '15%' }}">
+                                                Kode Transaksi
                                             </th>
                                             <th style="width: 10%">
                                                 Tanggal Digunakan
@@ -356,8 +356,8 @@
                                                         <span
                                                             class="badge badge-warning">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'checking')
-                                                        <span
-                                                            class="badge" style="background-color: #ee00ff">{{ $all_expense->status }}</span>
+                                                        <span class="badge"
+                                                            style="background-color: #ee00ff">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'rejected')
                                                         <span class="badge badge-danger">{{ $all_expense->status }}</span>
                                                     @elseif ($all_expense->status == 'finish')
@@ -367,12 +367,14 @@
                                                 </td>
                                                 <td>
                                                     @if ($all_expense->report_file)
-                                                        <a class="btn btn-sm btn-danger rounded-partner" href="{{ asset('storage/' . $all_expense->report_file) }}" target="_blank"><i class="fa-solid fa-file-pdf"></i></a>
+                                                        <a class="btn btn-sm btn-danger rounded-partner"
+                                                            href="{{ asset('storage/' . $all_expense->report_file) }}"
+                                                            target="_blank"><i class="fa-solid fa-file-pdf"></i></a>
                                                     @else
                                                         -
                                                     @endif
                                                 </td>
-                                                @if (auth()->user()->role_id == 1 || auth()->user()->department_id == 8)
+                                                @if (auth()->user()->role_id == 1|| auth()->user()->department_id == 8)
                                                     <td>
                                                         <button type="button" class="btn btn-sm btn-info rounded-partner"
                                                             data-toggle="modal"
@@ -526,7 +528,7 @@
                                         <h6><strong>Nama</strong></h6>
                                         {{ $manager->costCenter?->name }}
                                         <hr>
-                                        <h6><strong>Kode Transaksi</strong></h6>
+                                        <h6><strong>Kode Target</strong></h6>
                                         {{ $manager->costCenter?->code_ref }}
                                         <hr>
                                         <div class="row">
@@ -545,7 +547,14 @@
                             <div class="col-12">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5 class="mb-3"><strong>Pengajuan: {{ $manager->title }}</strong></h5>
+                                        <h5><strong>Pengajuan: {{ $manager->title }}</strong></h5>
+                                        <div class="col-12 mb-3 px-0">
+                                            <label for="codeRefRequest" class="mb-0 form-label col-form-label-sm">Kode
+                                                Transaksi</label>
+                                            <input type="text" id="codeRefRequest"
+                                                class="form-control form-control-sm"
+                                                value="{{ $manager->code_ref_request }}" readonly="readonly">
+                                        </div>
                                         <table class="table table-bordered" id="items-table">
                                             <thead>
                                                 <tr>
@@ -555,18 +564,32 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @php
+                                                    $actual_amount_manager = 0;
+                                                @endphp
                                                 @foreach ($manager->items as $item)
                                                     <tr>
                                                         <td>{{ $item->item_name }}</td>
                                                         <td>{{ $item->quantity }}</td>
                                                         <td>{{ formatRupiah($item->unit_price) }}</td>
                                                     </tr>
+                                                    @php
+                                                        $actual_amount_manager += $item->actual_amount;
+                                                    @endphp
                                                 @endforeach
                                             </tbody>
                                         </table>
-                                        <div class="w-100 text-center mt-3">
-                                            <strong class="text-center">Total =
-                                                {{ formatRupiah($manager->total_amount) }}</strong>
+                                        <div class="row mt-3 px-3">
+                                            <div class="col-6 text-left">
+                                                <strong>
+                                                    Total = {{ formatRupiah($manager->total_amount) }}
+                                                </strong>
+                                            </div>
+                                            <div class="col-6 text-right">
+                                                <strong>
+                                                    Terpakai = {{ formatRupiah($actual_amount_manager) }}
+                                                </strong>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -612,7 +635,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
                                         <h5><strong>Informasi Pengaju</strong></h5>
@@ -625,7 +648,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
                                         <h5><strong>Jenis Pengajuan</strong></h5>
@@ -643,7 +666,7 @@
                                 </div>
                             </div>
                             <hr>
-                            <div class="col-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
                                         <h5><strong>Informasi Rekening</strong></h5>
@@ -659,7 +682,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
                                         <h5><strong>Target Cost Center</strong></h5>
@@ -667,7 +690,7 @@
                                         <h6><strong>Nama</strong></h6>
                                         {{ $direktur->costCenter?->name }}
                                         <hr>
-                                        <h6><strong>Kode Transaksi</strong></h6>
+                                        <h6><strong>Kode Target</strong></h6>
                                         {{ $direktur->costCenter?->code_ref }}
                                         <hr>
                                         <div class="row">
@@ -686,7 +709,14 @@
                             <div class="col-12">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5 class="mb-3"><strong>Pengajuan: {{ $direktur->title }}</strong></h5>
+                                        <h5><strong>Pengajuan: {{ $direktur->title }}</strong></h5>
+                                        <div class="col-12 mb-3 px-0">
+                                            <label for="codeRefRequest" class="mb-0 form-label col-form-label-sm">Kode
+                                                Transaksi</label>
+                                            <input type="text" id="codeRefRequest"
+                                                class="form-control form-control-sm"
+                                                value="{{ $direktur->code_ref_request }}" readonly="readonly">
+                                        </div>
                                         <table class="table table-bordered" id="items-table">
                                             <thead>
                                                 <tr>
@@ -696,18 +726,32 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @php
+                                                    $actual_amount_direktur = 0;
+                                                @endphp
                                                 @foreach ($direktur->items as $item)
                                                     <tr>
                                                         <td>{{ $item->item_name }}</td>
                                                         <td>{{ $item->quantity }}</td>
                                                         <td>{{ formatRupiah($item->unit_price) }}</td>
                                                     </tr>
+                                                    @php
+                                                        $actual_amount_direktur += $item->actual_amount;
+                                                    @endphp
                                                 @endforeach
                                             </tbody>
                                         </table>
-                                        <div class="w-100 text-center mt-3">
-                                            <strong class="text-center">Total =
-                                                {{ formatRupiah($direktur->total_amount) }}</strong>
+                                        <div class="row mt-3 px-3">
+                                            <div class="col-6 text-left">
+                                                <strong>
+                                                    Total = {{ formatRupiah($direktur->total_amount) }}
+                                                </strong>
+                                            </div>
+                                            <div class="col-6 text-right">
+                                                <strong>
+                                                    Terpakai = {{ formatRupiah($actual_amount_direktur) }}
+                                                </strong>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -753,7 +797,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
                                         <h5><strong>Informasi Pengaju</strong></h5>
@@ -766,7 +810,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
                                         <h5><strong>Jenis Pengajuan</strong></h5>
@@ -784,7 +828,7 @@
                                 </div>
                             </div>
                             <hr>
-                            <div class="col-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
                                         <h5><strong>Informasi Rekening</strong></h5>
@@ -800,7 +844,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-12 col-md-6">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
                                         <h5><strong>Target Cost Center</strong></h5>
@@ -808,7 +852,7 @@
                                         <h6><strong>Nama</strong></h6>
                                         {{ $all_expense->costCenter?->name }}
                                         <hr>
-                                        <h6><strong>Kode Transaksi</strong></h6>
+                                        <h6><strong>Kode Target</strong></h6>
                                         {{ $all_expense->costCenter?->code_ref }}
                                         <hr>
                                         <div class="row">
@@ -827,7 +871,14 @@
                             <div class="col-12">
                                 <div class="card rounded-partner">
                                     <div class="card-body">
-                                        <h5 class="mb-3"><strong>Pengajuan: {{ $all_expense->title }}</strong></h5>
+                                        <h5><strong>Pengajuan: {{ $all_expense->title }}</strong></h5>
+                                        <div class="col-12 mb-3 px-0">
+                                            <label for="codeRefRequest" class="mb-0 form-label col-form-label-sm">Kode
+                                                Transaksi</label>
+                                            <input type="text" id="codeRefRequest"
+                                                class="form-control form-control-sm"
+                                                value="{{ $all_expense->code_ref_request }}" readonly="readonly">
+                                        </div>
                                         <table class="table table-bordered" id="items-table">
                                             <thead>
                                                 <tr>
@@ -1138,15 +1189,24 @@
         function submitBulkAction(actionType) {
             const selectedCheckboxes = document.querySelectorAll('.select-box:checked');
             if (selectedCheckboxes.length === 0) {
-                Swal.fire('Warning', 'Please select at least one item.', 'warning');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan!',
+                    text: 'Silahkan pilih pengajuan terlebih dahulu',
+                    confirmButtonColor: '#5cb85c',
+                    confirmButtonText: 'Oke',
+                });
                 return;
             }
 
             Swal.fire({
-                title: `Are you sure to ${actionType}?`,
+                title: `Apa Anda Yakin untuk ${actionType}?`,
+                text: `Anda akan ${actionType == 'Menyetujui Masal' ? 'menyetujui' : 'menolak'} menyetujui semua pengajuan yang dipilih!`,
                 icon: 'warning',
                 confirmButtonColor: '#5cb85c',
-                confirmButtonText: 'Yes'
+                confirmButtonText: 'Ya, Setujui',
+                cancelButtonText: 'Batal',
+                showCancelButton: true,
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.getElementById('bulkActionForm');
