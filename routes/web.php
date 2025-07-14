@@ -152,9 +152,6 @@ Route::middleware('auth')->group(function () {
     // Supplier
     Route::resource('supplier', SupplierController::class);
 
-    // Partner
-    Route::resource('partner', PartnerController::class);
-
     /**
      * Date: 21/05/2025
      * UserJobs Menu
@@ -233,4 +230,23 @@ Route::middleware('auth')->group(function () {
                         ->name('cost-center.departments.requests');
                 });
         });
+
+    /**
+     * Mon, 14 July 2025
+     */
+    Route::get('/merge-supplier', function () {
+        FacadesDB::table('suppliers')->insertUsing(
+            ['name', 'contact', 'number', 'keyword', 'desc', 'is_active', 'created_at', 'updated_at'],
+            FacadesDB::table('partners')->select('name', 'contact', 'number', 'keyword', 'desc', 'is_active', 'created_at', 'updated_at')
+        );
+    });
+
+    Route::get('/count-supplier', function () {
+        $count = FacadesDB::table('suppliers')->count();
+        dd($count);
+    });
+
+    Route::get('/truncate-supplier', function () {
+        FacadesDB::table('partners')->truncate(); // kosongkan isi tabel
+    });
 });
