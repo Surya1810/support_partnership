@@ -347,7 +347,7 @@
                                     </div>
                                 </div>
                                 <div class="col-12">
-                                    <div class="d-flex mt-3" style="max-height: 150px; display: none"
+                                    <div class="d-flex mt-3" style="max-height: 150px; display: none!important;"
                                         id="cardSaldoRABWrapper">
                                         <div class="card bg-primary text-center col-10 col-md-6 mx-1 h-100">
                                             <div class="card-header">

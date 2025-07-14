@@ -55,7 +55,7 @@
                             <table id="myexpenseTable" class="table table-bordered text-nowrap">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th style="width: 70%">
+                                        <th style="width: 60%">
                                             Judul
                                         </th>
                                         <th style="width: 10%">
@@ -69,6 +69,9 @@
                                         </th>
                                         <th style="width: 10%">
                                             Nominal
+                                        </th>
+                                        <th style="width: 10%">
+                                            Referensi
                                         </th>
                                         <th style="width: 5%">
                                             Status
@@ -91,6 +94,16 @@
                                             </td>
                                             <td>{{ $my_expense->use_date->format('d/m/y') }}</td>
                                             <td>{{ formatRupiah($my_expense->total_amount) }}</td>
+                                            <td>
+                                                @if ($my_expense->reference_file)
+                                                    <a href="{{ asset('storage/' . $my_expense->reference_file) }}"
+                                                        target="_blank" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
                                             <td>
                                                 @if ($my_expense->status == 'pending')
                                                     <span class="badge badge-secondary">{{ $my_expense->status }}</span>
@@ -205,8 +218,8 @@
     </section>
 
     {{-- Modal Add Pengajuan --}}
-    <div class="modal fade" id="addApplication" tabindex="-1" aria-labelledby="addApplicationLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal fade" id="addApplication" data-bs-backdrop="static" tabindex="-1" aria-labelledby="addApplicationLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addApplicationLabel">Buat Pengajuan</h5>
@@ -214,9 +227,8 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="{{ route('application.store') }}" method="POST" enctype="multipart/form-data">
+                <form class="modal-body pt-0" action="{{ route('application.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="modal-body pt-0">
                         <div class="form-group">
                             <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
                         </div>
@@ -367,6 +379,15 @@
                             </span>
                         @enderror
 
+                        {{-- File referensi --}}
+                        <div class="col-12 my-3">
+                            <label for="reference_file" class="mb-0 form-label col-form-label-sm">File Pendukung <span class="text-sm text-danger">*opsional berupa gambar atau pdf</span></label>
+                            <input type="file" class="form-control @error('reference_file') is-invalid @enderror" id="reference_file"
+                                name="reference_file" value="{{ old('reference_file') }}" placeholder="Upload dokumen pendukung"
+                                accept="image/jpeg, image/png, image/jpg, image/webp, application/pdf"
+                            />
+                        </div>
+
                         <label for="items" class="mb-0 form-label col-form-label-sm mt-3">Rincian Item</label>
                         <div class="table-responsive">
                             <table class="table table-sm" id="items-table">
@@ -409,7 +430,6 @@
 
                         <button type="button" id="add-item" class="btn btn-primary btn-sm rounded-partner"><i
                                 class="fas fa-plus"></i></button>
-                    </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary rounded-partner">Apply</button>
                     </div>

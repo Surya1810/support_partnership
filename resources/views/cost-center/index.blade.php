@@ -39,7 +39,7 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Debet</strong></p>
+                                <p><strong>Total Debet (Uang Kas Seluruh Divisi)</strong></p>
                                 <h6>{{ $sums['debit'] }}</h6>
                             </div>
                         </div>
@@ -47,7 +47,7 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Kredit</strong></p>
+                                <p><strong>Total Kredit (Limit Seluruh RAB Divisi)</strong></p>
                                 <h6>{{ $sums['credit'] }}</h6>
                             </div>
                         </div>
@@ -63,8 +63,8 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Pendapatan Tahun Berjalan</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <p><strong>Total Pendapatan Tahun Berjalan ({{ date('Y') }})</strong></p>
+                                <h6>{{ $sums['yearly_margin'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                                     </div>
                                     <div class="col-6">
                                         <small><strong>Tahun Berjalan</strong></small><br>
-                                        <small>{{ $department['total_yearly'] }}</small>
+                                        <small>{{ $department['yearly_margin'] }}</small>
                                     </div>
                                 </div>
                             </div>

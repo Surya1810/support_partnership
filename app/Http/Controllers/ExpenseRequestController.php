@@ -20,7 +20,7 @@ class ExpenseRequestController extends Controller
      */
     public function index()
     {
-        $departments = Department::all()->except([2, 4, 6, 7, 8]);
+        $departments = Department::all()->except([2, 4, 6, 7]);
         $my_expenses = ExpenseRequest::where('user_id', Auth::id())
             ->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->orderBy('created_at', 'desc')
             ->with('costCenter')
@@ -40,7 +40,9 @@ class ExpenseRequestController extends Controller
         $projects = Project::where('department_id', $user_department)
             ->where('status', '!=', 'Finished')
             ->get();
-        $generalCostCenters = CostCenter::where('department_id', $user_department)
+
+        // jika user adalah bagian finance maka get general affair
+        $generalCostCenters = CostCenter::where('department_id', $user_department == 8 ? 9 : $user_department)
             ->where('type', 'department')
             ->whereNot('cost_center_category_id', 1)
             ->where('year', date('Y'))
@@ -119,6 +121,7 @@ class ExpenseRequestController extends Controller
             'category' => 'bail|required|',
             'use_date' => 'bail|required|max:255',
             'project_cost_center_id' => 'bail|nullable|exists:cost_centers,id',
+            'reference_file' => 'bail|nullable|mimes:jpg,jpeg,png,webp,pdf|max:122880',
             'items' => 'required|array',
             'items.*.item_name' => 'required|string',
             'items.*.quantity' => 'required|integer|min:1',
@@ -131,11 +134,12 @@ class ExpenseRequestController extends Controller
         $expenseRequest = new ExpenseRequest();
         $expenseRequest->user_id = $request->user_id;
 
-        if ($request->department_id == 1) {
+        if ($request->department_id == 1 || $request->department_id == 8 || $request->department_id == 9) {
             $expenseRequest->department_id = $request->department_id;
             $expenseRequest->approved_by_manager = true;
         } else {
-            $expenseRequest->department_id = $request->department_id;
+            // jika finance maka jadi general affair
+            $expenseRequest->department_id = $request->department_id == 8 ? 9 : $request->department_id;
         }
 
         $expenseRequest->title = $request->title;
@@ -169,6 +173,14 @@ class ExpenseRequestController extends Controller
 
         if (Auth::user()->role_id == 3) {
             $expenseRequest->approved_by_manager = true;
+        }
+
+        // store file reference
+        if ($request->hasFile('reference_file')) {
+            $file = $request->file('reference_file');
+            $fileName = time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('uploads/files/pengajuan/references', $fileName, 'public');
+            $expenseRequest->reference_file = $path;
         }
 
         $expenseRequest->code_ref_request = $this->generateCodeRefRequest($expenseRequest->cost_center_id);
@@ -205,7 +217,7 @@ class ExpenseRequestController extends Controller
             ->with('category')
             ->first();
 
-        if ($costCenterTarget->category->code == 'BP') {
+        if ($costCenterTarget->category->code == 'BP' && $costCenterTarget->type == 'project') {
             return $costCenterTarget->code_ref;
         }
 
@@ -272,6 +284,7 @@ class ExpenseRequestController extends Controller
         // Logika untuk Direktur
         if ($userRole === 'Director') {
             // if (!$expenseRequest->approved_by_manager && $expenseRequest->total_amount > 150000) {
+
             if (!$expenseRequest->approved_by_manager && $expenseRequest->total_amount > 150000) {
                 return redirect()->back()->with(['pesan' => 'Pengajuan harus disetujui oleh manager terlebih dahulu', 'level-alert' => 'alert-danger']);
             }

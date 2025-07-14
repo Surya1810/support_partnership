@@ -69,7 +69,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Pendapatan Tahun Berjalan</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <h6>{{ $sums['yearly_margin'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -84,8 +84,13 @@
                         <div class="col-12 col-md-3">
                             <div class="card card-outline rounded-partner card-info bg-primary">
                                 <div class="card-body">
-                                    <p><strong>{{ $category['name'] }}</strong></p>
-                                    <h6>{{ $category['total_debit'] }}</h6>
+                                    @if ($category['code'] == 'KS')
+                                        <p><strong>{{ $category['name'] }}</strong></p>
+                                        <h6>{{ $category['total_debit'] }}</h6>
+                                    @else
+                                        <p><strong>{{ $category['name'] }}</strong></p>
+                                        <h6>{{ $category['total_credit'] }}</h6>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -98,9 +103,11 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12 text-center">
-                            <a href="{{ route('cost-center.departments.projects', $department->id) }}" class="btn btn-outline-dark">
-                                View Data Project
-                            </a>
+                            @if ($department->id != 9)
+                                <a href="{{ route('cost-center.departments.projects', $department->id) }}" class="btn btn-outline-dark">
+                                    View Data Project
+                                </a>
+                            @endif
                             <a href="{{ route('cost-center.departments.requests', $department->id) }}" class="btn btn-outline-dark">
                                 View Data Kas
                             </a>

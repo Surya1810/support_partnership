@@ -52,14 +52,14 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Kredit (Pengajuan Terealisasi)</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <h6>{{ $totalAmount['total_actual_amount'] }}</h6>
                             </div>
                         </div>
                     </div>
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Sisa Saldo (Pengajuan Terealisasi + Uang Kas)</strong></p>
+                                <p><strong>Sisa (Modal - Pengajuan Terealisasi)</strong></p>
                                 <h6>{{ $totalAmount['total_remaining'] }}</h6>
                             </div>
                         </div>
@@ -443,7 +443,7 @@
                         orderable: false,
                         searchable: false,
                         data: null,
-                        defaultContent: '<button class="badge bg-info border-0" title="Detail Profit"><i class="fas fa-dollar-sign"></i></button>',
+                        defaultContent: '<button class="badge bg-info border-0" title="List Pengajuan"><i class="fas fa-dollar-sign"></i></button>',
                     },
                     {
                         data: 'DT_RowIndex',
@@ -479,10 +479,17 @@
                 ]
             });
 
+            // hide expand button untuk baris pertama
+            table.on('draw', function () {
+                const firstRow = $('#tableProject tbody tr').first();
+                firstRow.find('td.details-control').html('');
+            });
+
             $('#tableProject tbody').on('click', 'td.details-control button', function() {
                 let tr = $(this).closest('tr');
                 let row = table.row(tr);
-                let projectId = row.data().id;
+                let projectId = row.data().project_id;
+                let costCenterId = row.data().id;
 
                 if (row.child.isShown()) {
                     row.child.hide();
@@ -490,15 +497,20 @@
                     $(this).html('<i class="fas fa-dollar-sign"></i>');
                 } else {
                     // Tambahkan HTML tabel kosong dengan ID unik
-                    let tableId = `tableProjectProfit-${projectId}`;
+                    let tableId = `tableProjectBudgetPlanRequests-${projectId}-${costCenterId}`;
                     let html = `
                     <table id="${tableId}" class="table table-sm table-bordered">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th>Nama Item</th>
-                                <th>Nilai (%)</th>
-                                <th>Nilai (Rp)</th>
+                                <th>Tanggal Digunakan</th>
+                                <th>Judul</th>
+                                <th>Kode Transaksi</th>
+                                <th>Pengaju</th>
+                                <th>Diajukan</th>
+                                <th>Digunakan</th>
+                                <th>Bukti</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                     </table>
@@ -508,34 +520,32 @@
                     $(this).text('-');
 
                     // Inisialisasi DataTables untuk tabel profit
-                    $(`#${tableId}`).DataTable({
-                        processing: true,
-                        serverSide: true,
-                        ordering: false,
-                        searching: false,
-                        paging: false,
-                        info: false,
-                        ajax: "{{ route('cost-center.departments.projects.profit', ':id') }}"
-                            .replace(':id', projectId),
-                        columns: [{
-                                data: 'DT_RowIndex',
-                                name: 'DT_RowIndex',
-                                className: 'text-center'
-                            },
-                            {
-                                data: 'name',
-                                name: 'name'
-                            },
-                            {
-                                data: 'percent',
-                                name: 'percent'
-                            },
-                            {
-                                data: 'idr',
-                                name: 'idr'
-                            }
-                        ]
-                    });
+                    setTimeout(() => {
+                        $(`#${tableId}`).DataTable({
+                            processing: true,
+                            serverSide: true,
+                            deferRender: true,
+                            destroy: true,
+                            ordering: false,
+                            searching: false,
+                            paging: false,
+                            info: false,
+                            ajax: "{{ route('cost-center.departments.projects.budget-plan.requests', [':id', ':ccid']) }}"
+                                .replace(':id', projectId)
+                                .replace(':ccid', costCenterId),
+                            columns: [
+                                { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center' },
+                                { data: 'date', name: 'date' },
+                                { data: 'title', name: 'title' },
+                                { data: 'code', name: 'code' },
+                                { data: 'user', name: 'user' },
+                                { data: 'credit', name: 'credit' },
+                                { data: 'used_amount', name: 'used_amount' },
+                                { data: 'report_file', name: 'report_file' },
+                                { data: 'status', name: 'status' }
+                            ]
+                        });
+                    }, 100);
                 }
             });
 

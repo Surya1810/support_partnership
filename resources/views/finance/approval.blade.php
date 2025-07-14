@@ -75,7 +75,7 @@
                                             <th style="width: 10%">
                                                 Pengaju
                                             </th>
-                                            <th style="width: 20%">
+                                            <th style="width: 15%">
                                                 Judul
                                             </th>
                                             <th style="width: 20%">
@@ -89,6 +89,9 @@
                                             </th>
                                             <th style="width: 15%">
                                                 Total Amount
+                                            </th>
+                                            <th>
+                                                Referensi
                                             </th>
                                             <th style="width: 5%">
                                                 Status
@@ -118,9 +121,17 @@
                                                         <strong>General</strong>
                                                     @endif
                                                 </td>
-                                                <td>{{ $manager->costCenter?->code_ref }}</td>
+                                                <td>{{ $manager->code_ref_request }}</td>
                                                 <td>{{ $manager->use_date->toFormattedDateString('d/m/y') }}</td>
                                                 <td>{{ formatRupiah($manager->total_amount) }}</td>
+                                                <td>
+                                                    @if ($manager->reference_file)
+                                                        <a href="{{ asset('storage/' . $manager->reference_file) }}"
+                                                            target="_blank" class="btn btn-sm btn-info"><i class="fa fa-download"></i></a>
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     @if ($manager->status == 'pending')
                                                         <span class="badge badge-secondary">{{ $manager->status }}</span>
@@ -203,7 +214,7 @@
                                             <th style="width: 20%">
                                                 Judul
                                             </th>
-                                            <th style="width: 20%">
+                                            <th style="width: 15%">
                                                 Kategori
                                             </th>
                                             <th style="width: 17%">
@@ -214,6 +225,9 @@
                                             </th>
                                             <th style="width: 15%">
                                                 Nominal Diajukan
+                                            </th>
+                                            <th style="width: 5%">
+                                                Referensi
                                             </th>
                                             <th style="width: 5%">
                                                 Status
@@ -246,6 +260,16 @@
                                                 <td>{{ $direktur->costCenter?->code_ref }}</td>
                                                 <td>{{ $direktur->use_date->toFormattedDateString('d/m/y') }}</td>
                                                 <td>{{ formatRupiah($direktur->total_amount) }}</td>
+                                                <td>
+                                                    @if ($direktur->reference_file)
+                                                        <a href="{{ asset('storage/' . $direktur->reference_file) }}"
+                                                            target="_blank" class="btn btn-sm btn-info">
+                                                            <i class="fa fa-file-pdf"></i>
+                                                        </a>
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     @if ($direktur->status == 'pending')
                                                         <span class="badge badge-secondary">{{ $direktur->status }}</span>
@@ -300,7 +324,7 @@
                                             <th style="width: {{  auth()->user()->role_id == 2 ? '25%' : '10%' }}">
                                                 Judul
                                             </th>
-                                            <th style="width: 20%">
+                                            <th style="width: 15%">
                                                 Kategori
                                             </th>
                                             <th style="width: {{  auth()->user()->role_id == 2 ? '20%' : '15%' }}">
@@ -314,6 +338,9 @@
                                             </th>
                                             <th style="width: 5%">
                                                 Status
+                                            </th>
+                                            <th style="width: 5%">
+                                                Referensi
                                             </th>
                                             <th style="width: 5%">
                                                 Report
@@ -340,7 +367,7 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    {{ $all_expense->costCenter?->code_ref }}
+                                                    {{ $all_expense->code_ref_request}}
                                                 </td>
                                                 <td>{{ $all_expense->use_date->toFormattedDateString('d/m/y') }}</td>
                                                 <td>{{ formatRupiah($all_expense->total_amount) }}</td>
@@ -363,6 +390,15 @@
                                                     @elseif ($all_expense->status == 'finish')
                                                         <span
                                                             class="badge badge-success">{{ $all_expense->status }}</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if ($all_expense->reference_file)
+                                                        <a class="btn btn-sm btn-info"
+                                                            href="{{ asset('storage/' . $all_expense->reference_file) }}"
+                                                            target="_blank"><i class="fa-solid fa-download"></i></a>
+                                                    @else
+                                                        -
                                                     @endif
                                                 </td>
                                                 <td>

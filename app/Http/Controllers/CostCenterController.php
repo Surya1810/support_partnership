@@ -34,23 +34,40 @@ class CostCenterController extends Controller
             ->orderBy('updated_at', 'desc')
             ->where('year', date('Y'));
 
-        // jangan lupa sum total
-        // pendatapan tahun berjalan
+        // hitung pendapatan tahun berjalan
+        $yearlyMargin = Project::whereHas('costCenters', function ($query) {
+            $query->where('type', 'project')
+                ->where('year', date('Y'));
+        })
+            ->where('status', 'Finished')
+            ->with('financial')
+            ->get()
+            ->sum(function ($project) {
+                return optional($project->financial)->margin ?? 0;
+            });
+
+        // untuk menampilkan total semua divisi
         $sums = [
             'debit' => formatRupiah($query->sum('amount_debit')),
             'credit' => formatRupiah($query->sum('amount_credit')), // belum dihitung dari total pengajuan diterima
-            'remaining' => formatRupiah($query->sum('amount_remaining')),
+            'remaining' => formatRupiah($query->sum('amount_debit') - $query->sum('amount_credit')),
+            'yearly_margin' => formatRupiah($yearlyMargin)
         ];
 
         // hitung sum debit, credit, remainging
         // & tahun pendapatan berjalan per divisi
         $departmentIds = [1, 3, 5, 9];
-        $sums['departments'] = DB::table('departments as d')
-            ->leftJoin('cost_centers as cc', function ($join) {
+        $year = date('Y');
+
+        // Step: Hitung total debit, credit, remaining dari cost center type department
+        $baseData = DB::table('departments as d')
+            ->leftJoin('cost_centers as cc', function ($join) use ($year) {
                 $join->on('d.id', '=', 'cc.department_id')
                     ->where('cc.type', 'department')
-                    ->where('cc.year', date('Y'));
+                    ->where('cc.year', $year);
             })
+            ->whereIn('d.id', $departmentIds)
+            ->groupBy('d.id', 'd.name')
             ->select(
                 'd.id as department_id',
                 'd.name as department_name',
@@ -58,20 +75,43 @@ class CostCenterController extends Controller
                 DB::raw('COALESCE(SUM(cc.amount_credit), 0) as total_credit'),
                 DB::raw('COALESCE(SUM(cc.amount_remaining), 0) as total_remaining')
             )
-            ->whereIn('d.id', $departmentIds)
-            ->groupBy('d.id', 'd.name')
             ->get()
-            ->map(function ($row) {
-                return [
-                    'department_id' => $row->department_id,
-                    'department_name' => $row->department_name,
-                    'total_debit' => formatRupiah($row->total_debit),
-                    'total_credit' => formatRupiah($row->total_credit),
-                    'total_remaining' => formatRupiah($row->total_remaining),
-                    'total_yearly' => formatRupiah(0), // belum ada
-                ];
-            });
+            ->keyBy('department_id');
 
+        // Step: Ambil project_id unik yang punya cost center project tahun berjalan
+        $projectIds = DB::table('cost_centers as cc')
+            ->join('projects as p', 'cc.project_id', '=', 'p.id')
+            ->where('cc.type', 'project')
+            ->where('cc.year', $year)
+            ->where('p.status', 'Finished')
+            ->pluck('p.id')
+            ->unique()
+            ->values();
+
+        // Step: Ambil total margin hanya untuk project unik tersebut
+        $projectMargins = DB::table('projects as p')
+            ->join('project_financials as pf', 'p.id', '=', 'pf.project_id')
+            ->whereIn('p.id', $projectIds)
+            ->whereIn('p.department_id', $departmentIds)
+            ->groupBy('p.department_id')
+            ->select(
+                'p.department_id',
+                DB::raw('SUM(pf.margin) as total_yearly')
+            )
+            ->pluck('total_yearly', 'department_id');
+
+        $sums['departments'] = $baseData->map(function ($row) use ($projectMargins) {
+            $total_yearly = $projectMargins[$row->department_id] ?? 0;
+
+            return [
+                'department_id' => $row->department_id,
+                'department_name' => $row->department_name,
+                'total_debit' => formatRupiah($row->total_debit),
+                'total_credit' => formatRupiah($row->total_credit),
+                'total_remaining' => formatRupiah($row->total_debit - $row->total_credit),
+                'yearly_margin' => formatRupiah($total_yearly),
+            ];
+        })->values();
 
         return view('cost-center.index', compact('sums'));
     }
@@ -249,6 +289,8 @@ class CostCenterController extends Controller
                     'name' => $request->name_new,
                     'month' => $request->month,
                     'year' => $request->year,
+                    'detail' => '<small>Dibuat oleh: ' . Auth::user()->username
+                        . '<br/>Tanggal: ' . date('d-m-Y') . '</small>',
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -312,17 +354,30 @@ class CostCenterController extends Controller
             ->where('year', date('Y'));
 
         $requests = ExpenseRequest::where('status', 'finish')
-            ->with(['costCenter', 'items', 'user'])
+            ->with(['costCenter', 'items', 'user', 'department'])
             ->where('category', 'department')
             ->orderBy('created_at', 'desc');
 
         // dd($requests->get());
 
+        // yearly margin dari project
+        $yearlyMargin = Project::where('status', 'Finished')
+            ->whereHas('costCenters', function ($query) {
+                $query->where('type', 'project')
+                    ->where('year', date('Y'));
+            })
+            ->with('financial') // asumsi relasi one-to-one ke financial
+            ->get()
+            ->sum(function ($project) {
+                return optional($project->financial)->margin ?? 0;
+            });
+
         // sum total keseluruhan RAB dari semua department
         $sums = [
             'debit' => formatRupiah($query->sum('amount_debit')),
             'credit' => formatRupiah($query->sum('amount_credit')), // belum dihitung dari total pengajuan diterima
-            'remaining' => formatRupiah($query->sum('amount_remaining')),
+            'remaining' => formatRupiah($query->sum('amount_debit') - $query->sum('amount_credit')),
+            'yearly_margin' => formatRupiah($yearlyMargin)
         ];
 
         $categories = CostCenterCategory::with(['costCenters' => function ($query) {
@@ -331,20 +386,39 @@ class CostCenterController extends Controller
         }])->get();
 
         $sums['categories'] = $categories->map(function ($category) {
-            $total_debit = $category->costCenters->sum('amount_debit');
+            $totalDebit = $category->costCenters->sum('amount_debit');
+            $totalCredit = $category->costCenters->sum('amount_credit');
 
             return [
                 'id' => $category->id,
+                'code' => $category->code,
                 'name' => '(' . $category->code . ') ' . $category->name,
-                'total_debit' => formatRupiah($total_debit)
+                'total_debit' => formatRupiah($totalDebit),
+                'total_credit' => formatRupiah($totalCredit),
             ];
         });
 
         if ($request->ajax()) {
-
+            return DataTables::of($requests)
+                ->addIndexColumn()
+                ->addColumn('request_name', fn($item) => $item->title)
+                ->addColumn('code_ref_request', fn($item) => $item->code_ref_request)
+                ->addColumn('department', fn($item) => $item->department?->name)
+                ->addColumn('user', fn($item) => $item->user?->name)
+                ->addColumn('credit', fn($item) => formatRupiah($item->total_amount))
+                ->addColumn('remaining', function ($item) {
+                    return formatRupiah($item->total_amount - $item->items?->sum('actual_amount'));
+                })
+                ->addColumn('report_file', function ($item) {
+                    return $item->report_file
+                        ? '<a href="' . asset('storage/' . $item->report_file) . '" target="_blank" class="btn btn-sm btn-danger"><i class="fa fa-file-pdf"></i></a>'
+                        : '-';
+                })
+                ->rawColumns(['report_file'])
+                ->make(true);
         }
 
-        // dd($results);
+        // dd($requests->get());
 
         return view('cost-center.transactions_rab_general_credit', compact('sums'));
     }
@@ -386,10 +460,23 @@ class CostCenterController extends Controller
                 ->where('department_id', $id);
 
             // sum total keseluruhan RAB dari semua department
+            $yearlyMargin = Project::whereHas('costCenters', function ($query) use ($id) {
+                $query->where('type', 'project')
+                    ->where('year', date('Y'));
+            })
+                ->where('status', 'Finished')
+                ->where('department_id', $id)
+                ->with('financial')
+                ->get()
+                ->sum(function ($project) {
+                    return optional($project->financial)->margin ?? 0;
+                });
+
             $sums = [
                 'debit' => formatRupiah($query->sum('amount_debit')),
                 'credit' => formatRupiah($query->sum('amount_credit')), // belum dihitung dari total pengajuan diterima
-                'remaining' => formatRupiah($query->sum('amount_remaining')),
+                'remaining' => formatRupiah($query->sum('amount_debit') - $query->sum('amount_credit')),
+                'yearly_margin' => formatRupiah($yearlyMargin)
             ];
 
             $categories = CostCenterCategory::with(['costCenters' => function ($query) use ($id) {
@@ -400,11 +487,14 @@ class CostCenterController extends Controller
 
             $sums['categories'] = $categories->map(function ($category) {
                 $total_debit = $category->costCenters->sum('amount_debit');
+                $total_credit = $category->costCenters->sum('amount_credit');
 
                 return [
                     'id' => $category->id,
+                    'code' => $category->code,
                     'name' => '(' . $category->code . ') ' . $category->name,
-                    'total_debit' => formatRupiah($total_debit)
+                    'total_debit' => formatRupiah($total_debit),
+                    'total_credit' => formatRupiah($total_credit),
                 ];
             });
 
@@ -412,7 +502,6 @@ class CostCenterController extends Controller
 
             return view('cost-center.transactions_rab_in_department', compact('sums', 'department'));
         } catch (\Exception $e) {
-            dd($e);
             return redirect()->back()->with([
                 'pesan' => 'Terjadi kesalahan: ' . $e->getMessage(),
                 'level-alert' => 'alert-danger'
@@ -440,29 +529,79 @@ class CostCenterController extends Controller
             })
                 ->where('status', 'Finished')
                 ->with(['financial', 'finalization', 'profit', 'costCenters']);
+            $projectIds = $projects->pluck('id')->toArray();
 
-            // get total debit, credit, remaining, and yearly margin
-            $getProjects = clone $projects->get();
             $totalDebit = 0;
             $totalCredit = 0;
-            $totalRemaining = 0; // belum fix
-            $totalYearlyMargin = 0; // belum fix
+            $totalRemaining = 0;
+            $totalYearlyMargin = 0;
+            $totalCompany = 0;
+            $totalDepreciation = 0;
+            $totalCashDepartment = 0;
+            $totalTeamBonus = 0;
+            $totalSP2D = 0;
+            $totalVAT = 0;
+            $totalTAX = 0;
 
-            foreach ($getProjects as $project) {
+            foreach ($projects->get() as $project) {
                 foreach ($project->costCenters as $costCenter) {
                     $totalDebit += $costCenter->amount_debit;
                     $totalCredit += $costCenter->amount_credit;
                 }
 
-                $margin = $project->financial->margin;
-                $totalYearlyMargin += $margin;
+                $financial = $project->financial;
+                $profit = $project->profit;
+
+                if ($financial) {
+                    $margin = $financial->margin;
+                    $totalYearlyMargin += $margin;
+
+                    // SP2D
+                    $sp2d = $financial->sp2d_amount;
+                    $totalSP2D += $sp2d;
+
+                    // VAT (PPN)
+                    $vatPercent = (float) $financial->vat_percent;
+                    $vat = $sp2d * ($vatPercent / 100);
+                    $totalVAT += $vat;
+
+                    // TAX (PPh)
+                    $taxPercent = (float) $financial->tax_percent;
+                    $tax = $sp2d * ($taxPercent / 100);
+                    $totalTAX += $tax;
+
+                    if ($profit) {
+                        $totalCompany += $margin * ($profit->percent_company / 100);
+                        $totalDepreciation += $margin * ($profit->percent_depreciation / 100);
+                        $totalCashDepartment += $margin * ($profit->percent_cash_department / 100);
+                        $totalTeamBonus += $margin * ($profit->percent_team_bonus / 100);
+                    }
+                }
             }
+
+            // sum total actual amount of expense requests
+            $actualAmountRequests = ExpenseRequest::where('status', 'finish')
+                ->where('department_id', $department->id)
+                ->whereIn('project_id', $projectIds)
+                ->with('items')
+                ->get()
+                ->sum(function ($request) {
+                    return $request->items()->sum('actual_amount');
+                });
 
             $totalAmount = [
                 'total_debit' => formatRupiah($totalDebit),
                 'total_credit' => formatRupiah($totalCredit),
-                'total_remaining' => formatRupiah($totalDebit - $totalCredit),
-                'total_yearly_margin' => formatRupiah($totalYearlyMargin)
+                'total_remaining' => formatRupiah($totalDebit - $actualAmountRequests),
+                'total_actual_amount' => formatRupiah($actualAmountRequests),
+                'total_yearly_margin' => formatRupiah($totalYearlyMargin),
+                'total_company' => formatRupiah($totalCompany),
+                'total_depreciation' => formatRupiah($totalDepreciation),
+                'total_cash_department' => formatRupiah($totalCashDepartment),
+                'total_team_bonus' => formatRupiah($totalTeamBonus),
+                'total_sp2d' => formatRupiah($totalSP2D),
+                'total_vat' => formatRupiah($totalVAT),
+                'total_tax' => formatRupiah($totalTAX),
             ];
 
             if ($request->ajax()) {
@@ -572,10 +711,20 @@ class CostCenterController extends Controller
 
             $projectMargin = ProjectFinancial::where('project_id', $project->id)->first()->margin;
 
+            // sum actual amount atau pengajuan terealisasi
+            $actualAmountRequests = ExpenseRequest::where('project_id', $id)
+                ->where('status', 'finish')
+                ->with('items')
+                ->get()
+                ->sum(function ($request) {
+                    return $request->items()->sum('actual_amount');
+                });
+
             $totalAmount = [
                 'total_debit' => formatRupiah($costCenters->sum('amount_debit')),
+                'total_actual_amount' => formatRupiah($actualAmountRequests),
                 'total_credit' => formatRupiah($costCenters->sum('amount_credit')),
-                'total_remaining' => formatRupiah($costCenters->sum('amount_debit') - $costCenters->sum('amount_credit')),
+                'total_remaining' => formatRupiah($costCenters->sum('amount_debit') - $actualAmountRequests),
                 'total_yearly_margin' => formatRupiah($projectMargin),
             ];
 
@@ -632,7 +781,7 @@ class CostCenterController extends Controller
     {
         try {
             $costCenters = CostCenter::where('type', 'project')
-                ->where('project_id', $id)// avoid to get uang kas project
+                ->where('project_id', $id) // avoid to get uang kas project
                 ->get();
 
             return response()->json([
@@ -929,6 +1078,41 @@ class CostCenterController extends Controller
                 'pesan' => 'Terjadi kesalahan: ' . $e->getMessage(),
                 'level-alert' => 'alert-danger'
             ]);
+        }
+    }
+
+    public function getProjectBudgetPlanRequestsTable(Request $request, $projectId, $costCenterId)
+    {
+        try {
+            if ($request->ajax()) {
+                $requests = ExpenseRequest::where('project_id', $projectId)
+                    ->where('cost_center_id', $costCenterId)
+                    ->where('category', 'project')
+                    ->with(['user', 'items']);
+
+                return DataTables::of($requests)
+                    ->addIndexColumn()
+                    ->addColumn('date', fn($item) => $item->use_date->format('Y-m-d'))
+                    ->addColumn('title', fn($item) => $item->title)
+                    ->addColumn('code', fn($item) => $item->code_ref_request)
+                    ->addColumn('user', fn($item) => $item->user?->name)
+                    ->addColumn('credit', fn($item) => formatRupiah($item->total_amount))
+                    ->addColumn('used_amount', fn($item) => formatRupiah($item->items?->sum('actual_amount')))
+                    ->addColumn('report_file', function ($item) {
+                        if ($item->report_file) {
+                            return '<a href="' . asset('storage/' . $item->report_file) . '" target="_blank" class="btn btn-danger btn-sm"><i class="fa fa-file-pdf"></i></a>';
+                        }
+                        return '-';
+                    })
+                    ->addColumn('status', fn($item) => $item->status)
+                    ->rawColumns(['report_file'])
+                    ->make(true);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

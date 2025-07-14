@@ -194,17 +194,12 @@ Route::middleware('auth')->group(function () {
             Route::get('/', 'index')->name('cost-center.index');
             Route::get('/create/rab-general', 'indexCreateRABGeneral')
                 ->name('cost-center.create.rab-general');
-
-            Route::middleware('auth.admin')
-                ->group(function () {
-                    Route::post('/create/rab-general', 'storeRABGeneral')
-                        ->name('cost-center.store.rab-general');
-                    Route::get('/edit/rab-general/{id}/list', 'getRABGeneralJSON')
-                        ->name('cost-center.edit.rab-general.list');
-                    Route::put('/edit/rab-general/{id}/update', 'updateRABGeneral')
-                        ->name('cost-center.edit.rab-general.update');
-                });
-
+            Route::post('/create/rab-general', 'storeRABGeneral')
+                ->name('cost-center.store.rab-general');
+            Route::get('/edit/rab-general/{id}/list', 'getRABGeneralJSON')
+                ->name('cost-center.edit.rab-general.list');
+            Route::put('/edit/rab-general/{id}/update', 'updateRABGeneral')
+                ->name('cost-center.edit.rab-general.update');
             Route::get('/transactions/rab-general/credit', 'indexTransactionCreditRABGeneral')
                 ->name('cost-center.transactions.rab-general.credit');
 
@@ -215,6 +210,8 @@ Route::middleware('auth')->group(function () {
                         ->name('cost-center.departments.index');
                     Route::get('/{id}/projects', 'indexDepartmentProjects')
                         ->name('cost-center.departments.projects');
+
+                    // route rab untuk project
                     Route::get('/projects/{projectId}/budget-plan', 'indexDepartmentProjectBudgetPlan')
                         ->name('cost-center.departments.projects.budget-plan');
                     Route::get('/projects/{projectId}/budget-plan/json', 'getCostCentersProjectJSON')
@@ -224,29 +221,15 @@ Route::middleware('auth')->group(function () {
                         ->name('cost-center.departments.projects.budget-plan.store');
                     Route::put('/projects/{projectId}/budget-plan', 'updateRABProject')
                         ->name('cost-center.departments.projects.budget-plan.update');
+
+                    // get detail rincian request ke cost center tertentu untuk project
+                    Route::get('/projects/{projectId}/budget-plan/{costCenterId}/table', 'getProjectBudgetPlanRequestsTable')
+                        ->name('cost-center.departments.projects.budget-plan.requests');
+
                     Route::get('/projects/{projectId}/profit', 'getProjectProfitTable')
                         ->name('cost-center.departments.projects.profit');
                     Route::get('/{id}/requests', 'indexDepartmentRequests')
                         ->name('cost-center.departments.requests');
                 });
         });
-
-    /**
-     * Mon, 14 July 2025
-     */
-    Route::get('/merge-supplier', function () {
-        FacadesDB::table('suppliers')->insertUsing(
-            ['name', 'contact', 'number', 'keyword', 'desc', 'is_active', 'created_at', 'updated_at'],
-            FacadesDB::table('partners')->select('name', 'contact', 'number', 'keyword', 'desc', 'is_active', 'created_at', 'updated_at')
-        );
-    });
-
-    Route::get('/count-supplier', function () {
-        $count = FacadesDB::table('suppliers')->count();
-        dd($count);
-    });
-
-    Route::get('/truncate-supplier', function () {
-        FacadesDB::table('partners')->truncate(); // kosongkan isi tabel
-    });
 });

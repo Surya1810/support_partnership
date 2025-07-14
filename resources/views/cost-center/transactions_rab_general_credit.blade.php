@@ -42,7 +42,7 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Debet</strong></p>
+                                <p><strong>Total Debet (Semua Divisi)</strong></p>
                                 <h6>{{ $sums['debit'] }}</h6>
                             </div>
                         </div>
@@ -50,7 +50,7 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Limit (Seluruh RAB General)</strong></p>
+                                <p><strong>Total Limit (Semua RAB Milik Divisi)</strong></p>
                                 <h6>{{ $sums['credit'] }}</h6>
                             </div>
                         </div>
@@ -58,7 +58,7 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Sisa Saldo</strong></p>
+                                <p><strong>Total Sisa Saldo (Semua Divisi)</strong></p>
                                 <h6>{{ $sums['remaining'] }}</h6>
                             </div>
                         </div>
@@ -67,7 +67,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Pendapatan Tahun Berjalan</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <h6>{{ $sums['yearly_margin'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -83,7 +83,11 @@
                             <div class="card card-outline rounded-partner card-info bg-primary">
                                 <div class="card-body">
                                     <p><strong>{{ $category['name'] }}</strong></p>
-                                    <h6>{{ $category['total_debit'] }}</h6>
+                                    @if ($category['code'] == 'KS')
+                                        <h6>{{ $category['total_debit'] }}</h6>
+                                    @else
+                                        <h6>{{ $category['total_credit'] }}</h6>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -113,13 +117,12 @@
                                             <tr>
                                                 <th>No.</th>
                                                 <th>Nama Pengajuan</th>
-                                                <th>Cost Center Target</th>
+                                                <th>Kode Transaksi</th>
                                                 <th>Divisi</th>
                                                 <th>Pengaju</th>
-                                                <th>Kredit</th>
-                                                <th>Sisa Saldo</th>
+                                                <th>Diajukan</th>
+                                                <th>Dikembalikan</th>
                                                 <th>Bukti</th>
-                                                <th>Keterangan</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -171,6 +174,45 @@
                     lengthMenu: 'Tampilkan _MENU_ data',
                     zeroRecords: 'Data tidak ditemukan',
                 },
+                ajax: {
+                    url: "{{ route('cost-center.transactions.rab-general.credit') }}",
+                    type: "GET"
+                },
+                columns: [
+                    {
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'title',
+                        name: 'title'
+                    },
+                    {
+                        data: 'code_ref_request',
+                        name: 'code_ref_request'
+                    },
+                    {
+                        data: 'department',
+                        name: 'department'
+                    },
+                    {
+                        data: 'user',
+                        name: 'user'
+                    },
+                    {
+                        data: 'credit',
+                        name: 'credit'
+                    },
+                    {
+                        data: 'remaining',
+                        name: 'remaining'
+                    },
+                    {
+                        data: 'report_file',
+                        name: 'report_file'
+                    }
+                ]
             });
         })
     </script>

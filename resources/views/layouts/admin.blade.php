@@ -167,10 +167,11 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    @if (auth()->user()->role_id == 1 ||
-                                            auth()->user()->role_id == 2 ||
-                                            auth()->user()->role_id == 3 ||
-                                            auth()->user()->department_id == 8)
+                                    @php
+                                        $roleIds = [1, 2, 3];
+                                        $deparmentsIds = [8];
+                                    @endphp
+                                    @if (in_array(auth()->user()->role_id, $roleIds) || in_array(auth()->user()->department_id, $deparmentsIds))
                                         <a href="{{ route('application.approval') }}" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Approval</p>

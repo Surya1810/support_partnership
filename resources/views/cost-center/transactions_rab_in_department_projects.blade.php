@@ -51,15 +51,15 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Kredit (Penggunaan Modal)</strong></p>
-                                <h6>{{ $totalAmount['total_credit'] }}</h6>
+                                <p><strong>Total Kredit (Pengajuan Terealisasi)</strong></p>
+                                <h6>{{ $totalAmount['total_actual_amount'] }}</h6>
                             </div>
                         </div>
                     </div>
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Sisa Saldo (Sisa Modal)</strong></p>
+                                <p><strong>Sisa (Modal - Pengajuan Terealisasi)</strong></p>
                                 <h6>{{ $totalAmount['total_remaining'] }}</h6>
                             </div>
                         </div>
@@ -69,6 +69,70 @@
                             <div class="card-body">
                                 <p><strong>Pendapatan Tahun Berjalan</strong></p>
                                 <h6>{{ $totalAmount['total_yearly_margin'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-primary">
+                            <div class="card-body">
+                                <p><strong>Total Limit (Seluruh RAB)</strong></p>
+                                <h6>{{ $totalAmount['total_credit'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-primary bg-info">
+                            <div class="card-body">
+                                <p><strong>Total Perusahaan</strong></p>
+                                <h6>{{ $totalAmount['total_company'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-primary bg-info">
+                            <div class="card-body">
+                                <p><strong>Total Penyusutan</strong></p>
+                                <h6>{{ $totalAmount['total_depreciation'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-primary bg-info">
+                            <div class="card-body">
+                                <p><strong>Total Bonus Tim</strong></p>
+                                <h6>{{ $totalAmount['total_team_bonus'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-primary bg-info">
+                            <div class="card-body">
+                                <p><strong>Total Kas Divisi</strong></p>
+                                <h6>{{ $totalAmount['total_cash_department'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-primary bg-info">
+                            <div class="card-body">
+                                <p><strong>Total Kas Divisi</strong></p>
+                                <h6>{{ $totalAmount['total_cash_department'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-dark bg-secondary">
+                            <div class="card-body">
+                                <p><strong>Total PPN</strong></p>
+                                <h6>{{ $totalAmount['total_vat'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="card card-outline rounded-partner card-dark bg-secondary">
+                            <div class="card-body">
+                                <p><strong>Total PPH</strong></p>
+                                <h6>{{ $totalAmount['total_tax'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -229,25 +293,23 @@
                     tr.removeClass('shown');
                     $(this).html('<i class="fas fa-dollar-sign"></i>');
                 } else {
-                    // Tambahkan HTML tabel kosong dengan ID unik
                     let tableId = `tableProjectProfit-${projectId}`;
                     let html = `
-            <table id="${tableId}" class="table table-sm table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>No.</th>
-                        <th>Nama Item</th>
-                        <th>Nilai (%)</th>
-                        <th>Nilai (Rp)</th>
-                    </tr>
-                </thead>
-            </table>
-        `;
+                        <table id="${tableId}" class="table table-sm table-bordered">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Nama Item</th>
+                                    <th>Nilai (%)</th>
+                                    <th>Nilai (Rp)</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    `;
                     row.child(html).show();
                     tr.addClass('shown');
                     $(this).text('-');
 
-                    // Inisialisasi DataTables untuk tabel profit
                     $(`#${tableId}`).DataTable({
                         processing: true,
                         serverSide: true,
@@ -278,7 +340,6 @@
                     });
                 }
             });
-
         });
     </script>
 @endpush
