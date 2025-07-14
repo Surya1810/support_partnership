@@ -85,7 +85,6 @@ class HomeController extends Controller
 
         $clients = Client::all()->count();
         $suppliers = Supplier::all()->count();
-        $partners = Partner::all()->count();
 
         return view('home.dashboard', compact('projects', 'applications', 'documents', 'files', 'izins', 'users', 'my_approval_dana', 'my_approval_izin', 'clients', 'suppliers', 'partners'));
     }

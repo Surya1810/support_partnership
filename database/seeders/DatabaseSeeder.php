@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
             $this->call(CostCenterCategoriesSeeder::class);
             $this->call(ClientSeeder::class);
             $this->call(SupplierSeeder::class);
-            $this->call(PartnerSeeder::class);
         }
     }
 }
