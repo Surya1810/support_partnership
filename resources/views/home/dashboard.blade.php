@@ -210,22 +210,6 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-lg-4 col-6">
-                    <a href="{{ route('partner.index') }}">
-                        <div class="small-box bg-info rounded-partner">
-                            <div class="inner">
-                                <h3>{{ $partners }}</h3>
-
-                                <p>Rekanan</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-regular fa-address-book"></i>
-                            </div>
-                            <span class="small-box-footer rounded-partner">More info <i
-                                    class="fas fa-arrow-circle-right"></i></span>
-                        </div>
-                    </a>
-                </div>
             </div>
         </div>
         </div>
