@@ -303,14 +303,6 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('partner.index') }}" class="nav-link">
-                                <i class="nav-icon fa-regular fa-address-book"></i>
-                                <p>
-                                    Rekanan
-                                </p>
-                            </a>
-                        </li>
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
