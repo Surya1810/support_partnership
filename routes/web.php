@@ -6,11 +6,11 @@ use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ExpenseRequestController;
+use App\Http\Controllers\Export\CostCenterExportController;
 use App\Http\Controllers\FileController;
-use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Import\CostCenterGeneralImportController;
 use App\Http\Controllers\IzinController;
-use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ScanController;
@@ -69,31 +69,28 @@ Route::middleware('auth')->group(function () {
     Route::resource('user-data', UserExtensionController::class);
 
     // Application
-    Route::middleware('auth.development')
+    Route::resource('application', ExpenseRequestController::class);
+
+    Route::middleware('auth.module.finance')
         ->group(function () {
-            Route::resource('application', ExpenseRequestController::class);
-
-            Route::middleware('auth.module.finance')
-                ->group(function () {
-                    Route::put('/application/{id}/approve', [ExpenseRequestController::class, 'approve'])
-                        ->name('application.approve');
-                    Route::get('/approval/pengajuan', [ExpenseRequestController::class, 'approval'])
-                        ->name('application.approval');
-                    Route::put('/application/{id}/reject', [ExpenseRequestController::class, 'reject'])
-                        ->name('application.reject');
-                    Route::post('/application/bulk-action', [ExpenseRequestController::class, 'bulkAction'])
-                        ->name('application.bulkAction');
-                    Route::put('/application/{id}/process', [ExpenseRequestController::class, 'process'])
-                        ->name('application.process');
-                    Route::put('/application/{id}/checking', [ExpenseRequestController::class, 'checking'])
-                        ->name('application.checking');
-                });
-
-            Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])
-                ->name('application.report');
-            Route::get('/application/{id}/pdf', [ExpenseRequestController::class, 'pdf'])
-                ->name('application.pdf');
+            Route::put('/application/{id}/approve', [ExpenseRequestController::class, 'approve'])
+                ->name('application.approve');
+            Route::get('/approval/pengajuan', [ExpenseRequestController::class, 'approval'])
+                ->name('application.approval');
+            Route::put('/application/{id}/reject', [ExpenseRequestController::class, 'reject'])
+                ->name('application.reject');
+            Route::post('/application/bulk-action', [ExpenseRequestController::class, 'bulkAction'])
+                ->name('application.bulkAction');
+            Route::put('/application/{id}/process', [ExpenseRequestController::class, 'process'])
+                ->name('application.process');
+            Route::put('/application/{id}/checking', [ExpenseRequestController::class, 'checking'])
+                ->name('application.checking');
         });
+
+    Route::post('/application/{id}/report', [ExpenseRequestController::class, 'report'])
+        ->name('application.report');
+    Route::get('/application/{id}/pdf', [ExpenseRequestController::class, 'pdf'])
+        ->name('application.pdf');
 
     // Debt
     Route::resource('izin', IzinController::class);
@@ -110,22 +107,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/document/import', [DocumentController::class, 'import'])->name('document.import');
 
     // Project Management
-    Route::middleware('auth.development')
+    Route::resource('project', ProjectController::class);
+    Route::controller(ProjectController::class)
+        ->prefix('projects')
         ->group(function () {
-            Route::resource('project', ProjectController::class);
-            Route::controller(ProjectController::class)
-                ->prefix('projects')
-                ->group(function () {
-                    Route::get('/create/download-template-rab', 'downloadTemplateImport')
-                        ->name('project.create.download-template-rab');
-                    Route::get('/detail/{kode}', 'detail')->name('project.detail');
-                    Route::get('/task/{kode}', 'task')->name('project.task');
-                    Route::get('/review/{kode}', 'review')->name('project.review');
-                    Route::get('/finalization/{kode}', 'finalization')->name('project.finalization');
-                    Route::post('/finalization/{id}', 'storeFinalization')->name('project.store.finalization');
-                    Route::post('/done/{id}', 'done')->name('project.done');
-                    Route::get('/arsip', 'archive')->name('project.archive');
-                });
+            Route::get('/create/download-template-rab', 'downloadTemplateImport')
+                ->name('project.create.download-template-rab');
+            Route::get('/detail/{kode}', 'detail')->name('project.detail');
+            Route::get('/task/{kode}', 'task')->name('project.task');
+            Route::get('/review/{kode}', 'review')->name('project.review');
+            Route::get('/finalization/{kode}', 'finalization')->name('project.finalization');
+            Route::post('/finalization/{id}', 'storeFinalization')->name('project.store.finalization');
+            Route::post('/done/{id}', 'done')->name('project.done');
+            Route::get('/arsip', 'archive')->name('project.archive');
         });
 
     // Files
@@ -178,7 +172,6 @@ Route::middleware('auth')->group(function () {
      * Project
      */
     Route::controller(ProjectController::class)
-        ->middleware('auth.development')
         ->prefix('/projects')
         ->group(function () {
             Route::post('/import/rab', 'importRab')->name('project.import.rab');
@@ -188,7 +181,7 @@ Route::middleware('auth')->group(function () {
      * Wed, 02 July 2025
      */
     Route::controller(CostCenterController::class)
-        ->middleware(['auth.development', 'auth.module.finance'])
+        ->middleware(['auth.module.finance'])
         ->prefix('/cost-center')
         ->group(function () {
             Route::get('/', 'index')->name('cost-center.index');
@@ -206,6 +199,34 @@ Route::middleware('auth')->group(function () {
             // per divisi
             Route::prefix('/departments')
                 ->group(function () {
+                    // export
+                    Route::controller(CostCenterExportController::class)
+                        ->prefix('/export')
+                        ->group(function () {
+                            Route::get('/{id}', 'departmentExpenseRequests')
+                                ->name('cost-center.export.expense-requests.departments');
+                            Route::get('/general/credit/realizations/', 'generalCreditRealizations')
+                                ->name('cost-center.export.general-credit.realizations');
+                            Route::get('/general/debit/realizations/', 'generalDebitRealizations')
+                                ->name('cost-center.export.general-debit.realizations');
+                            Route::get('/project/realizations/{id}', 'projectRealizationsByDepartmentId')
+                                ->name('cost-center.export.project.realizations');
+                            Route::get('/project/{id}/budget-plan', 'projectBudgetPlan')
+                                ->name('cost-center.export.project.budget-plan');
+                            Route::get('/project/{id}/budget-plan/requests', 'projectBudgetPlanRequests')
+                                ->name('cost-center.export.project.budget-plan.requests');
+                        });
+
+                    // import
+                    Route::controller(CostCenterGeneralImportController::class)
+                        ->prefix('/import')
+                        ->group(function () {
+                            Route::get('/rab-general', 'downloadTemplate')
+                                ->name('cost-center.import.rab-general');
+                            Route::post('/rab-general', 'import')
+                                ->name('cost-center.import.rab-general.store');
+                        });
+
                     Route::get('/{id}', 'indexDepartment')
                         ->name('cost-center.departments.index');
                     Route::get('/{id}/projects', 'indexDepartmentProjects')

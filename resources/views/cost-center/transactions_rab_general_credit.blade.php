@@ -104,10 +104,10 @@
                                 <h4><b>Realisasi General Report Credit {{ date('Y') }}</b></h4>
                                 <div class="row mt-3">
                                     <div class="col-12">
-                                        <button type="button"
-                                            class="btn btn-sm btn-success rounded-partner px-4 float-right">
+                                        <a href="{{ route('cost-center.export.general-credit.realizations') }}"
+                                            class="btn btn-sm btn-success rounded-partner px-4 float-right" target="_blank">
                                             <i class="fas fa-file-excel"></i> Export
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                                 <div class="card-body table-responsive w-100 px-0">

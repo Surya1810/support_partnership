@@ -136,6 +136,17 @@
                                             </div>
                                         </div>
                                         <div class="col-12">
+                                            <h6><b>Rencana Anggaran Biaya (RAB)</b></h6>
+                                            <small>
+                                                Untuk melihat RAB project silahkan klik tombol berikut.
+                                                <br />
+                                                <a class="btn btn-sm btn-primary"
+                                                    href="{{ route('cost-center.departments.projects.budget-plan', $project->id) }}">
+                                                    <i class="fa fa-eye"></i> Lihat RAB
+                                                </a>
+                                            </small>
+                                        </div>
+                                        <div class="col-12">
                                             <hr />
                                             <h5>
                                                 Rincian Rancangan Anggaran Biaya (RAB)
@@ -157,8 +168,10 @@
                                                             <tr>
                                                                 <td>{{ $loop->iteration }}</td>
                                                                 <td>{{ $data->name }}</td>
-                                                                <td>{{ $data->amount_debit != 0 ? formatRupiah($data->amount_debit) : '-' }}</td>
-                                                                <td>{{ $data->amount_credit != 0 ? formatRupiah($data->amount_credit) : '-' }}</td>
+                                                                <td>{{ $data->amount_debit != 0 ? formatRupiah($data->amount_debit) : '-' }}
+                                                                </td>
+                                                                <td>{{ $data->amount_credit != 0 ? formatRupiah($data->amount_credit) : '-' }}
+                                                                </td>
                                                                 <td>{{ $data->code_ref }}</td>
                                                             </tr>
                                                         @endforeach
@@ -187,7 +200,5 @@
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('assets/adminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
-    <script type="text/javascript">
-
-    </script>
+    <script type="text/javascript"></script>
 @endpush

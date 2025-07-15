@@ -703,9 +703,10 @@
 
             const ppn = pekerjaan * (ppnPercent / 100);
             const pph = pekerjaan * (pphPercent / 100);
+
             const sp2d = pekerjaan - ppn - pph;
 
-            const margin = sp2d - totalAmountRAB;
+            const margin = sp2d;
 
             // Tampilkan hasil SP2D dan Margin
             $('#sp2d').val(formatCurrency(sp2d));

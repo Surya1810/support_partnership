@@ -183,14 +183,75 @@ class CostCenterController extends Controller
                 'type' => 'department',
                 'code_ref' => $codeRef,
                 'name' => $request->name,
-                'amount_debit' => $request->nominal,
-                'amount_remaining' => $request->nominal,
+                'amount_debit' => $request->category != 1 ? 0 : $request->nominal,
+                'amount_credit' => $request->category == 1 ? 0 : $request->nominal,
+                'amount_remaining' => $request->category == 1 ? 0 : $request->nominal,
                 'month' => $request->month,
                 'year' => $request->year,
                 'detail' => $note,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
+
+            /**
+             * Jika RAB baru bukanlah uang kas,
+             * maka tambah nominalnya juga ke uang kas
+             */
+            if ($request->category != 1) {
+                $cashCostCenter = CostCenter::where('cost_center_category_id', 1)
+                    ->where('department_id', $departmentId)
+                    ->where('year', $request->year)
+                    ->where('month', $request->month)
+                    ->first();
+
+                if ($cashCostCenter) {
+                    // masukkan note ditambah rab baru
+                    $note = $cashCostCenter->detail ? $cashCostCenter->detail . '<hr style="margin:0"/>' : '';
+                    $note .= '<small><span class="text-success">RAB ditambah: '
+                        . formatRupiah((int) $request->nominal)
+                        . '</span><br/>Oleh: ' . Auth::user()->username
+                        . '<br/>Tanggal: ' . date('d-m-Y')
+                        . '</small>';
+
+                    // masukkan note dikurangi rab baru
+                    $note .= '<hr style="margin:0"/><small><span class="text-danger">RAB dikurangi: '
+                        . formatRupiah((int) $request->nominal)
+                        . '</span><br/>Untuk RAB Baru: ' . $codeRef
+                        . '</span><br/>Oleh: ' . Auth::user()->username
+                        . '<br/>Tanggal: ' . date('d-m-Y')
+                        . '</small>';
+
+                    $cashCostCenter->amount_debit += $request->nominal;
+                    $cashCostCenter->detail = $note;
+                    $cashCostCenter->save();
+                } else {
+                    $request->category = 1;
+                    $note = '<small>Dibuat oleh: ' . Auth::user()->username
+                        . '<br/>Tanggal: ' . date('d-m-Y') . '</small>'
+                        . '<hr style="margin:0"/><small><span class="text-success">RAB dikurangi: '
+                        . formatRupiah((int) $request->nominal)
+                        . '</span><br/>Untuk RAB Baru: ' . $codeRef
+                        . '</span><br/>Oleh: ' . Auth::user()->username
+                        . '<br/>Tanggal: ' . date('d-m-Y')
+                        . '</small>';
+
+                    $dataCash = [
+                        'department_id' => $departmentId,
+                        'cost_center_category_id' => $request->category,
+                        'type' => 'department',
+                        'code_ref' => $this->generateCodeRef($departmentId, $request),
+                        'name' => 'Uang Kas',
+                        'amount_debit' => $request->nominal,
+                        'month' => $request->month,
+                        'year' => $request->year,
+                        'detail' => $note,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+
+                    CostCenter::insert($dataCash);
+                }
+            }
 
             $insertRAB = CostCenter::insert($dataRAB);
 
@@ -357,8 +418,6 @@ class CostCenterController extends Controller
             ->with(['costCenter', 'items', 'user', 'department'])
             ->where('category', 'department')
             ->orderBy('created_at', 'desc');
-
-        // dd($requests->get());
 
         // yearly margin dari project
         $yearlyMargin = Project::where('status', 'Finished')
@@ -562,12 +621,12 @@ class CostCenterController extends Controller
 
                     // VAT (PPN)
                     $vatPercent = (float) $financial->vat_percent;
-                    $vat = $sp2d * ($vatPercent / 100);
+                    $vat = $financial->job_value * ($vatPercent / 100);
                     $totalVAT += $vat;
 
                     // TAX (PPh)
                     $taxPercent = (float) $financial->tax_percent;
-                    $tax = $sp2d * ($taxPercent / 100);
+                    $tax = $financial->job_value * ($taxPercent / 100);
                     $totalTAX += $tax;
 
                     if ($profit) {
@@ -615,13 +674,13 @@ class CostCenterController extends Controller
                     ->addColumn('margin', fn($item) => formatRupiah($item->financial?->margin))
                     ->addColumn('sp2d', fn($item) => formatRupiah($item->financial?->sp2d_amount))
                     ->addColumn('ppn', function ($item) {
-                        $vatInNumberFormat = number_format($item->financial?->vat_percent, 2);
-                        $vatValue = $item->financial?->sp2d_amount * ($vatInNumberFormat / 100);
+                        $vatInNumberFormat = (float) $item->financial?->vat_percent;
+                        $vatValue = $item->financial?->job_value * ($vatInNumberFormat / 100);
                         return formatRupiah($vatValue);
                     })
                     ->addColumn('pph', function ($item) {
-                        $taxInNumberFormat = number_format($item->financial?->tax_percent, 2);
-                        $taxValue = $item->financial?->sp2d_amount * ($taxInNumberFormat / 100);
+                        $taxInNumberFormat = (float) $item->financial?->tax_percent;
+                        $taxValue = $item->financial?->job_value * ($taxInNumberFormat / 100);
                         return formatRupiah($taxValue);
                     })
                     ->addColumn('pic', fn($item) => $item->pic?->name)
@@ -794,7 +853,7 @@ class CostCenterController extends Controller
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], $e->status);
+            ], 500);
         }
     }
 
@@ -865,6 +924,8 @@ class CostCenterController extends Controller
                     ]);
                 }
             }
+
+            dd($insert);
         } catch (\Exception $e) {
             dd($e);
             return redirect()->back()->with([
@@ -1061,17 +1122,65 @@ class CostCenterController extends Controller
                 ]);
             }
 
+            $query = CostCenter::where('type', 'department')
+                ->where('department_id', $id)
+                ->orderBy('updated_at', 'desc')
+                ->where('year', date('Y'));
+
+            // yearly margin dari project
+            $yearlyMargin = Project::where('status', 'Finished')
+                ->whereHas('costCenters', function ($query) {
+                    $query->where('type', 'project')
+                        ->where('year', date('Y'));
+                })
+                ->with('financial')
+                ->get()
+                ->sum(function ($project) {
+                    return optional($project->financial)->margin ?? 0;
+                });
+
+            // sum total keseluruhan RAB dari semua department
+            $sums = [
+                'debit' => formatRupiah($query->sum('amount_debit')),
+                'credit' => formatRupiah($query->sum('amount_credit')),
+                'remaining' => formatRupiah($query->sum('amount_debit') - $query->sum('amount_credit')),
+                'yearly_margin' => formatRupiah($yearlyMargin)
+            ];
+
             if ($request->ajax()) {
-                $generalRequests = CostCenter::where('type', 'department')
-                    ->whereHas('expenses', function ($query) {
-                        $query->with(['user', 'items']);
+                $requests = ExpenseRequest::whereIn('status', ['finish', 'checking', 'reported'])
+                    ->with(['costCenter', 'items', 'user', 'department'])
+                    ->whereHas('costCenter', function ($query) {
+                        $query->where('year', date('Y'));
                     })
+                    ->where('category', 'department')
                     ->where('department_id', $department->id)
-                    ->where('year', date('Y'))
-                    ->with(['department', 'expenses']);
+                    ->orderBy('created_at', 'desc');
+
+                return DataTables::of($requests)
+                    ->addIndexColumn()
+                    ->addColumn('date', fn($item) => $item->use_date->format('Y-m-d'))
+                    ->addColumn('title', fn($item) => $item->title)
+                    ->addColumn('code_ref_request', fn($item) => $item->code_ref_request)
+                    ->addColumn('user', fn($item) => $item->user->name)
+                    ->addColumn('limit', fn($item) => formatRupiah($item->costCenter->amount_credit))
+                    ->addColumn('total_amount', fn($item) => formatRupiah($item->total_amount))
+                    ->addColumn('actual_amount', fn($item) => formatRupiah($item->items->sum('actual_amount')))
+                    ->addColumn('remaining', function ($item) {
+                        if ($item->status == 'finish') {
+                            return formatRupiah($item->total_amount - $item->items->sum('actual_amount'));
+                        }
+                        return '-';
+                    })
+                    ->addColumn('report_file', function ($item) {
+                        return $item->report_file ? '<a class="btn btn-sm btn-danger" href="' . asset('storage/' . $item->report_file) . '" target="_blank"><i class="fa fa-file-pdf"></i></a>' : '-';
+                    })
+                    ->addColumn('status', fn($item) => $item->status)
+                    ->rawColumns(['report_file'])
+                    ->make(true);
             }
 
-            return view('cost-center.transactions_rab_in_department_general', compact('department'));
+            return view('cost-center.transactions_rab_in_department_general', compact('department', 'sums'));
         } catch (\Exception $e) {
             dd($e);
             return redirect()->back()->with([
@@ -1086,6 +1195,7 @@ class CostCenterController extends Controller
         try {
             if ($request->ajax()) {
                 $requests = ExpenseRequest::where('project_id', $projectId)
+                    ->whereIn('status', ['finish', 'checking', 'reported'])
                     ->where('cost_center_id', $costCenterId)
                     ->where('category', 'project')
                     ->with(['user', 'items']);

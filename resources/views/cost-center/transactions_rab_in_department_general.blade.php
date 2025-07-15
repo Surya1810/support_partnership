@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title')
-    Cost Center Cash Data of {{ $department->name }}
+    Laporan Penggunaan RAB Divisi {{ $department->name }} Tahun {{ date('Y') }}
 @endsection
 
 @push('css')
@@ -22,7 +22,9 @@
                         <li class="breadcrumb-item"><a class="text-black-50" href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item">Finance</li>
                         <li class="breadcrumb-item">Cost Center</li>
-                        <li class="breadcrumb-item active"><strong>Cash Data of {{ $department->name }}</strong></li>
+                        <li class="breadcrumb-item active">
+                            <strong>Laporan Penggunaan RAB Divisi {{ $department->name }} Tahun {{ date('Y') }}</strong>
+                        </li>
                     </ol>
                 </div>
             </div>
@@ -34,16 +36,17 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <h4><b>Laporan Keuangan Divisi {{ $department->name }} Tahun {{ date('Y') }}</b></h4>
+                    <h4><b>Laporan Penggunaan RAB Divisi {{ $department->name }} Tahun {{ date('Y') }}</b></h4>
                 </div>
             </div>
             <div class="text-sm mt-3">
+                <input type="hidden" id="department_id" value="{{ $department->id }}">
                 <div class="row">
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Debet</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <h6>{{ $sums['debit'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -51,7 +54,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Total Kredit</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <h6>{{ $sums['credit'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -59,7 +62,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Sisa Saldo</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <h6>{{ $sums['remaining'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -67,7 +70,7 @@
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
                                 <p><strong>Pendapatan Tahun Berjalan</strong></p>
-                                <h6>{{ formatRupiah(0) }}</h6>
+                                <h6>{{ $sums['yearly_margin'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -80,11 +83,11 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="card card-outline rounded-partner card-primary p-3">
-                                {{-- <h4><b>Laporan Keuangan Divisi {{ $department->name }} Tahun {{ date('Y') }}</b></h4> --}}
                                 <div class="col-12 float-right">
-                                    <button type="button" class="btn btn-sm btn-success rounded-partner float-right">
+                                    <a href="{{ route('cost-center.export.expense-requests.departments', $department->id) }}"
+                                        class="btn btn-sm btn-success rounded-partner float-right" target="_blank">
                                         <i class="fas fa-file-excel"></i> Export
-                                    </button>
+                                    </a>
                                 </div>
                                 <div class="card-body table-responsive w-100 px-0">
                                     <table class="table table-bordered table-striped text-sm" id="tableTransactions"
@@ -92,14 +95,16 @@
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th>No.</th>
-                                                <th>Tanggal</th>
-                                                <th>Nama Barang</th>
+                                                <th>Tanggal Digunakan</th>
+                                                <th>Judul</th>
                                                 <th>Kode Transaksi</th>
-                                                <th>PIC</th>
-                                                <th>Debet</th>
-                                                <th>Kredit</th>
-                                                <th>Kwitansi</th>
-                                                <th>Keterangan</th>
+                                                <th>Pengaju</th>
+                                                <th>Limit</th>
+                                                <th>Diajukan</th>
+                                                <th>Digunakan</th>
+                                                <th>Dikembalikan</th>
+                                                <th>Report</th>
+                                                <th>Status</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -152,8 +157,57 @@
                     lengthMenu: 'Tampilkan _MENU_ data',
                     zeroRecords: 'Data tidak ditemukan',
                 },
-            })
-        })
+                ajax: `{{ route('cost-center.departments.requests', ':id') }}`.replace(':id', $(
+                    '#department_id').val()),
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'date',
+                        name: 'date'
+                    },
+                    {
+                        data: 'title',
+                        name: 'title'
+                    },
+                    {
+                        data: 'code_ref_request',
+                        name: 'code_ref_request'
+                    },
+                    {
+                        data: 'user',
+                        name: 'user'
+                    },
+                    {
+                        data: 'limit',
+                        name: 'limit'
+                    },
+                    {
+                        data: 'total_amount',
+                        name: 'total_amoun'
+                    },
+                    {
+                        data: 'actual_amount',
+                        name: 'actual_amount'
+                    },
+                    {
+                        data: 'remaining',
+                        name: 'remaining'
+                    },
+                    {
+                        data: 'report_file',
+                        name: 'report_file'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
+                    }
+                ],
+            });
+        });
 
         function parseCurrency(value) {
             return parseInt(value.replace(/[^0-9]/g, '')) || 0;

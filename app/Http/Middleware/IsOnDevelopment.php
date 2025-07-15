@@ -15,7 +15,7 @@ class IsOnDevelopment
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (env('APP_ENV') != 'local') {
+        if (config('app.env') != 'local') {
             abort(403, 'SEDANG DALAM PENGEMBANGAN');
         }
         return $next($request);

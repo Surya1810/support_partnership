@@ -479,7 +479,7 @@ class ProjectController extends Controller
 
     public function downloadTemplateImport()
     {
-        $filePath = storage_path('app/public/uploads/files/templates/Template_Cost_Center_Project.xlsx');
+        $filePath = storage_path('app/public/uploads/files/templates/template_cost_center_untuk_project.xlsx');
 
         if (!file_exists($filePath)) {
             return back()->with([
@@ -493,9 +493,9 @@ class ProjectController extends Controller
                 ob_end_clean();
             }
             readfile($filePath);
-        }, 'Template_Cost_Center_Project.xlsx', [
+        }, 'template_cost_center_untuk_project.xlsx', [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="Template_Cost_Center_Project.xlsx"',
+            'Content-Disposition' => 'attachment; filename="template_cost_center_untuk_project.xlsx"',
         ]);
     }
 

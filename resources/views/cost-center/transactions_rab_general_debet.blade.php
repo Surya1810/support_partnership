@@ -90,11 +90,11 @@
                                             </button>
                                         </div>
                                         <div class="col-6">
-                                            <button type="button"
-                                                class="btn btn-sm btn-success rounded-partner float-right">
+                                            <a href="{{ route('cost-center.export.general-debit.realizations') }}"
+                                                class="btn btn-sm btn-success rounded-partner float-right" target="_blank">
                                                 <i class="fas fa-file-excel"></i> Export
-                                            </button>
-                                            <button type="button"
+                                            </a>
+                                            <button type="button" id="buttonOpenModalImport"
                                                 class="btn btn-sm btn-danger rounded-partner mr-1 float-right">
                                                 <i class="fas fa-upload"></i> Import
                                             </button>
@@ -130,31 +130,35 @@
     <div class="modal fade text-sm" id="modalAddRAB" tabindex="-1" role="dialog" aria-labelledby="modalAddRABTitle"
         aria-hidden="true" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
-            @csrf
             <div class="modal-content">
                 <div class="modal-header bg-primary">
                     <h5 class="modal-title">Tambah Uang Kas</h5>
                     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 </div>
-                <form id="formAddRAB" class="modal-body" action="{{ route('cost-center.store.rab-general') }}" method="POST">
+                <form id="formAddRAB" class="modal-body" action="{{ route('cost-center.store.rab-general') }}"
+                    method="POST">
+                    @csrf
                     <div>
                         <div class="form-group row">
                             <label for="department" class="col-sm-4 col-form-label">Divisi</label>
                             <div class="col-sm-8">
                                 @if (auth()->user()->role_id == 3)
-                                <select class="form-control" disabled required>
-                                    @foreach ($departments as $department)
-                                        <option value="{{ $department->id }}" {{ auth()->user()->department_id == $department->id ? 'selected' : '' }}>{{ $department->name }}</option>
-                                    @endforeach
-                                    <input type="hidden" name="department" value="{{ auth()->user()->department_id }}">
-                                </select>
+                                    <select class="form-control" disabled required>
+                                        @foreach ($departments as $department)
+                                            <option value="{{ $department->id }}"
+                                                {{ auth()->user()->department_id == $department->id ? 'selected' : '' }}>
+                                                {{ $department->name }}</option>
+                                        @endforeach
+                                        <input type="hidden" name="department"
+                                            value="{{ auth()->user()->department_id }}">
+                                    </select>
                                 @else
-                                <select name="department" id="department" class="form-control" required>
-                                    <option value="" selected disabled>-- Pilih Divisi --</option>
-                                    @foreach ($departments as $department)
-                                        <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                    @endforeach
-                                </select>
+                                    <select name="department" id="department" class="form-control" required>
+                                        <option value="" selected disabled>-- Pilih Divisi --</option>
+                                        @foreach ($departments as $department)
+                                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                        @endforeach
+                                    </select>
                                 @endif
                             </div>
                         </div>
@@ -162,26 +166,26 @@
                             <label for="category" class="col-sm-4 col-form-label">Kategori</label>
                             <div class="col-sm-8">
                                 @if (auth()->user()->role_id == 3)
-                                <div>
-                                    <select class="form-control select2" disabled required>
-                                        <option value="1" selected>(KS) Kas/Pemasukan</option>
-                                    </select>
-                                    <input type="hidden" name="category" value="1">
-                                </div>
-                                <div>
-                                    <span class="text-sm text-danger">
-                                        *Penambahan cost center lain atau suntik dana dilalukan melalui ubah RAB
-                                    </span>
-                                </div>
+                                    <div>
+                                        <select class="form-control select2" disabled required>
+                                            <option value="1" selected>(KS) Kas/Pemasukan</option>
+                                        </select>
+                                        <input type="hidden" name="category" value="1">
+                                    </div>
+                                    <div>
+                                        <span class="text-sm text-danger">
+                                            *Penambahan cost center lain atau suntik dana dilalukan melalui ubah RAB
+                                        </span>
+                                    </div>
                                 @else
-                                <select name="category" id="category" class="form-control select2" required>
-                                    <option value="" selected disabled>-- Pilih Cost Center --</option>
-                                    <option value="1">(KS) Kas/Pemasukan</option>
-                                    @foreach ($costCenterCategories as $category)
-                                        <option value="{{ $category->id }}">
-                                            {{ '(' . $category->code . ') ' . $category->name }}</option>
-                                    @endforeach
-                                </select>
+                                    <select name="category" id="category" class="form-control select2" required>
+                                        <option value="" selected disabled>-- Pilih Cost Center --</option>
+                                        <option value="1">(KS) Kas/Pemasukan</option>
+                                        @foreach ($costCenterCategories as $category)
+                                            <option value="{{ $category->id }}">
+                                                {{ '(' . $category->code . ') ' . $category->name }}</option>
+                                        @endforeach
+                                    </select>
                                 @endif
                             </div>
                         </div>
@@ -225,14 +229,15 @@
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary rounded-partner">Simpan</button>
                     </div>
-                </div>
+            </div>
             </form>
         </div>
     </div>
 
     {{-- Modal Edit RAB --}}
-    <div class="modal fade text-sm" data-backdrop="static" data-keyboard="false" id="modalEditRAB" tabindex="-1" role="dialog" aria-labelledby="modalEditRABTitle"
-        aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal fade text-sm" data-backdrop="static" data-keyboard="false" id="modalEditRAB" tabindex="-1"
+        role="dialog" aria-labelledby="modalEditRABTitle" aria-hidden="true" data-backdrop="static"
+        data-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-warning">
@@ -247,12 +252,15 @@
                             <label for="departmentEdit" class="col-sm-4 col-form-label">Divisi</label>
                             <div class="col-sm-8">
                                 @if (auth()->user()->role_id == 3)
-                                <select class="form-control" disabled required>
-                                    @foreach ($departments as $department)
-                                        <option value="{{ $department->id }}" {{ auth()->user()->department_id == $department->id ? 'selected' : '' }}>{{ $department->name }}</option>
-                                    @endforeach
-                                </select>
-                                <input type="hidden" name="department" id="departmentEdit" value="{{ auth()->user()->department_id }}">
+                                    <select class="form-control" disabled required>
+                                        @foreach ($departments as $department)
+                                            <option value="{{ $department->id }}"
+                                                {{ auth()->user()->department_id == $department->id ? 'selected' : '' }}>
+                                                {{ $department->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="hidden" name="department" id="departmentEdit"
+                                        value="{{ auth()->user()->department_id }}">
                                 @else
                                     <select name="department" id="departmentEdit" class="form-control" required>
                                         <option value="">-- Pilih Divisi --</option>
@@ -279,7 +287,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="remainingAmountEdit" class="col-sm-4 col-form-label">Saldo Tersisa</label>
+                            <label for="remainingAmountEdit" class="col-sm-4 col-form-label">Saldo Target Tersisa</label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control text-sm price" id="remainingAmountEdit"
                                     name="remaining_amount" readonly>
@@ -304,7 +312,8 @@
                             <div class="form-group row">
                                 <label for="newNominalEdit" class="col-sm-4 col-form-label">Debet Tambahan</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control text-sm price" id="newNominalEdit" placeholder="Rp0">
+                                    <input type="text" class="form-control text-sm price" id="newNominalEdit"
+                                        placeholder="Rp0">
                                     <input type="hidden" id="newNominalEditHidden" name="new_nominal">
                                 </div>
                             </div>
@@ -339,7 +348,8 @@
                             <div class="form-group row">
                                 <label for="nominalNewEdit" class="col-sm-4 col-form-label">Nominal Debet</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control text-sm price" id="nominalNewEdit" placeholder="Rp0">
+                                    <input type="text" class="form-control text-sm price" id="nominalNewEdit"
+                                        placeholder="Rp0">
                                     <small class="text-danger d-none" id="nominalNewAlert">Nominal melebihi saldo
                                         tersisa!</small>
                                     <input type="hidden" id="nominalNewRABEditHidden" name="nominal_new_rab">
@@ -374,6 +384,36 @@
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+
+    {{-- Modal Import File --}}
+    <div class="modal fade" id="modalImportFile" tabindex="-1" role="dialog" aria-labelledby="modalLabelImportFile"
+        aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <form id="formImportFile" method="POST" enctype="multipart/form-data" action="{{ route('cost-center.import.rab-general.store') }}">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Import RAB General</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <button class="btn btn-secondary rounded-partner" id="buttonDownloadTemplate" type="button">
+                            <i class="fas fa-download"></i> Download Template
+                        </button>
+                        <div class="form-group mt-3 mx-2">
+                            <label for="costCenterFile">Import File Excel</label>
+                            <input type="file" class="form-control-file" id="costCenterFile" name="file" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary rounded-partner">
+                            <i class="fas fa-upload"></i> Upload
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 @endsection
@@ -478,6 +518,24 @@
                         name: 'detail'
                     }
                 ]
+            });
+
+            $('#buttonOpenModalImport').click(function() {
+                $('#modalImportFile').modal('show');
+            });
+
+            $('#buttonDownloadTemplate').on('click', function() {
+                $.LoadingOverlay('show');
+
+                setTimeout(() => {
+                    window.open('{{ route('cost-center.import.rab-general') }}', '_blank');
+                }, 1500);
+
+                $.LoadingOverlay('hide');
+            });
+
+            $('#formImportFile').on('submit', function(e) {
+                $.LoadingOverlay('show');
             });
 
             $('#buttonAddRAB').on('click', function() {
@@ -611,16 +669,65 @@
 
     {{-- Role Director and Finance --}}
     @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2 || auth()->user()->department_id == 8)
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('#departmentEdit').select2({
-                theme: 'bootstrap4',
-                width: '100%',
-                dropdownParent: $('#modalEditRAB')
-            });
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('#departmentEdit').select2({
+                    theme: 'bootstrap4',
+                    width: '100%',
+                    dropdownParent: $('#modalEditRAB')
+                });
 
-            $('#departmentEdit').on('change', function(e) {
-                const id = e.target.value;
+                $('#departmentEdit').on('change', function(e) {
+                    const id = e.target.value;
+
+                    if (id == '') {
+                        $('#targetEdit').prop('disabled', true).html(
+                            '<option value="" selected disabled>Pilih Divisi Terlebih Dahulu</option>');
+                        return;
+                    }
+
+                    $.ajax({
+                        url: "{{ route('cost-center.edit.rab-general.list', ':id') }}".replace(
+                            ':id', id),
+                        type: 'GET',
+                        beforeSend: function() {
+                            $('#targetEdit').html(
+                                '<option value="" selected disabled>Loading...</option>');
+                        },
+                        success: function(response) {
+                            console.log(response);
+                            let html =
+                                '<option value="" selected disabled>-- Pilih Cost Center Target --</option>';
+
+                            if (response.data.length == 0) {
+                                html =
+                                    '<option value="" selected disabled>RAB Belum Tersedia</option>';
+                                $('#targetEdit').prop('disabled', true).html(html);
+                            } else {
+                                response.data.forEach(item => {
+                                    html +=
+                                        `<option value="${item.id}" data-name="${item.name}" data-debit="${Number(item.amount_debit)}" data-remaining="${Number(item.amount_remaining)}">${item.code_ref} - ${item.name}</option>`;
+                                });
+                                $('#targetEdit').prop('disabled', false).prop('required', true)
+                                    .html(html);
+                            }
+                        },
+                        error: function(xhr) {
+                            console.log(xhr);
+                            $('#targetEdit').prop('disabled', true).html(
+                                '<option value="" selected disabled>Error</option>');
+                            showToast('error', 'Gagal memuat data');
+                        }
+                    });
+                });
+            });
+        </script>
+    @endif
+
+    @if (auth()->user()->role_id == 3)
+        <script type="text/javascript">
+            $(document).ready(function() {
+                const id = $('#departmentEdit').val();
 
                 if (id == '') {
                     $('#targetEdit').prop('disabled', true).html(
@@ -662,55 +769,6 @@
                     }
                 });
             });
-        });
-    </script>
-    @endif
-
-    @if (auth()->user()->role_id == 3)
-    <script type="text/javascript">
-        $(document).ready(function() {
-            const id = $('#departmentEdit').val();
-
-            if (id == '') {
-                $('#targetEdit').prop('disabled', true).html(
-                    '<option value="" selected disabled>Pilih Divisi Terlebih Dahulu</option>');
-                return;
-            }
-
-            $.ajax({
-                url: "{{ route('cost-center.edit.rab-general.list', ':id') }}".replace(
-                    ':id', id),
-                type: 'GET',
-                beforeSend: function() {
-                    $('#targetEdit').html(
-                        '<option value="" selected disabled>Loading...</option>');
-                },
-                success: function(response) {
-                    console.log(response);
-                    let html =
-                        '<option value="" selected disabled>-- Pilih Cost Center Target --</option>';
-
-                    if (response.data.length == 0) {
-                        html =
-                            '<option value="" selected disabled>RAB Belum Tersedia</option>';
-                        $('#targetEdit').prop('disabled', true).html(html);
-                    } else {
-                        response.data.forEach(item => {
-                            html +=
-                                `<option value="${item.id}" data-name="${item.name}" data-debit="${Number(item.amount_debit)}" data-remaining="${Number(item.amount_remaining)}">${item.code_ref} - ${item.name}</option>`;
-                        });
-                        $('#targetEdit').prop('disabled', false).prop('required', true)
-                            .html(html);
-                    }
-                },
-                error: function(xhr) {
-                    console.log(xhr);
-                    $('#targetEdit').prop('disabled', true).html(
-                        '<option value="" selected disabled>Error</option>');
-                    showToast('error', 'Gagal memuat data');
-                }
-            });
-        });
-    </script>
+        </script>
     @endif
 @endpush

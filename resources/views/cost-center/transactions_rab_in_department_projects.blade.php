@@ -148,10 +148,9 @@
                                 <h4><b>Realisasi Project Tahun {{ date('Y') }}</b></h4>
                                 <div class="row my-3">
                                     <div class="col-12">
-                                        <button type="button" class="btn btn-sm btn-success rounded-partner float-right"
-                                            id="buttonExport">
+                                        <a href="{{ route('cost-center.export.project.realizations', $department->id) }}" class="btn btn-sm btn-success rounded-partner float-right" target="_blank">
                                             <i class="fas fa-file-excel"></i> Export
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                                 <div class="row">

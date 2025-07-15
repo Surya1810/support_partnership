@@ -52,7 +52,7 @@
                                             <label class="mb-0 form-label col-form-label-sm" for="username">Username</label>
                                             <div class="input-group mb-3">
                                                 <input type="text" class="form-control" id="username" name="username"
-                                                    aria-describedby="username" value="{{ $user->username }}">
+                                                    aria-describedby="username" value="{{ $user->username }}" disabled>
                                             </div>
                                             <button type="submit" class="btn btn-sm btn-dark text-xs">SAVE</button>
                                         </form>

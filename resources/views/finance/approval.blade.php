@@ -45,7 +45,7 @@
                                     <div class="col-6">
                                         <div class="float-right">
                                             <span class="badge badge-warning">Pending :
-                                                {{ $managerRequests->count() }}</span>
+                                                {{ count($managerRequests) }}</span>
                                         </div>
                                     </div>
                                 </div>

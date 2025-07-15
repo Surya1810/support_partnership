@@ -100,7 +100,9 @@
                                             <div class="col-md-6 mb-2">
                                                 <button type="button" class="btn btn-sm btn-primary rounded-partner"
                                                     id="buttonAddRAB">
-                                                    <i class="fas fa-plus"></i> Tambah RAB
+                                                    <i class="fas fa-plus"@section('')
+
+                                                    @show></i> Tambah RAB
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-warning rounded-partner mr-1"
                                                     id="buttonEditRAB">
@@ -111,19 +113,21 @@
                                     @endif
 
                                     <div
-                                        class="{{ $project->status == 'Finished' ? 'col-md-12' : 'col-md-6' }} mb-2 text-right">
-                                        @if (in_array(auth()->user()->role_id, $roleIds) || in_array(auth()->user()->department_id, $deparmentsIds))
+                                        class="{{ $project->status == 'Finished' ? 'col-md-12' : ($project->department_id == auth()->user()->department_id ? 'col-md-6' : 'col-md-12' ) }} mb-2 text-right">
+                                        {{-- @if (in_array(auth()->user()->role_id, $roleIds) || in_array(auth()->user()->department_id, $deparmentsIds))
                                             @if ($project->status != 'Finished' && $project->department_id == auth()->user()->department_id)
                                                 <button type="button" class="btn btn-sm btn-danger rounded-partner mr-1"
                                                     id="buttonImport">
                                                     <i class="fas fa-upload"></i> Import
                                                 </button>
                                             @endif
-                                        @endif
-                                        <button type="button" class="btn btn-sm btn-success rounded-partner"
-                                            id="buttonExport">
-                                            <i class="fas fa-file-excel"></i> Export
-                                        </button>
+                                        @endif --}}
+                                        <a href="{{ route('cost-center.export.project.budget-plan', $project->id) }}" class="btn btn-sm btn-success rounded-partner" target="_blank">
+                                            <i class="fas fa-file-excel"></i> Export RAB
+                                        </a>
+                                        <a href="{{ route('cost-center.export.project.budget-plan.requests', $project->id) }}" class="btn btn-sm btn-success rounded-partner" target="_blank">
+                                            <i class="fas fa-file-excel"></i> Export Pengajuan
+                                        </a>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -284,7 +288,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="remainingAmountEdit" class="col-sm-4 col-form-label">Saldo Tersisa</label>
+                            <label for="remainingAmountEdit" class="col-sm-4 col-form-label">Saldo Target Tersisa</label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control text-sm price" id="remainingAmountEdit"
                                     name="remaining_amount" readonly>
