@@ -127,7 +127,7 @@
                                                 <td>
                                                     @if ($manager->reference_file)
                                                         <a href="{{ asset('storage/' . $manager->reference_file) }}"
-                                                            target="_blank" class="btn btn-sm btn-info"><i class="fa fa-download"></i></a>
+                                                            target="_blank" class="btn btn-sm btn-info"><i class="fa fa-file-pdf"></i></a>
                                                     @else
                                                         -
                                                     @endif
@@ -396,7 +396,7 @@
                                                     @if ($all_expense->reference_file)
                                                         <a class="btn btn-sm btn-info"
                                                             href="{{ asset('storage/' . $all_expense->reference_file) }}"
-                                                            target="_blank"><i class="fa-solid fa-download"></i></a>
+                                                            target="_blank"><i class="fa-solid fa-file-pdf"></i></a>
                                                     @else
                                                         -
                                                     @endif

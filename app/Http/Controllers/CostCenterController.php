@@ -18,9 +18,14 @@ use App\Models\ProjectFinancial;
 
 class CostCenterController extends Controller
 {
-    private function getMonths()
+    private function getMonths($month = null)
     {
-        return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        $months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        if ($month) {
+            return $months[$month - 1];
+        }
+        return $months;
     }
 
     private function getYears()
@@ -177,21 +182,6 @@ class CostCenterController extends Controller
             $departmentId = $request->department;
             $codeRef = $this->generateCodeRef($departmentId, $request);
             $note = '<small>Dibuat oleh: ' . Auth::user()->username . '<br/>Tanggal: ' . date('d-m-Y') . '</small>';
-            $dataRAB = [
-                'department_id' => $departmentId,
-                'cost_center_category_id' => $request->category,
-                'type' => 'department',
-                'code_ref' => $codeRef,
-                'name' => $request->name,
-                'amount_debit' => $request->category != 1 ? 0 : $request->nominal,
-                'amount_credit' => $request->category == 1 ? 0 : $request->nominal,
-                'amount_remaining' => $request->category == 1 ? 0 : $request->nominal,
-                'month' => $request->month,
-                'year' => $request->year,
-                'detail' => $note,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
 
             /**
              * Jika RAB baru bukanlah uang kas,
@@ -204,7 +194,33 @@ class CostCenterController extends Controller
                     ->where('month', $request->month)
                     ->first();
 
-                if ($cashCostCenter) {
+                if (!$cashCostCenter) {
+                    $request->category = 1;
+                    $note = '<small>Dibuat oleh: ' . Auth::user()->username
+                        . '<br/>Tanggal: ' . date('d-m-Y') . '</small>'
+                        . '<hr style="margin:0"/><small><span class="text-danger">RAB dikurangi: '
+                        . formatRupiah((int) $request->nominal)
+                        . '</span><br/>Untuk RAB Baru: ' . $codeRef
+                        . '</span><br/>Oleh: ' . Auth::user()->username
+                        . '<br/>Tanggal: ' . date('d-m-Y')
+                        . '</small>';
+
+                    $dataCash = [
+                        'department_id' => $departmentId,
+                        'cost_center_category_id' => $request->category,
+                        'type' => 'department',
+                        'code_ref' => $this->generateCodeRef($departmentId, $request),
+                        'name' => 'Uang Kas Bulan ' . $this->getMonths($request->month),
+                        'amount_debit' => $request->nominal,
+                        'month' => $request->month,
+                        'year' => $request->year,
+                        'detail' => $note,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+
+                    CostCenter::insert($dataCash);
+                } else {
                     // masukkan note ditambah rab baru
                     $note = $cashCostCenter->detail ? $cashCostCenter->detail . '<hr style="margin:0"/>' : '';
                     $note .= '<small><span class="text-success">RAB ditambah: '
@@ -224,34 +240,24 @@ class CostCenterController extends Controller
                     $cashCostCenter->amount_debit += $request->nominal;
                     $cashCostCenter->detail = $note;
                     $cashCostCenter->save();
-                } else {
-                    $request->category = 1;
-                    $note = '<small>Dibuat oleh: ' . Auth::user()->username
-                        . '<br/>Tanggal: ' . date('d-m-Y') . '</small>'
-                        . '<hr style="margin:0"/><small><span class="text-success">RAB dikurangi: '
-                        . formatRupiah((int) $request->nominal)
-                        . '</span><br/>Untuk RAB Baru: ' . $codeRef
-                        . '</span><br/>Oleh: ' . Auth::user()->username
-                        . '<br/>Tanggal: ' . date('d-m-Y')
-                        . '</small>';
-
-                    $dataCash = [
-                        'department_id' => $departmentId,
-                        'cost_center_category_id' => $request->category,
-                        'type' => 'department',
-                        'code_ref' => $this->generateCodeRef($departmentId, $request),
-                        'name' => 'Uang Kas',
-                        'amount_debit' => $request->nominal,
-                        'month' => $request->month,
-                        'year' => $request->year,
-                        'detail' => $note,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-
-                    CostCenter::insert($dataCash);
                 }
             }
+
+            $dataRAB = [
+                'department_id' => $departmentId,
+                'cost_center_category_id' => $request->category,
+                'type' => 'department',
+                'code_ref' => $this->generateCodeRef($departmentId, $request),
+                'name' => $request->name,
+                'amount_debit' => $request->category != 1 ? 0 : $request->nominal,
+                'amount_credit' => $request->category == 1 ? 0 : $request->nominal,
+                'amount_remaining' => $request->category == 1 ? 0 : $request->nominal,
+                'month' => $request->month,
+                'year' => $request->year,
+                'detail' => $note,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
 
             $insertRAB = CostCenter::insert($dataRAB);
 

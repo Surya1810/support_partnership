@@ -58,7 +58,7 @@
                     <div class="col-12 col-md-4">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Sisa Saldo</strong></p>
+                                <p><strong>Sisa (Debet - Limit Seluruh RAB)</strong></p>
                                 <h6>{{ $sums['remaining'] }}</h6>
                             </div>
                         </div>
@@ -111,8 +111,8 @@
                                                 <th>Kode Transaksi</th>
                                                 <th>Divisi</th>
                                                 <th>Bulan Realisasi</th>
-                                                <th>Debet</th>
                                                 <th>Tahun</th>
+                                                <th>Debet</th>
                                                 <th>Keterangan</th>
                                             </tr>
                                         </thead>
@@ -506,12 +506,12 @@
                         name: 'month'
                     },
                     {
-                        data: 'debit',
-                        name: 'debit'
-                    },
-                    {
                         data: 'year',
                         name: 'year'
+                    },
+                    {
+                        data: 'debit',
+                        name: 'debit'
                     },
                     {
                         data: 'detail',

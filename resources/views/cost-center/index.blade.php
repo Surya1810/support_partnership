@@ -55,7 +55,7 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Sisa Saldo</strong></p>
+                                <p><strong>Sisa (Debet - Pengajuan Terealisasi)</strong></p>
                                 <h6>{{ $sums['remaining'] }}</h6>
                             </div>
                         </div>

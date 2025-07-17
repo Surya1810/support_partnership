@@ -72,20 +72,32 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <input type="hidden" value="{{ auth()->user()->department_id }}"
-                                            name="department_id">
                                         <label for="department_select_id" class="mb-0 form-label col-form-label-sm"
                                             class="small">Divisi</label>
-                                        <select class="form-control department muted" style="width: 100%;"
-                                            id="department_select_id" name="department_id" readonly required disabled>
-                                            <option></option>
-                                            @foreach ($departments as $department)
-                                                <option value="{{ $department->id }}"
-                                                    {{ auth()->user()->department_id == $department->id ? 'selected' : '' }}>
-                                                    {{ $department->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                        @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2)
+                                            <select class="form-control department muted" style="width: 100%;"
+                                                id="department_select_id" name="department_id" required>
+                                                <option selected disabled>Pilih Divisi</option>
+                                                @foreach ($departments as $department)
+                                                    <option value="{{ $department->id }}">
+                                                        {{ $department->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        @else
+                                            <input type="hidden" value="{{ auth()->user()->department_id }}"
+                                                name="department_id">
+                                            <select class="form-control department muted" style="width: 100%;"
+                                                id="department_select_id" name="department_id"required disabled>
+                                                <option></option>
+                                                @foreach ($departments as $department)
+                                                    <option value="{{ $department->id }}"
+                                                        {{ auth()->user()->department_id == $department->id ? 'selected' : '' }}>
+                                                        {{ $department->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        @endif
                                         @error('department_id')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -701,11 +713,9 @@
             const ppnPercent = parseFloat($('#ppn').val()) || 0;
             const pphPercent = parseFloat($('#pph').val()) || 0;
 
-            const ppn = pekerjaan * (ppnPercent / 100);
-            const pph = pekerjaan * (pphPercent / 100);
-
+            const ppn = pekerjaan * (ppnPercent / (100 + ppnPercent));
+            const pph = (pekerjaan - ppn) * (pphPercent / 100);
             const sp2d = pekerjaan - ppn - pph;
-
             const margin = sp2d;
 
             // Tampilkan hasil SP2D dan Margin
@@ -765,4 +775,12 @@
             return labels[id] || id;
         }
     </script>
+
+    @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 2)
+        <script>
+            $(document).ready(function() {
+                $('#department_select_id').select2();
+            });
+        </script>
+    @endif
 @endpush

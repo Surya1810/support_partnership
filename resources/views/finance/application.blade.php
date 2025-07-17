@@ -381,10 +381,11 @@
 
                         {{-- File referensi --}}
                         <div class="col-12 my-3">
-                            <label for="reference_file" class="mb-0 form-label col-form-label-sm">File Pendukung <span class="text-sm text-danger">*opsional berupa gambar atau pdf</span></label>
+                            <label for="reference_file" class="mb-0 form-label col-form-label-sm">File Pendukung <span class="text-sm text-danger">*wajib (gambar atau pdf)</span></label>
                             <input type="file" class="form-control @error('reference_file') is-invalid @enderror" id="reference_file"
                                 name="reference_file" value="{{ old('reference_file') }}" placeholder="Upload dokumen pendukung"
                                 accept="image/jpeg, image/png, image/jpg, image/webp, application/pdf"
+                                required
                             />
                         </div>
 
