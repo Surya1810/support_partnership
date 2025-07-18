@@ -52,7 +52,7 @@ class CostCenterController extends Controller
         $yearlyMargin = Project::whereHas('costCenters', function ($query) {
             $query->where('type', 'project')
                 ->where('year', date('Y'));
-        })
+            })
             ->where('status', 'Finished')
             ->with('financial')
             ->get()
@@ -61,10 +61,29 @@ class CostCenterController extends Controller
             });
 
         // untuk menampilkan total semua divisi
+        $finishedRequests = ExpenseRequest::where('status', 'finish')
+            ->where('category', 'department')
+            ->whereHas('costCenter', function ($query) {
+                $query->where('year', date('Y'));
+            })
+            ->with('items')
+            ->get()
+            ->map(function ($item) {
+                return $item->items->sum('actual_amount');
+            })
+            ->values()
+            ->toArray();
+
+        $remainingAmount = 0;
+
+        foreach ($finishedRequests as $request) {
+            $remainingAmount += $request;
+        }
+
         $sums = [
             'debit' => formatRupiah($query->sum('amount_debit')),
             'credit' => formatRupiah($query->sum('amount_credit')), // belum dihitung dari total pengajuan diterima
-            'remaining' => formatRupiah($query->sum('amount_debit') - $query->sum('amount_credit')),
+            'remaining' => formatRupiah($query->sum('amount_debit') - $remainingAmount),
             'yearly_margin' => formatRupiah($yearlyMargin)
         ];
 
