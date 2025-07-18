@@ -10,13 +10,15 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class CostCenterGeneralDebitRealizations implements FromCollection, WithEvents, WithHeadings, ShouldAutoSize
+class CostCenterGeneralDebitRealizationExport implements FromCollection, WithEvents, WithHeadings, ShouldAutoSize
 {
     protected $year;
+    protected $filter;
 
-    public function __construct($year)
+    public function __construct($year, $filter)
     {
         $this->year = $year;
+        $this->filter = $filter;
     }
 
     public function collection()
@@ -27,6 +29,13 @@ class CostCenterGeneralDebitRealizations implements FromCollection, WithEvents, 
             })
             ->with('department')
             ->where('year', $this->year)
+            ->when($this->filter, function ($query) {
+                $query->whereBetween('year', [$this->filter['fromYear'], $this->filter['toYear']]);
+            })
+            ->when($this->filter['departmentFilter'], function ($query) {
+                $query->where('department_id', $this->filter['departmentFilter']);
+            })
+            ->where('type', 'department')
             ->get();
 
         return $debitRealizations->map(function ($debitRealization, $index) {
@@ -45,6 +54,7 @@ class CostCenterGeneralDebitRealizations implements FromCollection, WithEvents, 
                 $debitRealization->month_name,
                 $debitRealization->year,
                 $debitRealization->amount_debit == 0 ? '' : $debitRealization->amount_debit,
+                $debitRealization->amount_credit == 0 ? '' : $debitRealization->amount_credit,
                 $finalDetail
             ];
         });
@@ -60,6 +70,7 @@ class CostCenterGeneralDebitRealizations implements FromCollection, WithEvents, 
             'Bulan Realisasi',
             'Tahun',
             'Debet',
+            'Kredit (Limit Setiap RAB)',
             'Keterangan'
         ];
     }

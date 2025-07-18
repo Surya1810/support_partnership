@@ -103,11 +103,44 @@
                             <div class="card card-outline rounded-partner card-primary p-3">
                                 <h4><b>Realisasi General Report Credit {{ date('Y') }}</b></h4>
                                 <div class="row mt-3">
-                                    <div class="col-12">
-                                        <a href="{{ route('cost-center.export.general-credit.realizations') }}"
-                                            class="btn btn-sm btn-success rounded-partner px-4 float-right" target="_blank">
+                                    <div class="row col-6">
+                                        <div class="col-md-2 mt-2 mt-md-0">
+                                            <select class="form-control" id="fromYear">
+                                                <option value="" disabled selected>Pilih Tahun</option>
+                                                @foreach ($years as $year)
+                                                    <option value="{{ $year }}"
+                                                        {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2 mt-2 mt-md-0">
+                                            <select class="form-control" id="toYear">
+                                                <option value="" disabled selected>Pilih Tahun</option>
+                                                @foreach ($years as $year)
+                                                    <option value="{{ $year }}"
+                                                        {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        @if (auth()->user()->role_id != 3)
+                                            <div class="col-md-4 mt-2 mt-md-0">
+                                                <select class="form-control" id="departmentFilter">
+                                                    <option value="">Pilih Semua</option>
+                                                    @foreach ($departments as $department)
+                                                        <option value="{{ $department->id }}">{{ $department->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" id="buttonExport"
+                                            class="btn btn-sm btn-success rounded-partner px-4 float-right">
                                             <i class="fas fa-file-excel"></i> Export
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="card-body table-responsive w-100 px-0">
@@ -176,10 +209,14 @@
                 },
                 ajax: {
                     url: "{{ route('cost-center.transactions.rab-general.credit') }}",
-                    type: "GET"
+                    type: "GET",
+                    data: function(data) {
+                        data.fromYear = $('#fromYear').find(':selected').val();
+                        data.toYear = $('#toYear').find(':selected').val();
+                        data.departmentFilter = $('#departmentFilter').find(':selected').val();
+                    }
                 },
-                columns: [
-                    {
+                columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         className: 'text-center'
@@ -214,6 +251,20 @@
                     }
                 ]
             });
-        })
+
+            $('#fromYear, #toYear, #departmentFilter').on('change', function() {
+                table.ajax.reload();
+            });
+
+            $('#buttonExport').on('click', function(e) {
+                const url = '{{ route('cost-center.export.general-credit.realizations') }}';
+                const fromYear = $('#fromYear').find(':selected').val();
+                const toYear = $('#toYear').find(':selected').val();
+                const departmentFilter = $('#departmentFilter').find(':selected').val();
+
+                window.open(url + '?fromYear=' + fromYear + '&toYear=' + toYear + '&departmentFilter=' +
+                    departmentFilter, '_blank');
+            });
+        });
     </script>
 @endpush

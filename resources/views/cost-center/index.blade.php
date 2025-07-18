@@ -31,7 +31,8 @@
                     <h4><b>General Report PT. Partnership Procurement Solution {{ date('Y') }}</b></h4>
                 </div>
                 <div class="col-4">
-                    <a href="{{ route('cost-center.create.rab-general') }}" class="btn btn-sm btn-primary rounded-partner float-right">Buat RAB Divisi</a>
+                    <a href="{{ route('cost-center.create.rab-general') }}"
+                        class="btn btn-sm btn-primary rounded-partner float-right">Buat RAB Divisi</a>
                 </div>
             </div>
             <div class="text-sm mt-3">
@@ -70,7 +71,8 @@
                     </div>
                 </div>
                 <div class="col-12 text-center my-3">
-                    <a href="{{ route('cost-center.transactions.rab-general.credit') }}" class="btn btn-sm btn-primary rounded-partner">View Transaksi</a>
+                    <a href="{{ route('cost-center.transactions.rab-general.credit') }}"
+                        class="btn btn-sm btn-primary rounded-partner">View Transaksi</a>
                 </div>
             </div>
 
@@ -105,11 +107,23 @@
                                     </div>
                                 </div>
                             </div>
-                            <a class="text-white" href="{{ route('cost-center.departments.index', $department['department_id']) }}">
-                                <div class="card-footer rounded-partner">
-                                    View Recap
-                                </div>
-                            </a>
+                            @php
+                                $user = auth()->user();
+                                $isAdminOrDirektur = in_array($user->role_id, [1, 2]);
+                                $isKeuangan = $user->department_id == 8;
+                                $isManagerOwnDepartment =
+                                    $user->role_id == 3 && $user->department_id == $department['department_id'];
+                            @endphp
+
+                            @if ($isAdminOrDirektur || $isKeuangan || $isManagerOwnDepartment)
+                                <a class="text-white"
+                                    href="{{ route('cost-center.departments.index', $department['department_id']) }}">
+                                    <div class="card-footer rounded-partner">
+                                        View Recap
+                                    </div>
+                                </a>
+                            @endif
+
                         </div>
                     </div>
                 @endforeach

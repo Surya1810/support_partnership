@@ -30,6 +30,15 @@ class CostCenterController extends Controller
 
     private function getYears()
     {
+        $years = CostCenter::where('type', 'department')
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->unique();
+
+        if (count($years->unique()->toArray()) > 0) {
+            return $years->push(date('Y') + 1)->unique()->toArray();
+        }
+
         return [date('Y'), date('Y') + 1];
     }
 
@@ -132,6 +141,13 @@ class CostCenterController extends Controller
             ->orderBy('updated_at', 'desc')
             ->when(Auth::user()->role_id == 3, function ($query) {
                 $query->where('department_id', Auth::user()->department_id);
+            })
+            ->when($request->has('fromYear') && $request->has('toYear'), function ($query) use ($request) {
+                $query->whereBetween('year', [$request->fromYear, $request->toYear]);
+            })
+            ->when($request->has('departmentFilter') && $request->filled('departmentFilter'),
+                function ($query) use ($request) {
+                    $query->where('department_id', $request->departmentFilter);
             })
             ->where('year', date('Y'));
 
@@ -418,11 +434,27 @@ class CostCenterController extends Controller
     {
         $query = CostCenter::where('type', 'department')
             ->orderBy('updated_at', 'desc')
-            ->where('year', date('Y'));
+            ->where('year', date('Y'))
+            ->when(Auth::user()->role_id == 3, function ($query) {
+                $query->where('department_id', Auth::user()->department_id);
+            });
 
         $requests = ExpenseRequest::where('status', 'finish')
             ->with(['costCenter', 'items', 'user', 'department'])
             ->where('category', 'department')
+            ->when(Auth::user()->role_id == 3, function ($query) {
+                $query->where('department_id', Auth::user()->department_id);
+            })
+            ->when($request->filled('fromYear') && $request->filled('toYear'), function ($query) use ($request) {
+                $query->whereBetween('created_at', [
+                    Carbon::createFromDate($request->fromYear, 1, 1)->startOfYear(),
+                    Carbon::createFromDate($request->toYear, 12, 31)->endOfYear()
+                ]);
+            })
+            ->when($request->filled('departmentFilter'),
+                function ($query) use ($request) {
+                    $query->where('department_id', $request->departmentFilter);
+            })
             ->orderBy('created_at', 'desc');
 
         // yearly margin dari project
@@ -431,7 +463,7 @@ class CostCenterController extends Controller
                 $query->where('type', 'project')
                     ->where('year', date('Y'));
             })
-            ->with('financial') // asumsi relasi one-to-one ke financial
+            ->with('financial')
             ->get()
             ->sum(function ($project) {
                 return optional($project->financial)->margin ?? 0;
@@ -484,8 +516,10 @@ class CostCenterController extends Controller
         }
 
         // dd($requests->get());
+        $years = $this->getYears();
+        $departments = Department::all()->except([2, 4, 6, 7, 8]);
 
-        return view('cost-center.transactions_rab_general_credit', compact('sums'));
+        return view('cost-center.transactions_rab_general_credit', compact('sums', 'years', 'departments'));
     }
 
     private function generateCodeRef($departmentId, $request)
@@ -518,6 +552,12 @@ class CostCenterController extends Controller
     // * Detail Transaksi Cost Center per Divisi
     public function indexDepartment($id)
     {
+        if (Auth::user()->role_id == 3 && Auth::user()->department_id != $id) {
+            return redirect()->back()->with([
+                'pesan' => 'Anda tidak memiliki hak untuk mengakses halaman tersebut',
+                'level-alert' => 'alert-danger'
+            ]);
+        }
         try {
             $query = CostCenter::where('type', 'department')
                 ->orderBy('updated_at', 'desc')
@@ -627,12 +667,12 @@ class CostCenterController extends Controller
 
                     // VAT (PPN)
                     $vatPercent = (float) $financial->vat_percent;
-                    $vat = $financial->job_value * ($vatPercent / 100);
+                    $vat = $financial->job_value * ($vatPercent / (100 + $vatPercent));
                     $totalVAT += $vat;
 
                     // TAX (PPh)
                     $taxPercent = (float) $financial->tax_percent;
-                    $tax = $financial->job_value * ($taxPercent / 100);
+                    $tax = ($financial->job_value - $vat) * ($taxPercent / 100);
                     $totalTAX += $tax;
 
                     if ($profit) {

@@ -34,8 +34,10 @@ class CostCenterProjectRealizationExport implements FromCollection, WithHeadings
             ->get();
 
         return $projects->map(function ($project, $index) {
-            $ppn = $project->financial->job_value * (((float) $project->financial->vat_percent) / 100);
-            $pph = $project->financial->job_value * (((float) $project->financial->tax_percent) / 100);
+            $floatPPN = (float) $project->financial->vat_percent;
+            $floatPPH = (float) $project->financial->tax_percent;
+            $ppn = $project->financial->job_value * ($floatPPN / (100 + $floatPPN));
+            $pph = ($project->financial->job_value - $ppn) * ($floatPPH / 100);
             $sp2d = $project->financial->job_value - $ppn - $pph;
             $modal = $project->costCenters->sum('amount_debit');
             $margin = $project->financial->margin;

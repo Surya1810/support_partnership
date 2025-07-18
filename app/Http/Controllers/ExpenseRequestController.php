@@ -12,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class ExpenseRequestController extends Controller
 {
@@ -130,87 +131,111 @@ class ExpenseRequestController extends Controller
             'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        $user = User::where('id', $request->user_id)->first();
+        DB::beginTransaction();
 
-        // Simpan data pengajuan biaya
-        $expenseRequest = new ExpenseRequest();
-        $expenseRequest->user_id = $request->user_id;
+        try {
+            $user = User::findOrFail($request->user_id);
 
-        if ($request->department_id == 1 || $request->department_id == 8 || $request->department_id == 9) {
-            $expenseRequest->department_id = $request->department_id;
-            $expenseRequest->approved_by_manager = true;
-        } else {
-            // jika finance maka jadi general affair
-            $expenseRequest->department_id = $request->department_id == 8 ? 9 : $request->department_id;
+            $expenseRequest = new ExpenseRequest();
+            $expenseRequest->user_id = $user->id;
+
+            if (in_array($request->department_id, [1, 8, 9])) {
+                $expenseRequest->department_id = $request->department_id;
+                $expenseRequest->approved_by_manager = true;
+            } else {
+                $expenseRequest->department_id = $request->department_id == 8 ? 9 : $request->department_id;
+            }
+
+            $expenseRequest->title = $request->title;
+            $explodedCategory = explode('#', $request->category);
+            $category = $explodedCategory[1];
+
+            if ($category == 'project') {
+                $expenseRequest->project_id = $explodedCategory[0];
+                $expenseRequest->cost_center_id = $request->project_cost_center_id;
+            } else {
+                $expenseRequest->project_id = null;
+                $expenseRequest->cost_center_id = $explodedCategory[0];
+            }
+
+            $expenseRequest->category = $category;
+            $expenseRequest->use_date = $request->use_date;
+
+            if ($request->pencairan === 'saya') {
+                $expenseRequest->bank_name = $user->extension->bank;
+                $expenseRequest->account_number = $user->extension->account;
+                $expenseRequest->account_holder_name = $user->name;
+            } elseif ($request->pencairan === 'lain') {
+                $expenseRequest->bank_name = $request->bank1;
+                $expenseRequest->account_number = $request->rekening1;
+                $expenseRequest->account_holder_name = $request->atas_nama;
+            } elseif ($request->pencairan === 'va') {
+                $expenseRequest->bank_name = $request->bank;
+                $expenseRequest->account_number = $request->rekening;
+                $expenseRequest->account_holder_name = '-';
+            }
+
+            if (Auth::user()->role_id == 3) {
+                $expenseRequest->approved_by_manager = true;
+            }
+
+            if ($request->hasFile('reference_file')) {
+                $file = $request->file('reference_file');
+                $fileName = time() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('uploads/files/pengajuan/references', $fileName, 'public');
+                $expenseRequest->reference_file = $path;
+            }
+
+            $expenseRequest->code_ref_request = $this->generateCodeRefRequest($expenseRequest->cost_center_id);
+            $expenseRequest->total_amount = 0;
+            $expenseRequest->save();
+
+            // --- CEK TOTAL AMOUNT ---
+            $costCenter = CostCenter::findOrFail($expenseRequest->cost_center_id);
+            $totalAmount = 0;
+
+            foreach ($request->items as $item) {
+                $totalAmount += $item['quantity'] * (int) $item['unit_price'];
+            }
+
+            if ($totalAmount > $costCenter->amount_remaining) {
+                // rollback & return error
+                DB::rollBack();
+                return redirect()->back()->withInput()->with([
+                    'pesan' => 'Sisa saldo dari Cost Center tidak mencukupi.',
+                    'level-alert' => 'alert-danger'
+                ]);
+            }
+
+            // Simpan item jika aman
+            foreach ($request->items as $item) {
+                ExpenseItem::create([
+                    'expense_request_id' => $expenseRequest->id,
+                    'item_name' => $item['item_name'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'total_price' => $item['quantity'] * (int) $item['unit_price'],
+                ]);
+            }
+
+            // Update total pengajuan
+            $expenseRequest->total_amount = $totalAmount;
+            $expenseRequest->save();
+
+            DB::commit();
+
+            return redirect()->route('application.index')->with([
+                'pesan' => 'Pengajuan berhasil dibuat!',
+                'level-alert' => 'alert-success'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->withInput()->with([
+                'pesan' => 'Terjadi kesalahan saat menyimpan: ' . $e->getMessage(),
+                'level-alert' => 'alert-danger'
+            ]);
         }
-
-        $expenseRequest->title = $request->title;
-        $explodedCategory = explode('#', $request->category);
-        $category = $explodedCategory[1];
-
-        if ($category == 'project') {
-            $expenseRequest->project_id = $explodedCategory[0];
-            $expenseRequest->cost_center_id = $request->project_cost_center_id;
-        } else {
-            $expenseRequest->project_id = null;
-            $expenseRequest->cost_center_id = $explodedCategory[0];
-        }
-
-        $expenseRequest->category = $category;
-        $expenseRequest->use_date = $request->use_date;
-
-        if ($request->pencairan == 'saya') {
-            $expenseRequest->bank_name = $user->extension->bank;
-            $expenseRequest->account_number = $user->extension->account;
-            $expenseRequest->account_holder_name = $user->name;
-        } elseif ($request->pencairan == 'lain') {
-            $expenseRequest->bank_name = $request->bank1;
-            $expenseRequest->account_number = $request->rekening1;
-            $expenseRequest->account_holder_name = $request->atas_nama;
-        } elseif ($request->pencairan == 'va') {
-            $expenseRequest->bank_name = $request->bank;
-            $expenseRequest->account_number = $request->rekening;
-            $expenseRequest->account_holder_name = '-';
-        }
-
-        if (Auth::user()->role_id == 3) {
-            $expenseRequest->approved_by_manager = true;
-        }
-
-        // store file reference
-        if ($request->hasFile('reference_file')) {
-            $file = $request->file('reference_file');
-            $fileName = time() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('uploads/files/pengajuan/references', $fileName, 'public');
-            $expenseRequest->reference_file = $path;
-        }
-
-        $expenseRequest->code_ref_request = $this->generateCodeRefRequest($expenseRequest->cost_center_id);
-        $expenseRequest->total_amount = 0;
-        $expenseRequest->save();
-
-        $totalAmount = 0;
-
-        // Simpan detail barang
-        foreach ($request->items as $item) {
-            $expenseItem = new ExpenseItem();
-            $expenseItem->expense_request_id = $expenseRequest->id;
-            $expenseItem->item_name = $item['item_name'];
-            $expenseItem->quantity = $item['quantity'];
-            $expenseItem->unit_price = $item['unit_price'];
-            $expenseItem->total_price = $item['quantity'] * (int)$item['unit_price'];
-            $expenseItem->save();
-            $totalAmount += $expenseItem->total_price;
-        }
-
-        // Perbarui total amount pada pengajuan biaya
-        $expenseRequest->total_amount = $totalAmount;
-        $expenseRequest->save();
-
-        return redirect()->route('application.index')->with([
-            'pesan' => 'Pengajuan berhasil dibuat!',
-            'level-alert' => 'alert-success'
-        ]);
     }
 
     private function generateCodeRefRequest($costCenterId)
@@ -238,7 +263,7 @@ class ExpenseRequestController extends Controller
             }
         }
 
-        $codeRef = $costCenterTarget->code_ref. '/' . $currentTransactionNumber;
+        $codeRef = $costCenterTarget->code_ref . '/' . $currentTransactionNumber;
 
         return $codeRef;
     }

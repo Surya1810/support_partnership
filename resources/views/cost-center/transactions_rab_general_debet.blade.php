@@ -79,8 +79,8 @@
                                 @endphp
                                 @if (in_array(auth()->user()->role_id, $roleIds) || in_array(auth()->user()->department_id, $deparmentsIds))
                                     <div class="row mt-3">
-                                        <div class="col-6">
-                                            <button type="button" class="btn btn-sm btn-primary rounded-partner"
+                                        <div class="row col-8">
+                                            <button type="button" class="btn btn-sm btn-primary rounded-partner mr-2"
                                                 id="buttonAddRAB">
                                                 <i class="fas fa-plus"></i> Tambah Uang Kas
                                             </button>
@@ -88,12 +88,44 @@
                                                 id="buttonEditRAB">
                                                 <i class="fas fa-pencil"></i> Ubah RAB
                                             </button>
+                                            <div class="col-md-2 mt-2 mt-md-0">
+                                                <select class="form-control" id="fromYear">
+                                                    <option value="" disabled selected>Pilih Tahun</option>
+                                                    @foreach ($years as $year)
+                                                        <option value="{{ $year }}"
+                                                            {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2 mt-2 mt-md-0">
+                                                <select class="form-control" id="toYear">
+                                                    <option value="" disabled selected>Pilih Tahun</option>
+                                                    @foreach ($years as $year)
+                                                        <option value="{{ $year }}"
+                                                            {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            @if (auth()->user()->role_id != 3)
+                                                <div class="col-md-3 mt-2 mt-md-0">
+                                                    <select class="form-control" id="departmentFilter">
+                                                        <option value="">Pilih Semua</option>
+                                                        @foreach ($departments as $department)
+                                                            <option value="{{ $department->id }}">{{ $department->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            @endif
                                         </div>
-                                        <div class="col-6">
-                                            <a href="{{ route('cost-center.export.general-debit.realizations') }}"
-                                                class="btn btn-sm btn-success rounded-partner float-right" target="_blank">
+                                        <div class="col-4">
+                                            <button type="button"
+                                                class="btn btn-sm btn-success rounded-partner float-right"
+                                                onclick="export()" id="buttonExport">
                                                 <i class="fas fa-file-excel"></i> Export
-                                            </a>
+                                            </button>
                                             <button type="button" id="buttonOpenModalImport"
                                                 class="btn btn-sm btn-danger rounded-partner mr-1 float-right">
                                                 <i class="fas fa-upload"></i> Import
@@ -391,7 +423,8 @@
     <div class="modal fade" id="modalImportFile" tabindex="-1" role="dialog" aria-labelledby="modalLabelImportFile"
         aria-hidden="true" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <form id="formImportFile" method="POST" enctype="multipart/form-data" action="{{ route('cost-center.import.rab-general.store') }}">
+            <form id="formImportFile" method="POST" enctype="multipart/form-data"
+                action="{{ route('cost-center.import.rab-general.store') }}">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
@@ -480,7 +513,12 @@
                 },
                 ajax: {
                     url: "{{ route('cost-center.create.rab-general') }}",
-                    type: "GET"
+                    type: "GET",
+                    data: function(d) {
+                        d.fromYear = $('#fromYear').find(':selected').val();
+                        d.toYear = $('#toYear').find(':selected').val();
+                        d.departmentFilter = $('#departmentFilter').find(':selected').val();
+                    }
                 },
                 columns: [{
                         data: 'DT_RowIndex',
@@ -518,6 +556,20 @@
                         name: 'detail'
                     }
                 ]
+            });
+
+            $('#buttonExport').on('click', function(e) {
+                const url = '{{ route('cost-center.export.general-debit.realizations') }}';
+                const fromYear = $('#fromYear').find(':selected').val();
+                const toYear = $('#toYear').find(':selected').val();
+                const departmentFilter = $('#departmentFilter').find(':selected').val();
+
+                window.open(url + '?fromYear=' + fromYear + '&toYear=' + toYear + '&departmentFilter=' +
+                    departmentFilter, '_blank');
+            });
+
+            $('#fromYear, #toYear, #departmentFilter').on('change', function() {
+                table.ajax.reload();
             });
 
             $('#buttonOpenModalImport').click(function() {
@@ -575,13 +627,10 @@
                 const debit = selectedOption.data('debit');
                 const remaining = selectedOption.data('remaining');
 
-                console.log(name, debit, remaining);
-
-                $('#nameEdit').prop('disabled', false).prop('readonly', false).prop('required', true).val(
-                    name);
+                $('#nameEdit').prop('disabled', false).prop('readonly', false)
+                    .prop('required', true).val(name);
 
                 $('#remainingAmountEdit').prop('disabled', true).val(remaining);
-
                 $('input[name="update_type"]').prop('disabled', false).prop('required', true);
             });
 

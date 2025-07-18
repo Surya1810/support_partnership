@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\ExpenseRequest;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -12,10 +13,12 @@ use Maatwebsite\Excel\Events\AfterSheet;
 class CostCenterGeneralCreditRealizationExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents
 {
     protected $year;
+    protected $filter;
 
-    public function __construct($year)
+    public function __construct($year, $filter)
     {
         $this->year = $year;
+        $this->filter = $filter;
     }
 
     public function collection()
@@ -23,6 +26,15 @@ class CostCenterGeneralCreditRealizationExport implements FromCollection, WithHe
         $creditRealizations = ExpenseRequest::where('status', 'finish')
             ->with(['costCenter', 'items', 'user', 'department'])
             ->where('category', 'department')
+            ->when(Auth::user()->role_id == 3, function ($query) {
+                $query->where('department_id', Auth::user()->department_id);
+            })
+            ->when($this->filter, function ($query) {
+                $query->whereBetween('created_at', [$this->filter['fromYear'], $this->filter['toYear']]);
+            })
+            ->when($this->filter['departmentFilter'], function ($query) {
+                $query->where('department_id', $this->filter['departmentFilter']);
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 
