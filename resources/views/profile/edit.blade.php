@@ -73,23 +73,47 @@
                                             <p class="m-0"><strong>Update Password</strong></p>
                                             <small>Ensure your account is using a long, random password to stay
                                                 secure.</small><br>
+
+                                            {{-- Current Password --}}
                                             <label class="mt-4 mb-0 form-label col-form-label-sm" for="old_password">Current
                                                 Password</label>
                                             <div class="input-group mb-3">
                                                 <input type="password" class="form-control" id="old_password"
-                                                    name="old_password" aria-describedby="old_password">
+                                                    name="old_password">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-secondary toggle-password" type="button"
+                                                        data-target="#old_password">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                </div>
                                             </div>
+
+                                            {{-- New Password --}}
                                             <label class="mb-0 form-label col-form-label-sm" for="new_password">New
                                                 Password</label>
                                             <div class="input-group mb-3">
                                                 <input type="password" class="form-control" id="new_password"
-                                                    name="new_password" aria-describedby="new_password">
+                                                    name="new_password">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-secondary toggle-password" type="button"
+                                                        data-target="#new_password">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                </div>
                                             </div>
+
+                                            {{-- Confirm Password --}}
                                             <label class="mb-0 form-label col-form-label-sm" for="confirm_password">Confirm
                                                 Password</label>
                                             <div class="input-group mb-3">
                                                 <input type="password" class="form-control" id="confirm_password"
-                                                    name="confirm_password" aria-describedby="confirm_password">
+                                                    name="confirm_password">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-secondary toggle-password" type="button"
+                                                        data-target="#confirm_password">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             <button type="submit" class="btn btn-sm btn-dark text-xs">SAVE</button>
@@ -153,5 +177,20 @@
                 }
             })
         }
+
+        $(document).ready(function() {
+            $('.toggle-password').on('click', function() {
+                const input = $($(this).data('target'));
+                const icon = $(this).find('i');
+
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+        });
     </script>
 @endpush
