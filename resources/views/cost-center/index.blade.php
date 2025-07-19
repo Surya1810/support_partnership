@@ -81,7 +81,7 @@
             {{-- Department --}}
             <div class="row">
                 @php
-                    $bgColors = ['bg-primary', 'bg-purple', 'bg-orange', 'bg-gray'];
+                    $bgColors = ['bg-primary', 'bg-orange', 'bg-purple', 'bg-gray'];
                 @endphp
                 @foreach ($sums['departments'] as $index => $department)
                     <div class="col-12 col-md-3">
