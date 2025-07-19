@@ -286,7 +286,7 @@ class CostCenterController extends Controller
                 'name' => $request->name,
                 'amount_debit' => $request->category != 1 ? 0 : $request->nominal,
                 'amount_credit' => $request->category == 1 ? 0 : $request->nominal,
-                'amount_remaining' => $request->category == 1 ? 0 : $request->nominal,
+                'amount_remaining' => $request->nominal,
                 'month' => $request->month,
                 'year' => $request->year,
                 'detail' => $note,

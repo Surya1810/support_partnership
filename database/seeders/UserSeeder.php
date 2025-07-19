@@ -122,9 +122,9 @@ class UserSeeder extends Seeder
             'avatar' => 'profile.jpg',
         ]);
         User::create([
-            'role_id' => '1',
+            'role_id' => '5',
             'position_id' => '1',
-            'department_id' => '5',
+            'department_id' => '9',
             'name' => 'Ibnu',
             'username' => 'Ibnu',
             'email' => 'Ibnu@partnership.co.id',
@@ -132,7 +132,7 @@ class UserSeeder extends Seeder
             'avatar' => 'profile.jpg',
         ]);
         User::create([
-            'role_id' => '4',
+            'role_id' => '3',
             'position_id' => '1',
             'department_id' => '3',
             'name' => 'Duhan Arif',
