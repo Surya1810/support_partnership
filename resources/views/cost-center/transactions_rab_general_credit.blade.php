@@ -50,7 +50,7 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Limit (Semua RAB Milik Divisi)</strong></p>
+                                <p><strong>Total Kredit (Pengajuan Terealisasi)</strong></p>
                                 <h6>{{ $sums['credit'] }}</h6>
                             </div>
                         </div>
@@ -58,7 +58,7 @@
                     <div class="col-12 col-md-3">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Sisa Saldo (Semua Divisi)</strong></p>
+                                <p><strong>Sisa Saldo</strong></p>
                                 <h6>{{ $sums['remaining'] }}</h6>
                             </div>
                         </div>
