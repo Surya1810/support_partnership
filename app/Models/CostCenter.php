@@ -9,8 +9,15 @@ class CostCenter extends Model
 {
     protected $guarded = ['id'];
 
-    public function getMonthNameAttribute() {
-        return Carbon::create()->month($this->month)->format('F');
+    public function getMonthNameAttribute()
+    {
+        $month = (int) $this->month;
+
+        if ($month >= 1 && $month <= 12) {
+            return Carbon::createFromDate(null, $month, 1)->format('F');
+        }
+
+        return '-';
     }
 
     public function category()
