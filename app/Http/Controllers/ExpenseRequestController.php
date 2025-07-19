@@ -47,6 +47,7 @@ class ExpenseRequestController extends Controller
             ->where('type', 'department')
             ->whereNot('cost_center_category_id', 1)
             ->where('year', date('Y'))
+            ->where('month', date('m')) // bulan berjalan saat ini
             ->get();
 
         return view(
