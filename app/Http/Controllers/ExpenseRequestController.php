@@ -139,7 +139,7 @@ class ExpenseRequestController extends Controller
             $expenseRequest = new ExpenseRequest();
             $expenseRequest->user_id = $user->id;
 
-            if (in_array($request->department_id, [1, 8, 9])) {
+            if (in_array($request->department_id, [1, 8])) {
                 $expenseRequest->department_id = $request->department_id;
                 $expenseRequest->approved_by_manager = true;
             } else {
@@ -190,7 +190,6 @@ class ExpenseRequestController extends Controller
             $expenseRequest->total_amount = 0;
             $expenseRequest->save();
 
-            // --- CEK TOTAL AMOUNT ---
             $costCenter = CostCenter::findOrFail($expenseRequest->cost_center_id);
             $totalAmount = 0;
 
@@ -216,6 +215,18 @@ class ExpenseRequestController extends Controller
                     'unit_price' => $item['unit_price'],
                     'total_price' => $item['quantity'] * (int) $item['unit_price'],
                 ]);
+            }
+
+            /**
+             * Untuk sementara jika yang mengajukan adalah
+             * department_id 9 atau General Affair
+             * maka approved_by_manager = true dan approved_by_director = true
+             * set statusnya juga langsung ke processing
+             */
+            if (Auth::user()->department_id == 9) {
+                $expenseRequest->approved_by_manager = true;
+                $expenseRequest->approved_by_director = true;
+                $expenseRequest->status = 'processing';
             }
 
             // Update total pengajuan

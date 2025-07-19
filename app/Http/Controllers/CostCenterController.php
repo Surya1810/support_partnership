@@ -342,11 +342,14 @@ class CostCenterController extends Controller
                     . '</span><br/>Oleh: ' . Auth::user()->username
                     . '<br/>Tanggal: ' . date('d-m-Y')
                     . '</small>';
+
                 $currentDebit = $costCenter->amount_debit + (int) $request->new_nominal;
                 $currentRemaining = $costCenter->amount_remaining + (int) $request->new_nominal;
 
                 $updateRAB = CostCenter::where('id', $id)->update([
-                    'amount_debit' => $currentDebit,
+                    'amount_debit' => $costCenter->cost_center_category == 1 ? $currentDebit : 0,
+                    'amount_credit' => $costCenter->cost_center_category == 1 ? 0
+                        : $costCenter->amount_credit + (int) $request->new_nominal,
                     'amount_remaining' => $currentRemaining,
                     'detail' => $note,
                     'updated_at' => now(),
