@@ -44,6 +44,13 @@ class ExpenseRequestController extends Controller
 
         // jika user adalah bagian finance maka get general affair
         $generalCostCenters = CostCenter::where('department_id', $user_department == 8 ? 9 : $user_department)
+            ->when(Auth::user()->role_id == 5 || Auth::user()->role_id == 4, function ($query) {
+                /**
+                 * jika user staff atau lead,
+                 * jangan get cost center gaji
+                 */
+                $query->whereNot('cost_center_category_id', 4);
+            })
             ->where('type', 'department')
             ->whereNot('cost_center_category_id', 1)
             ->where('year', date('Y'))
@@ -180,17 +187,6 @@ class ExpenseRequestController extends Controller
                 $expenseRequest->approved_by_manager = true;
             }
 
-            if ($request->hasFile('reference_file')) {
-                $file = $request->file('reference_file');
-                $fileName = time() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('uploads/files/pengajuan/references', $fileName, 'public');
-                $expenseRequest->reference_file = $path;
-            }
-
-            $expenseRequest->code_ref_request = $this->generateCodeRefRequest($expenseRequest->cost_center_id);
-            $expenseRequest->total_amount = 0;
-            $expenseRequest->save();
-
             $costCenter = CostCenter::findOrFail($expenseRequest->cost_center_id);
             $totalAmount = 0;
 
@@ -206,6 +202,17 @@ class ExpenseRequestController extends Controller
                     'level-alert' => 'alert-danger'
                 ]);
             }
+
+            if ($request->hasFile('reference_file')) {
+                $file = $request->file('reference_file');
+                $fileName = time() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('uploads/files/pengajuan/references', $fileName, 'public');
+                $expenseRequest->reference_file = $path;
+            }
+
+            $expenseRequest->code_ref_request = $this->generateCodeRefRequest($expenseRequest->cost_center_id);
+            $expenseRequest->total_amount = 0;
+            $expenseRequest->save();
 
             // Simpan item jika aman
             foreach ($request->items as $item) {

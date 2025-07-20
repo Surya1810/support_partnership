@@ -50,7 +50,7 @@
                     <div class="col-12 col-md-4">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Total Kredit (Limit Seluruh RAB)</strong></p>
+                                <p><strong>Total Kredit (Pengajuan Terealisasi)</strong></p>
                                 <h6>{{ $sums['credit'] }}</h6>
                             </div>
                         </div>
@@ -58,7 +58,7 @@
                     <div class="col-12 col-md-4">
                         <div class="card card-outline rounded-partner card-primary">
                             <div class="card-body">
-                                <p><strong>Sisa (Debet - Limit Seluruh RAB)</strong></p>
+                                <p><strong>Total Sisa (Debet - Kredit)</strong></p>
                                 <h6>{{ $sums['remaining'] }}</h6>
                             </div>
                         </div>
@@ -79,7 +79,7 @@
                                 @endphp
                                 @if (in_array(auth()->user()->role_id, $roleIds) || in_array(auth()->user()->department_id, $deparmentsIds))
                                     <div class="row mt-3">
-                                        <div class="row col-8">
+                                        <div class="row col-10">
                                             <button type="button" class="btn btn-sm btn-primary rounded-partner mr-2"
                                                 id="buttonAddRAB">
                                                 <i class="fas fa-plus"></i> Tambah Uang Kas
@@ -108,6 +108,15 @@
                                                     @endforeach
                                                 </select>
                                             </div>
+                                            <div class="col-md-2 mt-2 mt-md-0">
+                                                <select class="form-control" id="filterMonth">
+                                                    @foreach ($months as $index => $month)
+                                                        <option value="{{ $index + 1 }}"
+                                                            {{ ($index + 1) == date('m') ? 'selected' : '' }}>{{ $month }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                             @if (auth()->user()->role_id != 3)
                                                 <div class="col-md-3 mt-2 mt-md-0">
                                                     <select class="form-control" id="departmentFilter">
@@ -120,7 +129,7 @@
                                                 </div>
                                             @endif
                                         </div>
-                                        <div class="col-4">
+                                        <div class="col-2">
                                             <button type="button"
                                                 class="btn btn-sm btn-success rounded-partner float-right"
                                                 onclick="export()" id="buttonExport">
@@ -518,6 +527,7 @@
                         d.fromYear = $('#fromYear').find(':selected').val();
                         d.toYear = $('#toYear').find(':selected').val();
                         d.departmentFilter = $('#departmentFilter').find(':selected').val();
+                        d.filterMonth = $('#filterMonth').find(':selected').val();
                     }
                 },
                 columns: [{
@@ -568,7 +578,7 @@
                     departmentFilter, '_blank');
             });
 
-            $('#fromYear, #toYear, #departmentFilter').on('change', function() {
+            $('#fromYear, #toYear, #departmentFilter, #filterMonth').on('change', function() {
                 table.ajax.reload();
             });
 

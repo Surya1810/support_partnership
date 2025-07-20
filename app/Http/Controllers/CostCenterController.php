@@ -192,7 +192,9 @@ class CostCenterController extends Controller
                     $query->where('department_id', $request->departmentFilter);
                 }
             )
-            ->where('year', date('Y'));
+            ->when($request->has('filterMonth'), function ($query) use ($request) {
+                $query->where('month', $request->filterMonth);
+            });
 
         if ($request->ajax()) {
             return DataTables::of($query)
@@ -217,13 +219,27 @@ class CostCenterController extends Controller
                 ->make(true);
         }
 
+        $expenseRequests = ExpenseRequest::where('status', 'finish')
+            ->where('category', 'department')
+            ->whereHas('costCenter', function ($query) {
+                $query->where('year', date('Y'))
+                    ->where('type', 'department');
+            })
+            ->with('items')
+            ->get()
+            ->sum(function ($query) {
+                return $query->items->sum('actual_amount');
+            });
+
         $sums = [
             'debit' => formatRupiah($query->sum('amount_debit')),
-            'credit' => formatRupiah($query->sum('amount_credit')),
-            'remaining' => formatRupiah($query->sum('amount_debit') - $query->sum('amount_credit')),
+            'credit' => formatRupiah($expenseRequests),
+            'remaining' => formatRupiah($query->sum('amount_debit') - $expenseRequests),
         ];
 
-        return view('cost-center.transactions_rab_general_debet', compact('departments', 'months', 'years', 'costCenterCategories', 'sums'));
+        $months = $this->getMonths();
+
+        return view('cost-center.transactions_rab_general_debet', compact('departments', 'months', 'years', 'costCenterCategories', 'sums', 'months'));
     }
 
     public function storeRABGeneral(Request $request)
@@ -1041,8 +1057,6 @@ class CostCenterController extends Controller
                     ]);
                 }
             }
-
-            dd($insert);
         } catch (\Exception $e) {
             dd($e);
             return redirect()->back()->with([
