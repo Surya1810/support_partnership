@@ -111,6 +111,7 @@ class ExpenseRequestController extends Controller
                         });
                 })
                 ->where('approved_by_manager', true)
+                ->orWhere('department_id', 8)
                 ->with('costCenter')
                 ->orderBy('created_at', 'desc')
                 ->get();
