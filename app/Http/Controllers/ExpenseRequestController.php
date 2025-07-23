@@ -112,6 +112,7 @@ class ExpenseRequestController extends Controller
                 })
                 ->where('approved_by_manager', true)
                 ->orWhere('department_id', 8)
+                ->where('status', 'pending')
                 ->with('costCenter')
                 ->orderBy('created_at', 'desc')
                 ->get();
