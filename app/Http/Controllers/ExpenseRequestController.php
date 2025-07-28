@@ -48,7 +48,11 @@ class ExpenseRequestController extends Controller
                 /**
                  * jika user staff atau lead,
                  * jangan get cost center gaji
+                 * kecuali department id 8 (finance)
                  */
+                if (Auth::user()->role_id == 4 && Auth::user()->department_id == 8) {
+                    return;
+                }
                 $query->whereNot('cost_center_category_id', 4);
             })
             ->where('type', 'department')
