@@ -180,7 +180,7 @@
                                     <div class="col-6">
                                         <div class="float-right">
                                             <span class="badge badge-warning">Pending :
-                                                {{ $directorRequests->count() }}</span>
+                                                {{ count($directorRequests) }}</span>
                                         </div>
                                     </div>
                                 </div>
