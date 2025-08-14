@@ -194,7 +194,12 @@ class CostCenterController extends Controller
             });
 
         if ($request->ajax()) {
-            return DataTables::of($query)
+            $datatableQuery = clone $query;
+            $datatableQuery = $datatableQuery->when(Auth::user()->role_id == 3, function ($query) {
+                $query->where('department_id', Auth::user()->department_id);
+            });
+
+            return DataTables::of($datatableQuery)
                 ->addIndexColumn()
                 ->addColumn('name', fn($item) => $item->name)
                 ->addColumn('code_ref', fn($item) => $item->code_ref)
