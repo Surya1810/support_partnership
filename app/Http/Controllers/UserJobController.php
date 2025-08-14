@@ -134,7 +134,7 @@ class UserJobController extends Controller
                 ->addIndexColumn()
                 ->addColumn('priority', function ($job) {
                     if ($job->is_priority) {
-                        return '<img src="'. asset('assets/img/jangrik.gif') .'" width="40px" />';
+                        return '<img src="' . asset('assets/img/jangrik.gif') . '" width="40px" />';
                     }
                     return '';
                 })
@@ -153,7 +153,7 @@ class UserJobController extends Controller
                         $completed = Carbon::parse($job->completed_at);
                         if ($completed->equalTo($end)) return "0";
                         $diff = $end->diffInDays($completed);
-                        return $completed->lt($end) ? "+" . $diff : (-1 * $diff);
+                        return $completed->lt($end) ? "+" . (-1 * $diff) : (-1 * $diff);
                     }
 
                     $today = Carbon::today();
@@ -170,14 +170,15 @@ class UserJobController extends Controller
                     if (!$job->start_date || !$job->end_date) return '-';
                     $start = Carbon::parse($job->start_date);
                     $end = Carbon::parse($job->end_date);
-                    if ($start->equalTo($end)) return '0%';
+                    if ($start->equalTo($end) && !$job->completed_at) return '0%';
 
                     $totalDuration = $start->diffInSeconds($end);
                     $actualDuration = !$job->completed_at
                         ? $start->diffInSeconds(Carbon::today())
                         : $start->diffInSeconds(Carbon::parse($job->completed_at));
 
-                    $diffPercentage = (($totalDuration - $actualDuration) / $totalDuration) * 100;
+                    $denom = $totalDuration > 0 ? $totalDuration : max($actualDuration, 1);
+                    $diffPercentage = (($totalDuration - $actualDuration) / $denom) * 100;
 
                     return $actualDuration == $totalDuration ? "0%"
                         : ($actualDuration < $totalDuration ? "+" : "-") . round(abs($diffPercentage)) . "%";
@@ -202,6 +203,10 @@ class UserJobController extends Controller
 
                     if ($job->assigner_id == $userId) {
                         $buttons .= '<button class="btn btn-sm btn-warning m-1 d-block d-md-inline-block" title="Adendum/Catatan" onclick="modalEdit(this)" data-id="' . $job->id . '"><i class="fas fa-pencil-alt"></i></button>';
+
+                        if ($job->status != 'completed' && $job->status != 'checking') {
+                            $buttons .= '</button><button class="btn btn-sm btn-secondary m-1 d-block d-md-inline-block" title="Hapus Tugas" onclick="deleteJob(this)" data-id="' . $job->id . '"><i class="fas fa-trash"></i></button>';
+                        }
                     }
 
                     if ($job->status == 'checking' && $job->assigner_id == $userId) {
@@ -235,7 +240,7 @@ class UserJobController extends Controller
                 ->make(true);
         }
 
-        $users = User::whereNotIn('id', [Auth::id(), 1])->get();
+        $users = User::whereNotIn('id', [Auth::id(), 1, 2])->get();
         $departments = Department::select('id', 'name')->whereIn('id', [1, 3, 5, 8])->get();
 
         return view('jobs.index', compact('users', 'departments', 'isMobile'));
@@ -353,7 +358,7 @@ class UserJobController extends Controller
                     $end = Carbon::parse($job->end_date);
 
                     // Jika tidak ada rentang waktu
-                    if ($start->equalTo($end)) return '0%';
+                    if ($start->equalTo($end) && !$job->completed_at) return '0%';
 
                     $totalDuration = $start->diffInSeconds($end);
 
@@ -377,7 +382,8 @@ class UserJobController extends Controller
                     // Jika sudah selesai
                     $completed = Carbon::parse($job->completed_at);
                     $actualDuration = $start->diffInSeconds($completed);
-                    $diffPercentage = (($totalDuration - $actualDuration) / $totalDuration) * 100;
+                    $denom = $totalDuration > 0 ? $totalDuration : max($actualDuration, 1);
+                    $diffPercentage = (($totalDuration - $actualDuration) / $denom) * 100;
 
                     if ($actualDuration < $totalDuration) {
                         return "+" . round($diffPercentage) . "%";
@@ -546,7 +552,13 @@ class UserJobController extends Controller
             $today = Carbon::today()->format('Y-m-d');
 
             if ($request->action == 'cancel') {
-                $status = 'cancelled';
+                /**
+                 * 14 August 2025
+                 * - ditugas dibatalkan menjadi dihapus saja
+                 */
+                $job->delete();
+                DB::commit();
+                return response()->json(['message' => 'Tugas berhasil dihapus']);
             } else if ($now->gte($start) && $now->lte($end)) {
                 $status = 'in_progress';
             } else if ($now->gt($end)) {
@@ -572,7 +584,26 @@ class UserJobController extends Controller
             DB::commit();
             return response()->json(['message' => 'Berhasil diperbarui']);
         } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e], 500);
+        }
+    }
 
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $job = UserJob::where('id', $id)->first();
+
+            if (!$job) return response()->json(['message' => 'Tugas tidak ditemukan'], 404);
+            if (Auth::user()->id != $job->assigner_id) return response()->json(['message' => 'Anda tidak berhak menghapus pekerjaan ini'], 403);
+
+            $job->delete();
+
+            DB::commit();
+            return response()->json(['message' => 'Tugas berhasil dihapus']);
+        } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => $e], 500);
         }

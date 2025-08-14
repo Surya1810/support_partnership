@@ -32,6 +32,23 @@
             <div class="row">
 
                 <div class="col-lg-2 col-6">
+                    <a href="{{ route('jobs.my_tasks') }}">
+                        <div class="small-box bg-primary rounded-partner">
+                            <div class="inner">
+                                <h3>{{ $myTasks }}</h3>
+
+                                <p>Tugas Belum Diselesaikan</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-solid fa-list-check"></i>
+                            </div>
+                            <span class="small-box-footer rounded-partner">More info <i
+                                    class="fas fa-arrow-circle-right"></i></span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-lg-2 col-6">
                     <a href="{{ route('employee.index') }}">
                         <div class="small-box bg-primary rounded-partner">
                             <div class="inner">

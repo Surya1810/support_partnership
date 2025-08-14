@@ -180,9 +180,6 @@ class CostCenterController extends Controller
 
         $query = CostCenter::where('type', 'department')
             ->orderBy('updated_at', 'desc')
-            ->when(Auth::user()->role_id == 3, function ($query) {
-                $query->where('department_id', Auth::user()->department_id);
-            })
             ->when($request->has('fromYear') && $request->has('toYear'), function ($query) use ($request) {
                 $query->whereBetween('year', [$request->fromYear, $request->toYear]);
             })
@@ -496,10 +493,7 @@ class CostCenterController extends Controller
     {
         $query = CostCenter::where('type', 'department')
             ->orderBy('updated_at', 'desc')
-            ->where('year', date('Y'))
-            ->when(Auth::user()->role_id == 3, function ($query) {
-                $query->where('department_id', Auth::user()->department_id);
-            });
+            ->where('year', date('Y'));
 
         $requests = ExpenseRequest::where('status', 'finish')
             ->with(['costCenter', 'items', 'user', 'department'])

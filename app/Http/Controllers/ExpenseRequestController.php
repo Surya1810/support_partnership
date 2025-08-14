@@ -21,17 +21,6 @@ class ExpenseRequestController extends Controller
      */
     public function index()
     {
-        /**
-         * ! Untuk sementara role_id 3 dan department_id 5
-         * tidak bisa membuat pengajuan
-         */
-        if (Auth::user()->department_id == 5 && Auth::user()->role_id == 3) {
-            return redirect()->back()->with([
-                'pesan' => 'Anda tidak dapat mengakses halaman ini. Silahkan hubungi direktur.',
-                'level-alert' => 'alert-danger'
-            ]);
-        }
-
         $departments = Department::all()->except([2, 4, 6, 7]);
         $my_expenses = ExpenseRequest::where('user_id', Auth::id())
             ->whereIn('status', ['pending', 'approved', 'processing', 'rejected'])->orderBy('created_at', 'desc')
@@ -54,15 +43,10 @@ class ExpenseRequestController extends Controller
             ->get();
 
         // jika user adalah bagian finance maka get general affair
-        /**
-         * !Untuk sementara, karena manager teknologi di freeze
-         * maka pengajuan keperluannya dialihkan ke direktur
-         */
         $rolesIds = [4, 5];
         $generalCostCenters = CostCenter::whereIn(
             'department_id',
-            $user_department == 8 ? [9]
-                : (Auth::user()->role_id == 2 ? [5, Auth::user()->department_id] : [$user_department])
+            $user_department == 8 ? [9] : [$user_department]
         )->when(in_array(Auth::user()->role_id, $rolesIds), function ($query) {
             /**
              * jika user staff atau lead,
@@ -89,17 +73,6 @@ class ExpenseRequestController extends Controller
 
     public function approval()
     {
-        /**
-         * ! Untuk sementara role_id 3 dan department_id 5
-         * tidak bisa membuat pengajuan
-         */
-        if (Auth::user()->department_id == 5 && Auth::user()->role_id == 3) {
-            return redirect()->back()->with([
-                'pesan' => 'Anda tidak dapat mengakses halaman ini. Silahkan hubungi direktur.',
-                'level-alert' => 'alert-danger'
-            ]);
-        }
-
         if (Auth::user()->role_id == 1 || (Auth::user()->role_id == 2 || Auth::user()->department_id == 8)) {
             //query seluruh data
             $all_expenses = ExpenseRequest::with(['items', 'costCenter'])
@@ -136,11 +109,7 @@ class ExpenseRequestController extends Controller
         }
 
         //query direktur
-        /**
-         * ! Untuk sementara deparment_id 5
-         * semua ke direktur
-         */
-        if (Auth::user()->id == 2) {
+        if (Auth::user()->role_id == 2) {
             $directorRequests = ExpenseRequest::where('status', 'pending')
                 ->where(function ($query) {
                     $query->where('total_amount', '>', 150000)
@@ -150,7 +119,7 @@ class ExpenseRequestController extends Controller
                         });
                 })
                 ->where('approved_by_manager', true)
-                ->orWhereIn('department_id', [8, 5]) // finance dan teknologi langsung ke direktur
+                ->orWhereIn('department_id', [8]) // finance dan teknologi langsung ke direktur
                 ->where('status', 'pending')
                 ->with('costCenter')
                 ->orderBy('created_at', 'desc')
@@ -167,17 +136,6 @@ class ExpenseRequestController extends Controller
      */
     public function store(Request $request)
     {
-        /**
-         * ! Untuk sementara role_id 3 dan department_id 5
-         * tidak bisa membuat pengajuan
-         */
-        if (Auth::user()->department_id == 5 && Auth::user()->role_id == 3) {
-            return redirect()->back()->with([
-                'pesan' => 'Anda tidak dapat membuat pengajuan. Silahkan hubungi direktur.',
-                'level-alert' => 'alert-danger'
-            ]);
-        }
-
         $request->validate([
             'department_id' => 'bail|required',
             'category' => 'bail|required|',
@@ -290,14 +248,6 @@ class ExpenseRequestController extends Controller
                 $expenseRequest->status = 'processing';
             }
 
-            /**
-             * ! Untuk sementara pengajuan ke department_id 5
-             * langsung disetujui oleh direktor
-             */
-            if (Auth::user()->department_id == 5) {
-                $expenseRequest->approved_by_manager = true;
-            }
-
             // Update total pengajuan
             $expenseRequest->total_amount = $totalAmount;
             $expenseRequest->save();
@@ -354,9 +304,7 @@ class ExpenseRequestController extends Controller
     public function destroy($id)
     {
         $expenseRequest = ExpenseRequest::findOrFail($id);
-        // Hapus semua item terkait menggunakan relasi
         $expenseRequest->items()->delete();
-        // Hapus pengajuan
         $expenseRequest->delete();
 
         return redirect()->route('application.index')->with(['pesan' => 'Pengajuan deleted successfully', 'level-alert' => 'alert-success']);
@@ -623,7 +571,6 @@ class ExpenseRequestController extends Controller
     public function pdf($id)
     {
         $expenseRequest = ExpenseRequest::with('items')->findOrFail($id);
-
         $pdf = Pdf::loadView('finance.pdf', compact('expenseRequest'))
             ->setPaper([0, 0, 595.28, 935.45], 'portrait'); // Ukuran F4 dalam mm
 

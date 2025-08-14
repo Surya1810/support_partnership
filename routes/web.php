@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AssetController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\DebtController;
@@ -132,14 +131,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/task/{id}', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/status/{id}', [TaskController::class, 'status'])->name('task.status');
 
-    // Asset RFID
-    Route::resource('asset', AssetController::class);
-    Route::post('/asset/import', [AssetController::class, 'import'])->name('asset.import');
-    Route::post('/asset/maintenance', [AssetController::class, 'maintenance'])->name('asset.maintenance');
-
-    // Scan RFID
-    Route::resource('scan', ScanController::class);
-
     // Client
     Route::resource('client', ClientController::class);
 
@@ -163,6 +154,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/upload/report/{id}', 'uploadFile')->name('jobs.upload_report');
             Route::get('/{id}', 'show')->name('jobs.show');
             Route::put('/{id}', 'update')->name('jobs.update');
+            Route::delete('/{id}', 'destroy')->name('jobs.destroy');
             Route::post('/{id}/mark-complete', 'markComplete')->name('jobs.complete');
         });
 

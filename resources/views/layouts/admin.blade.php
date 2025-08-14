@@ -172,23 +172,19 @@
                                         $deparmentsIds = [8];
                                     @endphp
                                     @if (in_array(auth()->user()->role_id, $roleIds) || in_array(auth()->user()->department_id, $deparmentsIds))
-                                        @if (!(auth()->user()->role_id == 3 && auth()->user()->department_id == 5))
-                                            <a href="{{ route('application.approval') }}" class="nav-link">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>Approval</p>
-                                            </a>
-                                        @endif
+                                        <a href="{{ route('application.approval') }}" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Approval</p>
+                                        </a>
                                         <a href="{{ route('cost-center.index') }}" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Cost Center</p>
                                         </a>
                                     @endif
-                                    @if (!(auth()->user()->role_id == 3 && auth()->user()->department_id == 5))
-                                        <a href="{{ route('application.index') }}" class="nav-link">
-                                            <i class="far fa-circle nav-icon"></i>
-                                            <p>Pengajuan Saya</p>
-                                        </a>
-                                    @endif
+                                    <a href="{{ route('application.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Pengajuan Saya</p>
+                                    </a>
                                 </li>
                             </ul>
                         </li>

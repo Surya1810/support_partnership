@@ -6,8 +6,7 @@
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/adminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet"
-        href="{{ asset('assets/adminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/adminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/adminLTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/adminLTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
 @endpush
@@ -49,7 +48,6 @@
                                         <option value="all">Semua</option>
                                         <option value="in_progress">In Progress</option>
                                         <option value="overdue">Overdue</option>
-                                        <option value="cancelled">Cancelled</option>
                                         <option value="checking">Checking</option>
                                         <option value="completed">Completed</option>
                                         <option value="revision">Revision</option>
@@ -984,6 +982,42 @@
             const final = `${parts[0]}, ${parts.slice(1).join(' ')}`;
 
             $('#time').val(final);
+        }
+
+        /**
+         * 14 August 2025
+         * menambah fungsi untuk delete tugas
+         * */
+        function deleteJob(element) {
+            const id = $(element).data('id');
+
+            Swal.fire({
+                title: 'Apakah Anda yakin ingin menghapus tugas ini?',
+                text: "Tugas yang telah dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/jobs/' + id,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            showToast('success', response.message);
+                            $('#jobTable').DataTable().ajax.reload();
+                        },
+                        error: function(xhr) {
+                            showToast('error', xhr.responseJSON.message);
+                        },
+                    });
+                }
+            });
         }
     </script>
 @endpush

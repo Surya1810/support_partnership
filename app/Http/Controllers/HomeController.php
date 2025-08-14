@@ -12,6 +12,7 @@ use App\Models\Partner;
 use App\Models\Project;
 use App\Models\Supplier;
 use App\Models\User;
+use App\Models\UserJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,8 +41,8 @@ class HomeController extends Controller
         $files  =   File::all()->count();
         $izins = Izin::all()->count();
         $users = User::all()->except(1)->count();
-
         $manager = User::where('role_id', 3)->pluck('id');
+        $myTasks = UserJob::where('assignee_id', Auth::user()->id)->whereNotIn('status', ['completed', 'cancelled', 'checking'])->count();
 
         if (Auth::user()->role_id == 1 || Auth::user()->department_id == 8) {
             $my_approval_izin = Izin::where('status', 'pending')->get()->count();
@@ -86,6 +87,6 @@ class HomeController extends Controller
         $clients = Client::all()->count();
         $suppliers = Supplier::all()->count();
 
-        return view('home.dashboard', compact('projects', 'applications', 'documents', 'files', 'izins', 'users', 'my_approval_dana', 'my_approval_izin', 'clients', 'suppliers'));
+        return view('home.dashboard', compact('projects', 'applications', 'documents', 'files', 'izins', 'users', 'my_approval_dana', 'my_approval_izin', 'clients', 'suppliers', 'myTasks'));
     }
 }
