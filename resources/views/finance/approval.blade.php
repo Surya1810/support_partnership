@@ -53,11 +53,11 @@
                             <div class="card-body table-responsive">
                                 <div class="mb-4">
                                     <button type="button" class="btn btn-success btn-sm rounded-partner"
-                                        onclick="submitBulkAction('Menyetujui Masal')">
+                                        onclick="submitBulkAction('approve')">
                                         <i class="fa fa-check"></i> Approve Selected
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm rounded-partner"
-                                        onclick="submitBulkAction('Menolak Masal')">
+                                        onclick="submitBulkAction('reject')">
                                         <i class="fa fa-times"></i> Reject Selected
                                     </button>
                                     <form id="bulkActionForm" method="POST" action="{{ route('application.bulkAction') }}">
@@ -1224,6 +1224,7 @@
 
         function submitBulkAction(actionType) {
             const selectedCheckboxes = document.querySelectorAll('.select-box:checked');
+
             if (selectedCheckboxes.length === 0) {
                 Swal.fire({
                     icon: 'warning',
@@ -1237,7 +1238,7 @@
 
             Swal.fire({
                 title: `Apa Anda Yakin untuk ${actionType}?`,
-                text: `Anda akan ${actionType == 'Menyetujui Masal' ? 'menyetujui' : 'menolak'} menyetujui semua pengajuan yang dipilih!`,
+                text: `Anda akan ${actionType == 'approve' ? 'menyetujui' : 'menolak'} semua pengajuan yang dipilih!`,
                 icon: 'warning',
                 confirmButtonColor: '#5cb85c',
                 confirmButtonText: 'Ya, Setujui',
